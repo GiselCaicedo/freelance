@@ -1,0 +1,22 @@
+@layer theme, base, clerk, components, utilities;
+
+@import 'tailwindcss';
+
+/* Tema base para todas las tablas */
+.ag-theme-cifra {
+  --ag-font-size: 13px;
+  --ag-font-family: 'Inter', 'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans';
+  --ag-header-background-color: #f9fafb;
+  --ag-header-foreground-color: #0f172a;
+  --ag-border-color: #e5e7eb;
+  --ag-row-hover-color: #f3f4f6;
+  --ag-odd-row-background-color: #ffffff;
+  --ag-even-row-background-color: #fafafa;
+  --ag-selected-row-background-color: #e0f2fe;
+}
+.ag-theme-cifra .ag-root-wrapper { border: none; }
+.ag-theme-cifra .ag-header { border-bottom: 1px solid #e5e7eb; }
+.ag-theme-cifra .ag-cell { display: flex; align-items: center; padding: 4px 8px; }
+.ag-theme-cifra .ag-paging-panel { justify-content: center; gap: 16px; padding: 8px 12px; }
+.ag-theme-cifra .ag-paging-page-size { display: inline-flex; align-items: center; gap: 6px; }
+.ag-theme-cifra .ag-paging-page-size > span:first-child { display: none; }

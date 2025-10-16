@@ -1,0 +1,53 @@
+'use client';
+
+import { createContext, useContext, useMemo } from 'react';
+
+type Ctx = {
+    permissions: Set<string>;
+    can: (p: string) => boolean;         // lectura
+    canAny: (list: string[]) => boolean; // al menos uno
+    canAll: (list: string[]) => boolean; // todos
+};
+
+const PermissionCtx = createContext<Ctx | null>(null);
+
+export default function PermissionProvider({
+    permissions,
+    children,
+}: {
+    permissions: string[];
+    children: React.ReactNode;
+}) {
+    const value = useMemo<Ctx>(() => {
+        const set = new Set(permissions);
+
+        const can = (p: string) => {
+            const hasPermission = set.has(p);
+            console.log(`[PermissionProvider]: "${p}" - Resultado: ${hasPermission}`);
+            return hasPermission;
+        };
+
+        const canAny = (list: string[]) => {
+            const result = list.some(can);
+            console.log(`[PermissionProvider - Any]: ${JSON.stringify(list)} - Resultado: ${result}`);
+            return result;
+        };
+
+        const canAll = (list: string[]) => {
+            const result = list.every(can);
+            console.log(`[PermissionProvider - All]: ${JSON.stringify(list)} - Resultado: ${result}`);
+            return result;
+        };
+
+        console.log(`Permisos adquiritos: ${JSON.stringify(permissions)}`);
+        return { permissions: set, can, canAny, canAll };
+    }, [permissions]);
+
+    return <PermissionCtx.Provider value={value}>{children}</PermissionCtx.Provider>;
+}
+
+export function usePermission() {
+    const ctx = useContext(PermissionCtx);
+    if (!ctx) throw new Error('PermissionProvider must be used inside provider');
+    return ctx;
+}

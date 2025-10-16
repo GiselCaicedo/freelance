@@ -1,0 +1,36 @@
+{
+  "Dashboard": {
+    "meta_title": "Dashboard",
+    "meta_description": "#####"
+  },
+
+  "RootLayout": {
+    "dashboard_link": "Dashboard",
+    "configuracion_link": "Configuración",
+    "cotizaciones_link": "Cotizaciones",
+    "pagos_link": "Pagos",
+    "servicios_link": "Servicios",
+    "user_profile_link": "Administrar cuenta",
+    "sign_out": "Cerrar sesión"
+  },
+
+  "Configuracion": {
+    "meta_title": "Configuración",
+    "meta_description": "#####"
+  },
+
+  "Cotizaciones": {
+    "meta_title": "Cotizaciones",
+    "meta_description": "#####"
+  },
+
+  "Pagos": {
+    "meta_title": "Pagos",
+    "meta_description": "#####"
+  },
+
+  "Servicios": {
+    "meta_title": "Servicios",
+    "meta_description": "#####"
+  }
+}
