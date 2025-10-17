@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { ColDef, RowClassRules, GridApi } from 'ag-grid-community';
+import { ColDef, RowClassRules } from 'ag-grid-community';
 import { Plus, Search } from 'lucide-react';
 import AgTable from '@/components/datagrid/AgTable';
 import ActionsCell from '@/components/common/ActionsCell';
@@ -10,8 +10,9 @@ import { BackendUser, deleteUserApi, getUsersApi } from '@/services/conexion';
 import { useEnterprise } from '@/libs/acl/EnterpriseProvider';
 import CreateUserForm from '@/components/users/CreateUserForm';
 import EditUserForm from '@/components/users/EditUserForm';
-import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { useParams } from 'next/navigation';
+import PageHeader from '@/components/common/PageHeader';
+import { useAlerts } from '@/components/common/AlertsProvider';
 
 type UserRow = {
   id: string;
@@ -23,13 +24,13 @@ type UserRow = {
 };
 
 export default function UsersPage() {
-  const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [quick, setQuick] = useState('');
   const [rows, setRows] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { locale } = useParams() as { locale: string };
   const { empresaId } = useEnterprise();
+  const { notify } = useAlerts();
 
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
@@ -60,11 +61,13 @@ export default function UsersPage() {
       setRows(normalize(data));
       setError(null);
     } catch (e: any) {
-      setError(e?.message || 'Error cargando usuarios');
+      const message = e?.message || 'Error cargando usuarios';
+      setError(message);
+      notify({ type: 'error', title: 'No se pudieron cargar los usuarios', description: message });
     } finally {
       setLoading(false);
     }
-  }, [empresaId]);
+  }, [empresaId, notify]);
 
   useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
@@ -79,8 +82,17 @@ export default function UsersPage() {
     if (!ok) return;
     const prev = rows;
     setRows((r) => r.filter((x) => x.id !== row.id));
-    try { await deleteUserApi(row.id); }
-    catch (e: any) { setRows(prev); alert(e?.message || 'No fue posible eliminar el usuario'); }
+    try {
+      await deleteUserApi(row.id);
+      notify({
+        type: 'success',
+        title: 'Usuario eliminado',
+        description: `${row.nombre || row.usuario} fue eliminado correctamente`,
+      });
+    } catch (e: any) {
+      setRows(prev);
+      notify({ type: 'error', title: 'No se pudo eliminar el usuario', description: e?.message || 'Ocurrió un error inesperado' });
+    }
   };
 
   const columns = useMemo<ColDef<UserRow>[]>(() => [
@@ -157,24 +169,25 @@ export default function UsersPage() {
 
   return (
     <div ref={containerRef} className="relative p-8 transition-[padding-right] duration-300">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <Breadcrumbs items={[
-            { label: 'Seguridad y Accesos', href: `/${locale}/settings` },
-            { label: 'Usuarios' },
-          ]} />
-          <div className="border border-gray-200 my-5" />
-          <h2 className="text-xl font-semibold text-gray-900">Usuarios</h2>
-          <p className="text-sm text-gray-500">Gestión de usuarios del sistema</p>
-        </div>
-        <button
-          onClick={() => { setOpenEdit(false); setEditUserId(null); setOpenCreate(true); }}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-gray-900 ring-1 ring-inset ring-gray-200 rounded-lg hover:bg-gray-50 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Nuevo Usuario</span>
-        </button>
-      </div>
+      <PageHeader
+        className="mb-6"
+        breadcrumbs={[
+          { label: 'Seguridad y Accesos', href: `/${locale}/settings` },
+          { label: 'Usuarios' },
+        ]}
+        title="Usuarios"
+        description="Gestión de usuarios del sistema"
+        actions={(
+          <button
+            type="button"
+            onClick={() => { setOpenEdit(false); setEditUserId(null); setOpenCreate(true); }}
+            className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-inset ring-gray-200 transition hover:bg-gray-50"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Nuevo usuario</span>
+          </button>
+        )}
+      />
 
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="relative w-full max-w-sm">
@@ -195,7 +208,6 @@ export default function UsersPage() {
         columns={columns}
         quickFilterText={quick}
         rowClassRules={rowClassRules}
-        onReady={(api) => setGridApi(api)}
         getRowId={(r) => r.id}
         height={440}
         pageSize={10}

@@ -1,14 +1,15 @@
 'use client';
 
 import React, { useEffect, useMemo, useState, useCallback, useRef } from 'react';
-import { ColDef, RowClassRules, GridApi } from 'ag-grid-community';
+import { ColDef, RowClassRules } from 'ag-grid-community';
 import { Plus, Search } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 
 import AgTable from '@/components/datagrid/AgTable';
 import ActionsCell from '@/components/common/ActionsCell';
 import SidePanel from '@/components/common/SidePanel';
-import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import PageHeader from '@/components/common/PageHeader';
+import { useAlerts } from '@/components/common/AlertsProvider';
 
 import { listRolesApi, deleteRoleApi, Role } from '@/services/conexion';
 import RoleFormModal from '@/components/roles/RoleFormModal';
@@ -22,14 +23,14 @@ type RoleRow = {
 };
 
 export default function RolesPage() {
-   const { locale } = useParams() as { locale: string };
+  const { locale } = useParams() as { locale: string };
   const router = useRouter();
+  const { notify } = useAlerts();
 
   // contenedor al abrir el panel
   const containerRef = useRef<HTMLDivElement>(null);
   
   // Tabla
-  const [gridApi, setGridApi] = useState<GridApi | null>(null);
   const [quick, setQuick] = useState('');
   const [rows, setRows] = useState<RoleRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,7 +39,6 @@ export default function RolesPage() {
   // Panels
   const [openCreate, setOpenCreate] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [openPerms, setOpenPerms] = useState(false);
   const [currentRole, setCurrentRole] = useState<Role | null>(null);
 
   const normalize = (list: Role[]): RoleRow[] =>
@@ -57,11 +57,13 @@ export default function RolesPage() {
       setRows(normalize(data));
       setError(null);
     } catch (e: any) {
-      setError(e?.message || 'Error cargando roles');
+      const message = e?.message || 'Error cargando roles';
+      setError(message);
+      notify({ type: 'error', title: 'No se pudieron cargar los roles', description: message });
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [notify]);
 
   useEffect(() => { fetchRoles(); }, [fetchRoles]);
 
@@ -74,7 +76,6 @@ export default function RolesPage() {
       updated: row.ultimaActualizacion,
     } as Role);
     setOpenCreate(false);
-    setOpenPerms(false);
     setOpenEdit(true);
   };
 
@@ -87,8 +88,13 @@ export default function RolesPage() {
     if (!ok) return;
     const prev = rows;
     setRows((r) => r.filter((x) => x.id !== row.id));
-    try { await deleteRoleApi(row.id); }
-    catch (e: any) { setRows(prev); alert(e?.message || 'No fue posible eliminar el rol'); }
+    try {
+      await deleteRoleApi(row.id);
+      notify({ type: 'success', title: 'Rol eliminado', description: `${row.rol} se eliminó correctamente` });
+    } catch (e: any) {
+      setRows(prev);
+      notify({ type: 'error', title: 'No se pudo eliminar el rol', description: e?.message || 'Ocurrió un error inesperado' });
+    }
   };
 
   const columns = useMemo<ColDef<RoleRow>[]>(() => [
@@ -158,30 +164,25 @@ export default function RolesPage() {
 
   return (
     <div ref={containerRef} className="relative p-8 transition-[padding-right] duration-300">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <Breadcrumbs
-            items={[
-              { label: 'Seguridad y Accesos', href: `/${locale}/settings` },
-              { label: 'Roles' },
-            ]}
-          />
-          <div className="border border-gray-200 my-5" />
-          <h2 className="text-xl font-semibold text-gray-900">Roles</h2>
-          <p className="text-sm text-gray-500">Gestión de roles y permisos</p>
-        </div>
-
-        <button
-          onClick={() => { setCurrentRole(null); setOpenEdit(false); setOpenPerms(false); setOpenCreate(true); }}
-          className="flex items-center gap-2 px-4 py-2 bg-white text-gray-900 ring-1 ring-inset ring-gray-200 rounded-lg hover:bg-gray-50 transition-all"
-        >
-
-
-          <Plus className="w-4 h-4" />
-          <span>Nuevo Rol</span>
-        </button>
-      </div>
+      <PageHeader
+        className="mb-6"
+        breadcrumbs={[
+          { label: 'Seguridad y Accesos', href: `/${locale}/settings` },
+          { label: 'Roles' },
+        ]}
+        title="Roles"
+        description="Gestión de roles y permisos"
+        actions={(
+          <button
+            type="button"
+            onClick={() => { setCurrentRole(null); setOpenEdit(false); setOpenCreate(true); }}
+            className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-900 ring-1 ring-inset ring-gray-200 transition hover:bg-gray-50"
+          >
+            <Plus className="h-4 w-4" />
+            <span>Nuevo rol</span>
+          </button>
+        )}
+      />
 
       <div className="mb-3 flex items-center justify-between gap-3">
         <div className="relative w-full max-w-sm">
@@ -202,9 +203,8 @@ export default function RolesPage() {
         columns={columns}
         quickFilterText={quick}
 
-        
+
         rowClassRules={rowClassRules}
-        onReady={(api) => setGridApi(api)}
         getRowId={(r) => r.id}
         height={440}
         pageSize={10}
