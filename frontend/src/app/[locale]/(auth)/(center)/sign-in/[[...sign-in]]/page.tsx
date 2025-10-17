@@ -1,90 +1,146 @@
 'use client';
-import { login } from "@/services/conexion";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 
-export default function SignUpPage() {
+import { useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { User, Lock, LogIn } from 'lucide-react';
+import { login } from '@/services/conexion';
+import { useAlerts } from '@/components/common/AlertsProvider';
+
+type FormState = {
+  identifier: string;
+  password: string;
+};
+
+export default function SignInPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    identifier: "",
-    password: "",
-  });
-
-  // async function checkBackend() {
-  //   try {
-  //     const data = await testConnection();
-  //     console.log("Conectado al Backend:", data);
-  //   } catch (error) {
-  //     console.error("Error al conectar con el Backend:", error);
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   checkBackend();
-  // }, []);
+  const { locale } = useParams() as { locale: string };
+  const { notify } = useAlerts();
+  const [form, setForm] = useState<FormState>({ identifier: '', password: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormError(null);
+    setForm((current) => ({ ...current, [e.target.name]: e.target.value }));
   };
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitting(true);
+    setFormError(null);
 
     try {
-      const res = await login(formData);
-      console.log("Respuesta del backend:", res);
-
-      if (res.success) {
-        alert("Inicio de sesión exitoso");
-        router.push("/es/");
-      } else {
-        alert("Error en el login: " + res.message);
+      const response = await login(form);
+      if (response.success) {
+        notify({ type: 'success', title: 'Inicio de sesión correcto', description: 'Bienvenido, redirigiendo al panel principal.' });
+        router.push(`/${locale}/dashboard`);
+        return;
       }
-    } catch (error) {
-      console.error("Error en login:", error);
-      alert("Error al conectar con el servidor");
+
+      const message = response.message ?? 'Usuario o contraseña incorrectos.';
+      setFormError(message);
+      notify({ type: 'error', title: 'No fue posible iniciar sesión', description: message });
+    } catch (error: any) {
+      const message = error?.message ?? 'Error al conectar con el servidor.';
+      setFormError(message);
+      notify({ type: 'error', title: 'Ocurrió un problema', description: message });
+    } finally {
+      setSubmitting(false);
     }
   };
 
-
+  const disabled = submitting || !form.identifier.trim() || !form.password.trim();
 
   return (
-    <div className="p-6 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Página de Sign In</h1>
+    <div className="relative flex min-h-screen w-full items-center justify-center bg-slate-950 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.35),_transparent_60%)]" aria-hidden="true" />
+      <div className="grid w-full max-w-4xl overflow-hidden rounded-3xl bg-white shadow-2xl ring-1 ring-black/5 md:grid-cols-[1.05fr_1fr]">
+        <div className="relative hidden flex-col justify-between bg-gradient-to-br from-emerald-500 via-emerald-600 to-emerald-700 p-10 text-white md:flex">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide">
+              Plataforma Administrativa
+            </span>
+            <h2 className="mt-6 text-3xl font-semibold leading-tight">Gestiona tus cobros y usuarios desde un solo lugar</h2>
+            <p className="mt-4 text-sm text-emerald-50/90">
+              Accede a reportes en tiempo real, administra roles y mantén tu operación segura con Cifra Pay.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/10 p-6 backdrop-blur">
+            <p className="text-sm font-medium uppercase tracking-wide text-emerald-100/80">¿Sabías que…?</p>
+            <p className="mt-2 text-sm text-emerald-50/95">
+              Puedes habilitar o desactivar accesos de tu equipo en cualquier momento desde el panel de seguridad.
+            </p>
+          </div>
+        </div>
 
-      <form onSubmit={handleLogin} className="flex flex-col gap-3">
-        <label htmlFor="identifier">Usuario</label>
-        <input
-          id="identifier"
-          name="identifier"
-          type="text"
-          className="border px-2 py-1 rounded"
-          value={formData.identifier}
-          onChange={handleChange}
-        />
+        <div className="flex flex-col justify-center px-8 py-10 sm:px-10 md:px-12">
+          <div className="mb-8">
+            <div className="flex items-center gap-2 text-emerald-600">
+              <span className="text-xl font-black tracking-tight">Cifra</span>
+              <span className="text-xl font-black tracking-tight">Pay</span>
+            </div>
+            <h1 className="mt-6 text-2xl font-semibold text-gray-900">Bienvenido de nuevo</h1>
+            <p className="mt-2 text-sm text-gray-500">Ingresa tus credenciales para continuar.</p>
+          </div>
 
-        <label htmlFor="password">Contraseña</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          className="border px-2 py-1 rounded"
-          value={formData.password}
-          onChange={handleChange}
-        />
+          <form onSubmit={handleLogin} className="space-y-6" noValidate>
+            <div className="space-y-2">
+              <label htmlFor="identifier" className="text-sm font-medium text-gray-700">
+                Usuario
+              </label>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  id="identifier"
+                  name="identifier"
+                  type="text"
+                  autoComplete="username"
+                  value={form.identifier}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-gray-200 bg-white px-10 py-2.5 text-sm text-gray-900 shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  placeholder="tu.usuario"
+                />
+              </div>
+            </div>
 
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded mt-4 hover:bg-blue-700"
-        >
-          Iniciar Sesión
-        </button>
-      </form>
+            <div className="space-y-2">
+              <label htmlFor="password" className="text-sm font-medium text-gray-700">
+                Contraseña
+              </label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full rounded-xl border border-gray-200 bg-white px-10 py-2.5 text-sm text-gray-900 shadow-sm transition focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                  placeholder="••••••••"
+                />
+              </div>
+            </div>
 
-     
+            {formError && (
+              <p className="text-sm text-red-600">{formError}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={disabled}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/30 transition hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              <LogIn className="h-4 w-4" />
+              {submitting ? 'Ingresando…' : 'Iniciar sesión'}
+            </button>
+
+            <p className="text-center text-xs text-gray-400">
+              ¿Olvidaste tu contraseña? Contacta al administrador de tu empresa para restablecerla.
+            </p>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

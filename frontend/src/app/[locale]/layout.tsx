@@ -3,6 +3,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { PostHogProvider } from '@/components/analytics/PostHogProvider';
+import { AlertsProvider } from '@/components/common/AlertsProvider';
 import { routing } from '@/libs/I18nRouting';
 import '@/styles/global.css';
 import PermissionProvider from '@/libs/acl/PermissionProvider';
@@ -49,11 +50,13 @@ export default async function RootLayout(props: {
       <body>
         <NextIntlClientProvider>
           <PostHogProvider>
-            <EnterpriseProvider empresaId={empresaId} empresaName={empresaName}>
-              <PermissionProvider permissions={permissions}>
-                {props.children}
-              </PermissionProvider>
-            </EnterpriseProvider>
+            <AlertsProvider>
+              <EnterpriseProvider empresaId={empresaId} empresaName={empresaName}>
+                <PermissionProvider permissions={permissions}>
+                  {props.children}
+                </PermissionProvider>
+              </EnterpriseProvider>
+            </AlertsProvider>
           </PostHogProvider>
         </NextIntlClientProvider>
       </body>

@@ -2,8 +2,9 @@
 
 import React, { useEffect, useMemo, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { Check, ChevronLeft, Save, Search, Shield, ToggleLeft, ToggleRight } from 'lucide-react'
-import Breadcrumbs from '@/components/ui/Breadcrumbs'
+import { Check, ChevronLeft, Save, Search, ToggleLeft, ToggleRight } from 'lucide-react'
+import PageHeader from '@/components/common/PageHeader'
+import { useAlerts } from '@/components/common/AlertsProvider'
 import {
   getRoleByIdApi,
   getPermissionsGroupedApi,
@@ -17,6 +18,7 @@ type Grouped = Record<string, Permission[]>
 export default function RolePermissionsPage() {
   const { locale, id } = useParams() as { locale: string; id: string }
   const router = useRouter()
+  const { notify } = useAlerts()
 
   const [roleName, setRoleName] = useState<string>('')
   const [groups, setGroups] = useState<Grouped>({})
@@ -41,12 +43,14 @@ export default function RolePermissionsPage() {
         setSelected(new Set(current))
         setError(null)
       } catch (e: any) {
-        setError(e?.message || 'Error cargando permisos del rol')
+        const message = e?.message || 'Error cargando permisos del rol'
+        setError(message)
+        notify({ type: 'error', title: 'No se pudieron cargar los permisos', description: message })
       } finally {
         setLoading(false)
       }
     })()
-  }, [id])
+  }, [id, notify])
 
   // Helpers
   const flatList = useMemo(() => {
@@ -104,9 +108,9 @@ export default function RolePermissionsPage() {
     try {
       setSaving(true)
       await saveRolePermissionsApi(id, Array.from(selected))
-      alert('Permisos actualizados')
+      notify({ type: 'success', title: 'Permisos actualizados', description: 'Los cambios se guardaron correctamente.' })
     } catch (e: any) {
-      alert(e?.message || 'No fue posible guardar')
+      notify({ type: 'error', title: 'No se pudieron guardar los permisos', description: e?.message || 'Ocurrió un error inesperado' })
     } finally {
       setSaving(false)
     }
@@ -114,39 +118,36 @@ export default function RolePermissionsPage() {
 
   return (
     <div className="p-8">
-      <div className="flex items-center justify-between">
-        <div>
-          <Breadcrumbs
-            items={[
-              { label: 'Seguridad y Accesos', href: `/${locale}/settings/security` },
-              { label: 'Roles', href: `/${locale}/settings/security/roles` },
-              { label: 'Permisos' },
-            ]}
-          />
-          <div className="border border-gray-200 my-5" />
-          <h2 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-            Permisos del rol: <span className="font-semibold ms-1">{roleName}</span>
-          </h2>
-          <p className="text-sm text-gray-500">Activa o desactiva permisos por sección (módulo).</p>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => router.push(`/${locale}/settings/security/roles`)}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50 text-sm"
-          >
-            <ChevronLeft className="w-4 h-4" /> Volver
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={saving || loading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm disabled:opacity-60"
-          >
-            <Save className="w-4 h-4" />
-            {saving ? 'Guardando…' : 'Guardar cambios'}
-          </button>
-        </div>
-      </div>
+      <PageHeader
+        className="mb-6"
+        breadcrumbs={[
+          { label: 'Seguridad y Accesos', href: `/${locale}/settings/security` },
+          { label: 'Roles', href: `/${locale}/settings/security/roles` },
+          { label: 'Permisos' },
+        ]}
+        title={`Permisos del rol: ${roleName || '—'}`}
+        description="Activa o desactiva permisos por sección (módulo)."
+        actions={(
+          <>
+            <button
+              type="button"
+              onClick={() => router.push(`/${locale}/settings/security/roles`)}
+              className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm hover:bg-gray-50"
+            >
+              <ChevronLeft className="h-4 w-4" /> Volver
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving || loading}
+              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-60"
+            >
+              <Save className="h-4 w-4" />
+              {saving ? 'Guardando…' : 'Guardar cambios'}
+            </button>
+          </>
+        )}
+      />
 
       {/* Barra de herramientas */}
       <div className="mt-4 mb-6 flex flex-wrap items-center gap-3">
@@ -161,10 +162,10 @@ export default function RolePermissionsPage() {
         </div>
 
         <div className="ms-auto flex items-center gap-2">
-          <button onClick={selectAll} className="px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
+          <button type="button" onClick={selectAll} className="px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
             Seleccionar todo
           </button>
-          <button onClick={clearAll} className="px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
+          <button type="button" onClick={clearAll} className="px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white hover:bg-gray-50">
             Limpiar
           </button>
         </div>
@@ -182,12 +183,14 @@ export default function RolePermissionsPage() {
               <h3 className="text-sm font-semibold text-gray-900">{module}</h3>
               <div className="flex items-center gap-2">
                 <button
+                  type="button"
                   onClick={() => toggleModule(module, true)}
                   className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100"
                 >
                   <ToggleRight className="w-3.5 h-3.5" /> Activar módulo
                 </button>
                 <button
+                  type="button"
                   onClick={() => toggleModule(module, false)}
                   className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-gray-200 bg-gray-50 hover:bg-gray-100"
                 >

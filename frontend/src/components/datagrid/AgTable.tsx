@@ -40,6 +40,7 @@ export type AgTableProps<T> = {
   pageSize?: number;
   className?: string;             // clases extra del wrapper
   themeClassName?: string;        // clase de tema (default incluida)
+  enableColumnFilters?: boolean;
 };
 
 export default function AgTable<T>({
@@ -53,19 +54,19 @@ export default function AgTable<T>({
   pageSize = 10,
   className,
   themeClassName = 'ag-theme-alpine ag-theme-cifra',
+  enableColumnFilters = false,
 }: AgTableProps<T>) {
 
   const defaultColDef = useMemo<ColDef>(() => ({
     sortable: true,
-    filter: true,
+    filter: enableColumnFilters,
     resizable: true,
     headerClass: 'ag-header-cell-label !font-semibold !text-gray-800',
-  }), []);
+  }), [enableColumnFilters]);
 
   const gridOptions = useMemo(() => ({
     theme: 'legacy',
-    quickFilterText,
-  }), [quickFilterText]);
+  }), []);
 
   const handleReady = (e: GridReadyEvent) => onReady?.(e.api);
 
@@ -76,6 +77,7 @@ export default function AgTable<T>({
     >
       <AgGridReact<T>
         gridOptions={gridOptions}
+        quickFilterText={quickFilterText}
         rowData={rows}
         columnDefs={columns}
         defaultColDef={defaultColDef}

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { usePermission } from '@/libs/acl/PermissionProvider';
 import Link from 'next/link';
 import LogoutButton from '@/components/auth/LogoutButton';
@@ -23,6 +23,33 @@ export default function CoreLayout({
   const pathname = usePathname();
   const [isEnterpriseOpen, setIsEnterpriseOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(true);
+  const navStateRef = useRef(isNavOpen);
+  const manualStateRef = useRef(isNavOpen);
+
+  useEffect(() => {
+    navStateRef.current = isNavOpen;
+  }, [isNavOpen]);
+
+  useEffect(() => {
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<{ open: boolean }>).detail;
+      if (!detail) return;
+
+      if (detail.open) {
+        manualStateRef.current = navStateRef.current;
+        setIsNavOpen(false);
+      } else {
+        setIsNavOpen(manualStateRef.current);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('app:sidepanel', handler as EventListener);
+      return () => window.removeEventListener('app:sidepanel', handler as EventListener);
+    }
+
+    return () => {};
+  }, []);
 
   const isActive = (href: string) => pathname.includes(href);
 

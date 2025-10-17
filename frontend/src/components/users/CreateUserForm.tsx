@@ -9,6 +9,7 @@ import {
   Role,
   Business,
 } from '@/services/conexion';
+import { useAlerts } from '@/components/common/AlertsProvider';
 
 type Props = {
   onClose?: () => void;
@@ -26,6 +27,7 @@ type FormData = {
 };
 
 export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }: Props) {
+  const { notify } = useAlerts();
   const [form, setForm] = useState<FormData>({
     user: '',
     name: '',
@@ -55,12 +57,14 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
         setRoles(r);
         setBusiness(b);
       } catch (e: any) {
-        setError(e?.message || 'No fue posible cargar listas');
+        const message = e?.message || 'No fue posible cargar listas';
+        setError(message);
+        notify({ type: 'error', title: 'Error al cargar datos', description: message });
       } finally {
         setLoadingLists(false);
       }
     })();
-  }, []);
+  }, [notify]);
 
   // Si cambian defaults y no hay selección, aplicarlas
   useEffect(() => {
@@ -101,7 +105,11 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!valid) {
-      alert('Completa los campos obligatorios (contraseña mínimo 8 caracteres).');
+      notify({
+        type: 'warning',
+        title: 'Formulario incompleto',
+        description: 'Completa los campos obligatorios. La contraseña debe tener al menos 8 caracteres.',
+      });
       return;
     }
 
@@ -112,14 +120,14 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
         res?.success ?? res?.ok ?? res?.status === true ?? (typeof res?.statusCode === 'number' && res.statusCode < 300);
 
       if (ok) {
-        alert('Usuario creado correctamente.');
+        notify({ type: 'success', title: 'Usuario creado', description: 'El usuario se registró correctamente.' });
         resetForm();        // para quedarte en el panel creando más
         onSuccess?.();      // para refrescar la tabla / cerrar si el padre así lo decide
       } else {
-        alert(res?.message ?? 'No fue posible crear el usuario.');
+        notify({ type: 'error', title: 'No se pudo crear el usuario', description: res?.message ?? 'Ocurrió un error inesperado.' });
       }
     } catch (err: any) {
-      alert(err?.message ?? 'Error al conectar con el servidor.');
+      notify({ type: 'error', title: 'Error al conectar con el servidor', description: err?.message ?? 'Inténtalo de nuevo más tarde.' });
     } finally {
       setLoading(false);
     }

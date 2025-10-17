@@ -10,6 +10,7 @@ import {
   Role,
   Business
 } from '@/services/conexion';
+import { useAlerts } from '@/components/common/AlertsProvider';
 
 type Props = {
   userId: string;
@@ -18,6 +19,7 @@ type Props = {
 };
 
 export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
+  const { notify } = useAlerts();
   const [user, setUser] = useState<BackendUser | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [business, setBusiness] = useState<Business[]>([]);
@@ -44,30 +46,38 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
         setBusiness(b);
 
         setName(u.name || '');
-        setRoleId((u as any).role_id || u.role?.name || '');
+        const initialRole = (u as any).role_id ?? u.role?.id ?? '';
+        setRoleId(initialRole ? String(initialRole) : '');
         setStatus(!!u.status);
         setErr(null);
       } catch (e: any) {
-        setErr(e?.message || 'No se pudo cargar la información');
+        const message = e?.message || 'No se pudo cargar la información';
+        setErr(message);
+        notify({ type: 'error', title: 'Error al cargar el usuario', description: message });
       } finally {
         setLoading(false);
       }
     })();
-  }, [userId]);
+  }, [userId, notify]);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setSaving(true);
-      await updateUserApi(userId, {
+      const response = await updateUserApi(userId, {
         name,
         role_id: roleId || undefined,
         status,
         password: password || undefined, // opcional
       });
+      if (!response.success) {
+        notify({ type: 'error', title: 'No se pudo actualizar el usuario', description: response.message || 'Inténtalo nuevamente.' });
+        return;
+      }
+      notify({ type: 'success', title: 'Usuario actualizado', description: 'Los cambios se guardaron correctamente.' });
       onSuccess?.();
     } catch (e: any) {
-      alert(e?.message || 'No fue posible actualizar el usuario');
+      notify({ type: 'error', title: 'No se pudo actualizar el usuario', description: e?.message || 'Ocurrió un error inesperado.' });
     } finally {
       setSaving(false);
     }
