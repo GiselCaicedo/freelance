@@ -1,15 +1,15 @@
 import type { Metadata } from 'next';
 import { hasLocale, NextIntlClientProvider } from 'next-intl';
-import { setRequestLocale } from 'next-intl/server';
+import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { cookies } from 'next/headers';
 import { PostHogProvider } from '@/components/analytics/PostHogProvider';
 import { AlertsProvider } from '@/components/common/AlertsProvider';
-import { routing } from '@/libs/I18nRouting';
-import '@/styles/global.css';
-import PermissionProvider from '@/libs/acl/PermissionProvider';
-import { verifyToken } from '@/libs/Auth';
-import { cookies } from 'next/headers';
 import { EnterpriseProvider } from '@/libs/acl/EnterpriseProvider';
+import PermissionProvider from '@/libs/acl/PermissionProvider';
+import { routing } from '@/libs/I18nRouting';
+import { verifyToken } from '@/libs/Auth';
+import '@/styles/global.css';
 
 export const metadata: Metadata = {
   icons: [
@@ -35,6 +35,8 @@ export default async function RootLayout(props: {
 
   const token = cookies().get('auth_token')?.value || '';
 
+  const messages = await getMessages({ locale });
+
   const payload = token ? await verifyToken<{
     permissions?: string[];
     empresaid?: string;
@@ -48,7 +50,7 @@ export default async function RootLayout(props: {
   return (
     <html lang={locale}>
       <body>
-        <NextIntlClientProvider>
+        <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
           <PostHogProvider>
             <AlertsProvider>
               <EnterpriseProvider empresaId={empresaId} empresaName={empresaName}>

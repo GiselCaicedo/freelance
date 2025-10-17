@@ -1,11 +1,35 @@
 import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+const TOKEN_STORAGE_KEY = 'auth_token';
 
 export const api = axios.create({
   baseURL: API_URL,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
+});
+
+const getStoredToken = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    return (
+      window.sessionStorage.getItem(TOKEN_STORAGE_KEY) ??
+      window.localStorage.getItem(TOKEN_STORAGE_KEY) ??
+      null
+    );
+  } catch (error) {
+    console.warn('Unable to read auth token from storage:', error);
+    return null;
+  }
+};
+
+api.interceptors.request.use((config) => {
+  const token = getStoredToken();
+  if (token) {
+    config.headers = config.headers ?? {};
+    (config.headers as Record<string, string>).Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // Sattus 401 (sesion expirada)
@@ -199,6 +223,13 @@ export async function login(credentials: {
 }): Promise<{ success: boolean; data?: any; message?: string }> {
   try {
     const response = await api.post('/auth/login', credentials);
+    const token: string | undefined = response?.data?.token;
+
+    if (token && typeof window !== 'undefined') {
+      window.sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
+      window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
+      api.defaults.headers.common.Authorization = `Bearer ${token}`;
+    }
     return { success: true, data: response.data };
   } catch (error: any) {
     console.error('Login error:', error);
@@ -209,6 +240,11 @@ export async function login(credentials: {
 export async function logout(): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await api.post('/auth/logout');
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.removeItem(TOKEN_STORAGE_KEY);
+      window.localStorage.removeItem(TOKEN_STORAGE_KEY);
+    }
+    delete api.defaults.headers.common.Authorization;
     return { success: true, data: response.data };
   } catch (error: any) {
     console.error('Logout error:', error);

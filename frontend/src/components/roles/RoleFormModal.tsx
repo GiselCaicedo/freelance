@@ -1,5 +1,6 @@
 'use client'
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Role, updateRoleApi, createRoleApi } from '@/services/conexion';
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
 export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
   const [form, setForm] = useState({ name: '', description: '', status: true });
   const [saving, setSaving] = useState(false);
+  const t = useTranslations('Roles.Form');
 
   useEffect(() => {
     if (!open) return;
@@ -49,28 +51,29 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
   };
 
   const field = 'mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900';
+  const statusLabel = form.status ? t('status.active') : t('status.inactive');
 
   return (
     <form onSubmit={handleSubmit} className="p-5 space-y-4">
       <div>
-        <label className="block text-sm font-medium text-gray-700">Nombre del rol</label>
+        <label className="block text-sm font-medium text-gray-700">{t('nameLabel')}</label>
         <input
           className={field}
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="Ej. Administrador"
+          placeholder={t('namePlaceholder')}
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">Descripción</label>
+        <label className="block text-sm font-medium text-gray-700">{t('descriptionLabel')}</label>
         <textarea
           className={field}
           rows={3}
           value={form.description}
           onChange={(e) => setForm({ ...form, description: e.target.value })}
-          placeholder="Descripción breve (opcional)"
+          placeholder={t('descriptionPlaceholder')}
         />
       </div>
 
@@ -82,7 +85,7 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
           onChange={(e) => setForm({ ...form, status: e.target.checked })}
           className="h-4 w-4 rounded border-gray-300"
         />
-        <label htmlFor="status" className="text-sm text-gray-700 select-none">Activo</label>
+        <label htmlFor="status" className="text-sm text-gray-700 select-none">{statusLabel}</label>
       </div>
 
       <div className="pt-2 flex gap-3">
@@ -91,14 +94,18 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
           disabled={saving}
           className="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
         >
-          {saving ? 'Guardando…' : role?.id ? 'Guardar cambios' : 'Crear rol'}
+          {saving
+            ? t('actions.saving')
+            : role?.id
+              ? t('actions.update')
+              : t('actions.create')}
         </button>
         <button
           type="button"
           onClick={onClose}
           className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
         >
-          Cancelar
+          {t('actions.cancel')}
         </button>
       </div>
     </form>
