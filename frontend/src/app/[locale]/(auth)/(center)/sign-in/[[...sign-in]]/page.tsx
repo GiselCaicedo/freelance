@@ -4,8 +4,8 @@ import { useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { LogIn, Lock, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { login } from '@/services/conexion';
-import { useAlerts } from '@/components/common/AlertsProvider';
+import { login } from '@/shared/services/conexion';
+import { useAlerts } from '@/shared/components/common/AlertsProvider';
 
 type FormState = {
   identifier: string;

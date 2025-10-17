@@ -1,21 +1,10 @@
- 
-import express from 'express'
-import authRoutes from './authRoutes.js'
-import utilsRoutes from './utilsRoutes.js'
-import configRoutes from './configRoutes.js'
-import { authenticate } from '../middlewares/authenticate.js'
+import { Router } from 'express'
+import adminRoutes from '../modules/admin/routes/index.js'
+import clientRoutes from '../modules/client/routes/index.js'
 
-const indexRoutes = express.Router()
+const apiRoutes = Router()
 
-indexRoutes.get('/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() })
-})
+apiRoutes.use('/', adminRoutes)
+apiRoutes.use('/client', clientRoutes)
 
-indexRoutes.use('/auth', authRoutes)
-indexRoutes.use(authenticate)
-indexRoutes.use('/utils', utilsRoutes)
-
-indexRoutes.use('/config', configRoutes)
-
-
-export default indexRoutes
+export default apiRoutes
