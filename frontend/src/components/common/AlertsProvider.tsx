@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { AlertCircle, CheckCircle2, Info, TriangleAlert, X } from 'lucide-react';
 
 type AlertType = 'success' | 'info' | 'warning' | 'error';
@@ -55,6 +56,21 @@ const typeStyles: Record<AlertType, { wrapper: string; badge: string; icon: Luci
 export function AlertsProvider({ children }: { children: ReactNode }) {
   const [alerts, setAlerts] = useState<AlertRecord[]>([]);
   const timers = useRef<Record<string, number>>({});
+  const translate = useTranslations();
+
+  const resolveCopy = useCallback(
+    (value?: string) => {
+      if (!value) return value;
+      if (!value.includes('.')) return value;
+      try {
+        return translate(value);
+      } catch (error) {
+        console.warn('Missing translation for alert copy:', value, error);
+        return value;
+      }
+    },
+    [translate],
+  );
 
   const dismiss = useCallback((id: string) => {
     setAlerts((current) => current.filter((alert) => alert.id !== id));
@@ -70,13 +86,16 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
       ? crypto.randomUUID()
       : Math.random().toString(36).slice(2);
 
+    const resolvedTitle = resolveCopy(title);
+    const resolvedDescription = resolveCopy(description);
+
     setAlerts((current) => [
       ...current,
       {
         id,
         type,
-        title,
-        description,
+        title: resolvedTitle,
+        description: resolvedDescription,
         duration,
       },
     ]);
@@ -89,7 +108,7 @@ export function AlertsProvider({ children }: { children: ReactNode }) {
     }
 
     return id;
-  }, []);
+  }, [resolveCopy]);
 
   const value = useMemo(() => ({ notify, dismiss }), [notify, dismiss]);
 

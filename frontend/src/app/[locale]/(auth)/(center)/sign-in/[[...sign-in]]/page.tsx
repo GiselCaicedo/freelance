@@ -40,6 +40,7 @@ export default function SignInPage() {
           description: t('alerts.success.description'),
         });
         router.push(`/${locale}/dashboard`);
+        router.refresh();
         return;
       }
 

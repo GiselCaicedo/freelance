@@ -11,6 +11,8 @@ type Ctx = {
 
 const PermissionCtx = createContext<Ctx | null>(null);
 
+const normalizePermission = (value: string) => value.trim().toLowerCase();
+
 export default function PermissionProvider({
     permissions,
     children,
@@ -19,10 +21,12 @@ export default function PermissionProvider({
     children: React.ReactNode;
 }) {
     const value = useMemo<Ctx>(() => {
-        const set = new Set(permissions);
+        const normalized = permissions.map((permission) => normalizePermission(permission));
+        const set = new Set(normalized);
 
         const can = (p: string) => {
-            const hasPermission = set.has(p);
+            const key = normalizePermission(p);
+            const hasPermission = set.has(key);
             console.log(`[PermissionProvider]: "${p}" - Resultado: ${hasPermission}`);
             return hasPermission;
         };
