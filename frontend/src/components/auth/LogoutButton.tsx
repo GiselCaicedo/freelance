@@ -29,6 +29,7 @@ export default function LogoutButton({ className = '', isNavOpen = true }: Logou
       }
       notify({ type: 'success', title: t('successTitle'), description: t('successDescription') });
       router.push(`/${locale ?? 'es'}/sign-in`);
+      router.refresh();
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
       notify({ type: 'error', title: t('errorTitle'), description: t('errorDescription') });

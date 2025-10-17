@@ -9,6 +9,8 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+const AUTH_COOKIE = 'auth_token';
+
 const getStoredToken = () => {
   if (typeof window === 'undefined') return null;
   try {
@@ -21,6 +23,18 @@ const getStoredToken = () => {
     console.warn('Unable to read auth token from storage:', error);
     return null;
   }
+};
+
+const setAuthCookie = (token: string) => {
+  if (typeof document === 'undefined') return;
+  const oneDay = 60 * 60 * 24;
+  const secure = typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = `${AUTH_COOKIE}=${token}; Path=/; Max-Age=${oneDay}; SameSite=Lax${secure}`;
+};
+
+const clearAuthCookie = () => {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${AUTH_COOKIE}=; Path=/; Max-Age=0; SameSite=Lax`;
 };
 
 api.interceptors.request.use((config) => {
@@ -229,6 +243,7 @@ export async function login(credentials: {
       window.sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
       window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
       api.defaults.headers.common.Authorization = `Bearer ${token}`;
+      setAuthCookie(token);
     }
     return { success: true, data: response.data };
   } catch (error: any) {
@@ -245,6 +260,7 @@ export async function logout(): Promise<{ success: boolean; message?: string }> 
       window.localStorage.removeItem(TOKEN_STORAGE_KEY);
     }
     delete api.defaults.headers.common.Authorization;
+    clearAuthCookie();
     return { success: true, data: response.data };
   } catch (error: any) {
     console.error('Logout error:', error);
