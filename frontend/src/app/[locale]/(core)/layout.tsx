@@ -128,13 +128,19 @@ export default function CoreLayout({
     <BaseTemplate
       leftNav={
         <div className={`flex h-full flex-col bg-white transition-all duration-300 ${isNavOpen ? 'w-52' : 'w-16'}`}>
-          <div className="flex justify-center">
+          <div
+            className={`flex ${isNavOpen ? 'justify-end px-2 pt-2' : 'justify-center pt-2'}`}
+          >
             <button
               onClick={() => setIsNavOpen(!isNavOpen)}
-              className="flex-shrink-0 p-1.5 rounded-md text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
+              className="p-1.5 rounded-md text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900"
               title={isNavOpen ? t('nav.collapse') : t('nav.expand')}
             >
-              {isNavOpen ? <ChevronDown className="h-4 w-4 rotate-90" /> : <Menu className="h-4 w-4" />}
+              {isNavOpen ? (
+                <ChevronDown className="h-4 w-4 rotate-90" />
+              ) : (
+                <Menu className="h-4 w-4" />
+              )}
             </button>
           </div>
 
@@ -157,8 +163,8 @@ export default function CoreLayout({
               <button
                 onClick={() => setIsEnterpriseOpen(!isEnterpriseOpen)}
                 className={`flex w-full items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-sm transition-all duration-200 ${isEnterpriseOpen
-                    ? 'border-emerald-300 bg-emerald-50'
-                    : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white'
+                  ? 'border-emerald-300 bg-emerald-50'
+                  : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white'
                   }`}
                 title={t('enterprise.switcherLabel')}
               >
