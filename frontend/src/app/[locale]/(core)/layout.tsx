@@ -55,7 +55,7 @@ export default function CoreLayout({
       return () => window.removeEventListener('app:sidepanel', handler as EventListener);
     }
 
-    return () => {};
+    return () => { };
   }, []);
 
   const navItems = useMemo<NavItem[]>(
@@ -63,10 +63,11 @@ export default function CoreLayout({
       { slug: 'dashboard', label: t('nav.dashboard'), icon: Home, permission: null },
       { slug: 'services', label: t('nav.services'), icon: Zap, permission: 'service' },
       { slug: 'payments', label: t('nav.payments'), icon: CreditCard, permission: 'pay' },
-      { slug: 'quotes', label: t('nav.quotes'), icon: FileText, permission: 'quote' },
+      { slug: 'quotes', label: t('nav.quotes'), icon: FileText, permission: 'invoice' },
     ],
     [t],
   );
+
 
   const settingsItems = useMemo<NavItem[]>(
     () => [
@@ -103,15 +104,13 @@ export default function CoreLayout({
     return (
       <Link
         href={href}
-        className={`group flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all duration-200 relative ${
-          active ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-gray-600 hover:bg-gray-50'
-        }`}
+        className={`group flex items-center gap-2 px-3 py-2.5 rounded-lg transition-all duration-200 relative ${active ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-gray-600 hover:bg-gray-50'
+          }`}
         title={!isNavOpen ? item.label : ''}
       >
         <item.icon
-          className={`w-5 h-5 transition-all duration-200 flex-shrink-0 ${
-            active ? 'text-emerald-500' : 'text-gray-400 group-hover:text-emerald-500'
-          }`}
+          className={`w-5 h-5 transition-all duration-200 flex-shrink-0 ${active ? 'text-emerald-500' : 'text-gray-400 group-hover:text-emerald-500'
+            }`}
         />
         {isNavOpen && (
           <>
@@ -157,11 +156,10 @@ export default function CoreLayout({
             <div className="px-3 py-3">
               <button
                 onClick={() => setIsEnterpriseOpen(!isEnterpriseOpen)}
-                className={`flex w-full items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-sm transition-all duration-200 ${
-                  isEnterpriseOpen
+                className={`flex w-full items-center justify-between gap-2 rounded-lg border px-2.5 py-2 text-sm transition-all duration-200 ${isEnterpriseOpen
                     ? 'border-emerald-300 bg-emerald-50'
                     : 'border-gray-200 bg-gray-50 hover:border-gray-300 hover:bg-white'
-                }`}
+                  }`}
                 title={t('enterprise.switcherLabel')}
               >
                 <div className="flex min-w-0 items-center gap-2">
@@ -173,9 +171,8 @@ export default function CoreLayout({
                   </span>
                 </div>
                 <ChevronDown
-                  className={`h-3.5 w-3.5 flex-shrink-0 text-gray-500 transition-transform duration-300 ${
-                    isEnterpriseOpen ? 'rotate-180' : ''
-                  }`}
+                  className={`h-3.5 w-3.5 flex-shrink-0 text-gray-500 transition-transform duration-300 ${isEnterpriseOpen ? 'rotate-180' : ''
+                    }`}
                 />
               </button>
             </div>
