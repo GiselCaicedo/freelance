@@ -1,36 +1,295 @@
 {
+  "Layout": {
+    "nav": {
+      "dashboard": "Inicio",
+      "services": "Servicios",
+      "payments": "Pagos",
+      "quotes": "Cotizaciones",
+      "settings": "Configuración",
+      "collapse": "Contraer menú",
+      "expand": "Expandir menú"
+    },
+    "enterprise": {
+      "switcherLabel": "Seleccionar empresa",
+      "placeholder": "Empresa"
+    }
+  },
+
   "Dashboard": {
-    "meta_title": "Dashboard",
-    "meta_description": "#####"
+    "meta_title": "Panel",
+    "meta_description": "Resumen de actividad",
+    "heading": "¡Bienvenido a tu panel!",
+    "subheading": "Revisa el estado de tus operaciones y accede rápidamente a las secciones clave de la plataforma."
   },
 
-  "RootLayout": {
-    "dashboard_link": "Dashboard",
-    "configuracion_link": "Configuración",
-    "cotizaciones_link": "Cotizaciones",
-    "pagos_link": "Pagos",
-    "servicios_link": "Servicios",
-    "user_profile_link": "Administrar cuenta",
-    "sign_out": "Cerrar sesión"
+  "Auth": {
+    "SignIn": {
+      "alerts": {
+        "success": {
+          "title": "Inicio de sesión correcto",
+          "description": "Bienvenido, estamos preparando tu panel."
+        },
+        "error": {
+          "title": "No fue posible iniciar sesión"
+        }
+      },
+      "errors": {
+        "invalidCredentials": "Usuario o contraseña incorrectos.",
+        "unexpected": "Ocurrió un error inesperado. Inténtalo más tarde."
+      },
+      "hero": {
+        "badge": "Plataforma administrativa",
+        "heading": "Gestiona tus cobros y usuarios desde un solo lugar",
+        "description": "Accede a reportes en tiempo real, administra roles y mantén tu operación segura con Cifra Pay.",
+        "tipTitle": "¿Sabías que…?",
+        "tipDescription": "Puedes habilitar o desactivar accesos de tu equipo en cualquier momento desde el panel de seguridad."
+      },
+      "form": {
+        "heading": "Bienvenido de nuevo",
+        "subheading": "Ingresa tus credenciales para continuar.",
+        "usernameLabel": "Usuario",
+        "usernamePlaceholder": "tu.usuario",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "••••••••",
+        "submit": "Iniciar sesión",
+        "submitLoading": "Ingresando…",
+        "footerNotice": "¿Olvidaste tu contraseña? Contacta al administrador de tu empresa para restablecerla."
+      }
+    },
+    "Logout": {
+      "successTitle": "Sesión cerrada",
+      "successDescription": "Vuelve pronto.",
+      "errorTitle": "No se pudo cerrar sesión",
+      "errorDescription": "Inténtalo de nuevo en unos segundos.",
+      "loading": "Cerrando…",
+      "buttonLabel": "Cerrar sesión"
+    }
   },
 
-  "Configuracion": {
-    "meta_title": "Configuración",
-    "meta_description": "#####"
+  "Roles": {
+    "Form": {
+      "nameLabel": "Nombre del rol",
+      "namePlaceholder": "Ej. Administrador",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Descripción breve (opcional)",
+      "status": {
+        "active": "Rol activo",
+        "inactive": "Rol inactivo"
+      },
+      "actions": {
+        "create": "Crear rol",
+        "update": "Guardar cambios",
+        "saving": "Guardando…",
+        "cancel": "Cancelar"
+      }
+    }
   },
 
-  "Cotizaciones": {
-    "meta_title": "Cotizaciones",
-    "meta_description": "#####"
+  "Users": {
+    "EditForm": {
+      "errors": {
+        "load": "No se pudo cargar la información del usuario.",
+        "unexpected": "Ocurrió un error inesperado."
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Error al cargar el usuario"
+        },
+        "updateError": {
+          "title": "No se pudo actualizar el usuario",
+          "description": "Inténtalo nuevamente."
+        },
+        "success": {
+          "title": "Usuario actualizado",
+          "description": "Los cambios se guardaron correctamente."
+        }
+      },
+      "states": {
+        "loading": "Cargando…"
+      },
+      "status": {
+        "active": "Usuario activo",
+        "inactive": "Usuario inactivo"
+      },
+      "fields": {
+        "username": { "label": "Usuario" },
+        "name": { "label": "Nombre", "placeholder": "Nombre completo" },
+        "role": { "label": "Rol", "placeholder": "Selecciona un rol…" },
+        "password": {
+          "label": "Nuevo password (opcional)",
+          "placeholder": "Dejar vacío para mantener"
+        }
+      },
+      "actions": {
+        "save": "Guardar cambios",
+        "saving": "Guardando…",
+        "cancel": "Cancelar"
+      }
+    },
+    "CreateForm": {
+      "errors": {
+        "loadLists": "No fue posible cargar las listas requeridas.",
+        "unexpected": "Ocurrió un error inesperado."
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Error al cargar datos"
+        },
+        "invalid": {
+          "title": "Formulario incompleto",
+          "description": "Completa los campos obligatorios. La contraseña debe tener al menos 8 caracteres."
+        },
+        "success": {
+          "title": "Usuario creado",
+          "description": "El usuario se registró correctamente."
+        },
+        "createError": {
+          "title": "No se pudo crear el usuario"
+        }
+      },
+      "states": {
+        "loadingLists": "Cargando listas…"
+      },
+      "fields": {
+        "username": { "label": "Usuario", "placeholder": "Nombre de usuario" },
+        "name": { "label": "Nombre completo", "placeholder": "Ej: Juan Pérez" },
+        "password": {
+          "label": "Contraseña",
+          "placeholder": "••••••••",
+          "help": "Mínimo 8 caracteres."
+        },
+        "role": {
+          "label": "Rol",
+          "searchPlaceholder": "Buscar rol…",
+          "empty": "No se encontraron roles"
+        },
+        "business": {
+          "label": "Empresa",
+          "searchPlaceholder": "Buscar empresa…",
+          "empty": "No se encontraron empresas"
+        }
+      },
+      "actions": {
+        "create": "Crear usuario",
+        "creating": "Creando…",
+        "cancel": "Cancelar"
+      }
+    }
   },
 
-  "Pagos": {
-    "meta_title": "Pagos",
-    "meta_description": "#####"
+  "Settings": {
+    "Roles": {
+      "breadcrumbs": {
+        "section": "Seguridad y accesos",
+        "current": "Roles"
+      },
+      "pageTitle": "Roles",
+      "pageDescription": "Gestiona los roles y permisos del sistema",
+      "actions": {
+        "newRole": "Nuevo rol"
+      },
+      "table": {
+        "columns": {
+          "role": "Rol",
+          "description": "Comentario",
+          "status": "Estado",
+          "updatedAt": "Últ. actualización",
+          "actions": "Acciones"
+        },
+        "searchPlaceholder": "Buscar por rol o comentario…"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "states": {
+        "loading": "Cargando roles…"
+      },
+      "panels": {
+        "createTitle": "Crear nuevo rol",
+        "editTitle": "Editar rol"
+      },
+      "alerts": {
+        "loadError": {
+          "title": "No se pudieron cargar los roles",
+          "description": "Inténtalo nuevamente."
+        },
+        "deleteSuccess": {
+          "title": "Rol eliminado",
+          "description": "{{role}} se eliminó correctamente."
+        },
+        "deleteError": {
+          "title": "No se pudo eliminar el rol",
+          "description": "Ocurrió un error inesperado."
+        }
+      },
+      "confirm": {
+        "deleteTitle": "Eliminar rol {{role}}",
+        "deleteDescription": "Esta acción no se puede deshacer."
+      }
+    },
+    "Users": {
+      "breadcrumbs": {
+        "section": "Seguridad y accesos",
+        "current": "Usuarios"
+      },
+      "pageTitle": "Usuarios",
+      "pageDescription": "Gestiona los usuarios del sistema",
+      "actions": {
+        "newUser": "Nuevo usuario"
+      },
+      "table": {
+        "columns": {
+          "username": "Usuario",
+          "name": "Nombre",
+          "role": "Perfil",
+          "status": "Estado",
+          "updatedAt": "Últ. actualización",
+          "actions": "Acciones"
+        },
+        "searchPlaceholder": "Buscar por usuario, nombre o perfil…"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "states": {
+        "loading": "Cargando usuarios…"
+      },
+      "panels": {
+        "createTitle": "Crear nuevo usuario",
+        "editTitle": "Editar usuario"
+      },
+      "alerts": {
+        "loadError": {
+          "title": "No se pudieron cargar los usuarios",
+          "description": "Inténtalo nuevamente."
+        },
+        "deleteSuccess": {
+          "title": "Usuario eliminado",
+          "description": "{{user}} fue eliminado correctamente."
+        },
+        "deleteError": {
+          "title": "No se pudo eliminar el usuario",
+          "description": "Ocurrió un error inesperado."
+        }
+      },
+      "confirm": {
+        "deleteTitle": "Eliminar usuario {{user}}",
+        "deleteDescription": "Esta acción no se puede deshacer."
+      }
+    }
   },
 
-  "Servicios": {
-    "meta_title": "Servicios",
-    "meta_description": "#####"
+  "Common": {
+    "Actions": {
+      "edit": "Editar",
+      "permissions": "Permisos",
+      "delete": "Eliminar"
+    },
+    "confirm": {
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
+    }
   }
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Combobox } from '@headlessui/react';
+import { useTranslations } from 'next-intl';
 import {
   getRolesApi,
   getBusinessApi,
@@ -14,7 +15,6 @@ import { useAlerts } from '@/components/common/AlertsProvider';
 type Props = {
   onClose?: () => void;
   onSuccess?: () => void;
-  /** Empresa preseleccionada (por contexto) */
   defaultBusinessId?: string;
 };
 
@@ -27,6 +27,7 @@ type FormData = {
 };
 
 export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }: Props) {
+  const t = useTranslations('Users.CreateForm');
   const { notify } = useAlerts();
   const [form, setForm] = useState<FormData>({
     user: '',
@@ -44,49 +45,49 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
 
   const [queryRole, setQueryRole] = useState('');
   const [queryBusiness, setQueryBusiness] = useState('');
-  const [formKey, setFormKey] = useState(0); // remount interno
+  const [formKey, setFormKey] = useState(0);
 
   const userRef = useRef<HTMLInputElement>(null);
 
-  // Cargar listas
   useEffect(() => {
     (async () => {
       try {
         setLoadingLists(true);
-        const [r, b] = await Promise.all([getRolesApi(), getBusinessApi()]);
-        setRoles(r);
-        setBusiness(b);
+        const [rolesResponse, businessResponse] = await Promise.all([getRolesApi(), getBusinessApi()]);
+        setRoles(rolesResponse);
+        setBusiness(businessResponse);
       } catch (e: any) {
-        const message = e?.message || 'No fue posible cargar listas';
+        const message = e?.message || t('errors.loadLists');
         setError(message);
-        notify({ type: 'error', title: 'Error al cargar datos', description: message });
+        notify({ type: 'error', title: t('alerts.loadError.title'), description: message });
       } finally {
         setLoadingLists(false);
       }
     })();
-  }, [notify]);
+  }, [notify, t]);
 
-  // Si cambian defaults y no hay selección, aplicarlas
   useEffect(() => {
     if (defaultBusinessId && !form.business_id) {
-      setForm((f) => ({ ...f, business_id: defaultBusinessId }));
+      setForm((current) => ({ ...current, business_id: defaultBusinessId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultBusinessId]);
 
   const filteredRoles =
-    queryRole === '' ? roles : roles.filter((r) => r.name.toLowerCase().includes(queryRole.toLowerCase()));
+    queryRole === '' ? roles : roles.filter((role) => role.name.toLowerCase().includes(queryRole.toLowerCase()));
 
   const filteredBusiness =
-    queryBusiness === '' ? business : business.filter((b) => b.name.toLowerCase().includes(queryBusiness.toLowerCase()));
+    queryBusiness === '' ? business : business.filter((item) => item.name.toLowerCase().includes(queryBusiness.toLowerCase()));
 
-  const valid = useMemo(() => (
-    form.user.trim().length >= 3 &&
-    form.name.trim().length >= 3 &&
-    form.password.trim().length >= 8 &&
-    !!form.role_id &&
-    !!form.business_id
-  ), [form]);
+  const valid = useMemo(
+    () =>
+      form.user.trim().length >= 3 &&
+      form.name.trim().length >= 3 &&
+      form.password.trim().length >= 8 &&
+      !!form.role_id &&
+      !!form.business_id,
+    [form],
+  );
 
   const resetForm = () => {
     setForm({
@@ -98,36 +99,39 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
     });
     setQueryRole('');
     setQueryBusiness('');
-    setFormKey((k) => k + 1); // remount interno (Combobox/Input)
+    setFormKey((key) => key + 1);
     requestAnimationFrame(() => userRef.current?.focus());
   };
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!valid) {
       notify({
         type: 'warning',
-        title: 'Formulario incompleto',
-        description: 'Completa los campos obligatorios. La contraseña debe tener al menos 8 caracteres.',
+        title: t('alerts.invalid.title'),
+        description: t('alerts.invalid.description'),
       });
       return;
     }
 
     try {
       setLoading(true);
-      const res = await registerUser({ ...form, status: true });
+      const response = await registerUser({ ...form, status: true });
       const ok =
-        res?.success ?? res?.ok ?? res?.status === true ?? (typeof res?.statusCode === 'number' && res.statusCode < 300);
+        response?.success ??
+        response?.ok ??
+        response?.status === true ??
+        (typeof response?.statusCode === 'number' && response.statusCode < 300);
 
       if (ok) {
-        notify({ type: 'success', title: 'Usuario creado', description: 'El usuario se registró correctamente.' });
-        resetForm();        // para quedarte en el panel creando más
-        onSuccess?.();      // para refrescar la tabla / cerrar si el padre así lo decide
+        notify({ type: 'success', title: t('alerts.success.title'), description: t('alerts.success.description') });
+        resetForm();
+        onSuccess?.();
       } else {
-        notify({ type: 'error', title: 'No se pudo crear el usuario', description: res?.message ?? 'Ocurrió un error inesperado.' });
+        notify({ type: 'error', title: t('alerts.createError.title'), description: response?.message ?? t('errors.unexpected') });
       }
-    } catch (err: any) {
-      notify({ type: 'error', title: 'Error al conectar con el servidor', description: err?.message ?? 'Inténtalo de nuevo más tarde.' });
+    } catch (error: any) {
+      notify({ type: 'error', title: t('alerts.createError.title'), description: error?.message ?? t('errors.unexpected') });
     } finally {
       setLoading(false);
     }
@@ -138,89 +142,88 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
       key={formKey}
       onSubmit={onSubmit}
       className="p-5 space-y-4"
-      autoComplete="off"             // evita rellenado agresivo
+      autoComplete="off"
     >
-      {/* Usuario */}
       <div className="space-y-1">
-        <label htmlFor="user" className="block text-sm font-medium">Usuario</label>
+        <label htmlFor="user" className="block text-sm font-medium">
+          {t('fields.username.label')}
+        </label>
         <input
           ref={userRef}
           id="user"
-          name="username"            // nombre estándar
+          name="username"
           type="text"
           value={form.user}
-          onChange={(e) => setForm((f) => ({ ...f, user: e.target.value }))}
+          onChange={(event) => setForm((current) => ({ ...current, user: event.target.value }))}
           required
-          autoComplete="username"    // guía correcta para Chrome
-          className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-          placeholder="Nombre de usuario"
+          autoComplete="username"
+          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+          placeholder={t('fields.username.placeholder')}
         />
       </div>
 
-      {/* Nombre completo */}
       <div className="space-y-1">
-        <label htmlFor="name" className="block text-sm font-medium">Nombre completo</label>
+        <label htmlFor="name" className="block text-sm font-medium">
+          {t('fields.name.label')}
+        </label>
         <input
           id="name"
           name="name"
           type="text"
           value={form.name}
-          onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+          onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))}
           required
           autoComplete="name"
-          className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-          placeholder="Ej: Juan Pérez"
+          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+          placeholder={t('fields.name.placeholder')}
         />
       </div>
 
-      {/* Contraseña */}
       <div className="space-y-1">
-        <label htmlFor="password" className="block text-sm font-medium">Contraseña</label>
+        <label htmlFor="password" className="block text-sm font-medium">
+          {t('fields.password.label')}
+        </label>
         <input
           id="password"
           name="new-password"
           type="password"
           value={form.password}
-          onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+          onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
           required
           minLength={8}
-          autoComplete="new-password" // clave para que no reinyecte
-          className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-          placeholder="••••••••"
+          autoComplete="new-password"
+          className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+          placeholder={t('fields.password.placeholder')}
         />
-        <p className="text-xs text-gray-500">Mínimo 8 caracteres.</p>
+        <p className="text-xs text-gray-500">{t('fields.password.help')}</p>
       </div>
 
-      {/* Selects con búsqueda */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {/* Rol */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div className="space-y-1">
-          <label className="block text-sm font-medium">Rol</label>
+          <label className="block text-sm font-medium">{t('fields.role.label')}</label>
           <Combobox
-            value={roles.find((r) => r.id === form.role_id) ?? null}
-            onChange={(value: Role | null) => setForm((f) => ({ ...f, role_id: value?.id ?? '' }))}
+            value={roles.find((role) => role.id === form.role_id) ?? null}
+            onChange={(value: Role | null) => setForm((current) => ({ ...current, role_id: value?.id ?? '' }))}
           >
             <div className="relative">
               <Combobox.Input
-                key={`role-${formKey}`}  // limpia input interno
-                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
+                key={`role-${formKey}`}
+                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
                 displayValue={(role: Role) => role?.name ?? ''}
-                onChange={(e) => setQueryRole(e.target.value)}
-                placeholder="Buscar o seleccionar rol"
+                onChange={(event) => setQueryRole(event.target.value)}
+                placeholder={t('fields.role.searchPlaceholder')}
               />
-              <Combobox.Options className="absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md bg-white border border-gray-200 shadow-md">
-                {filteredRoles.length === 0 && (
-                  <div className="px-3 py-2 text-sm text-gray-500">Sin resultados</div>
-                )}
-                {filteredRoles.map((r) => (
+              <Combobox.Options className="absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg">
+                {filteredRoles.length === 0 && <div className="px-3 py-2 text-gray-500">{t('fields.role.empty')}</div>}
+                {filteredRoles.map((role) => (
                   <Combobox.Option
-                    key={r.id}
-                    value={r}
+                    key={role.id}
+                    value={role}
                     className={({ active }) =>
                       `cursor-pointer select-none px-3 py-2 text-sm ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-800'}`
                     }
                   >
-                    {r.name}
+                    {role.name}
                   </Combobox.Option>
                 ))}
               </Combobox.Options>
@@ -228,34 +231,31 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
           </Combobox>
         </div>
 
-        {/* Empresa */}
         <div className="space-y-1">
-          <label className="block text-sm font-medium">Empresa</label>
+          <label className="block text-sm font-medium">{t('fields.business.label')}</label>
           <Combobox
-            value={business.find((b) => b.id === form.business_id) ?? null}
-            onChange={(value: Business | null) => setForm((f) => ({ ...f, business_id: value?.id ?? '' }))}
+            value={business.find((item) => item.id === form.business_id) ?? null}
+            onChange={(value: Business | null) => setForm((current) => ({ ...current, business_id: value?.id ?? '' }))}
           >
             <div className="relative">
               <Combobox.Input
-                key={`biz-${formKey}`}   // limpia input interno
-                className="w-full border border-gray-200 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-200"
-                displayValue={(b: Business) => b?.name ?? ''}
-                onChange={(e) => setQueryBusiness(e.target.value)}
-                placeholder="Buscar o seleccionar empresa"
+                key={`business-${formKey}`}
+                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
+                displayValue={(item: Business) => item?.name ?? ''}
+                onChange={(event) => setQueryBusiness(event.target.value)}
+                placeholder={t('fields.business.searchPlaceholder')}
               />
-              <Combobox.Options className="absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md bg-white border border-gray-200 shadow-md">
-                {filteredBusiness.length === 0 && (
-                  <div className="px-3 py-2 text-sm text-gray-500">Sin resultados</div>
-                )}
-                {filteredBusiness.map((b) => (
+              <Combobox.Options className="absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg">
+                {filteredBusiness.length === 0 && <div className="px-3 py-2 text-gray-500">{t('fields.business.empty')}</div>}
+                {filteredBusiness.map((item) => (
                   <Combobox.Option
-                    key={b.id}
-                    value={b}
+                    key={item.id}
+                    value={item}
                     className={({ active }) =>
                       `cursor-pointer select-none px-3 py-2 text-sm ${active ? 'bg-blue-50 text-blue-700' : 'text-gray-800'}`
                     }
                   >
-                    {b.name}
+                    {item.name}
                   </Combobox.Option>
                 ))}
               </Combobox.Options>
@@ -264,27 +264,26 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
         </div>
       </div>
 
-      {/* Errores / estado */}
       {error && <p className="text-xs text-red-600">{error}</p>}
-      {loadingLists && <p className="text-xs text-gray-500">Cargando listas…</p>}
+      {loadingLists && <p className="text-xs text-gray-500">{t('states.loadingLists')}</p>}
 
-      {/* Botones */}
       <div className="flex items-center justify-end gap-2 pt-2">
         <button
           type="button"
           onClick={onClose}
-          className="px-3 py-2 text-sm rounded-md border border-gray-200 hover:bg-gray-50"
+          className="rounded-md border border-gray-200 px-3 py-2 text-sm hover:bg-gray-50"
         >
-          Cancelar
+          {t('actions.cancel')}
         </button>
         <button
           type="submit"
           disabled={!valid || loading}
-          className="px-4 py-2 text-sm rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? 'Creando…' : 'Crear usuario'}
+          {loading ? t('actions.creating') : t('actions.create')}
         </button>
       </div>
     </form>
   );
 }
+

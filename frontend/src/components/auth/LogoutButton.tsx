@@ -1,9 +1,10 @@
 'use client';
 
-import { logout } from '@/services/conexion';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { logout } from '@/services/conexion';
 import { useAlerts } from '@/components/common/AlertsProvider';
 
 interface LogoutButtonProps {
@@ -13,6 +14,8 @@ interface LogoutButtonProps {
 
 export default function LogoutButton({ className = '', isNavOpen = true }: LogoutButtonProps) {
   const router = useRouter();
+  const { locale } = useParams() as { locale?: string };
+  const t = useTranslations('Auth.Logout');
   const [loading, setLoading] = useState(false);
   const { notify } = useAlerts();
 
@@ -20,11 +23,15 @@ export default function LogoutButton({ className = '', isNavOpen = true }: Logou
     setLoading(true);
     try {
       await logout();
-      document.cookie = 'token=; Max-Age=0; path=/;';
-      router.push('/es/sign-in');
+      if (typeof window !== 'undefined') {
+        window.sessionStorage.removeItem('auth_token');
+        window.localStorage.removeItem('auth_token');
+      }
+      notify({ type: 'success', title: t('successTitle'), description: t('successDescription') });
+      router.push(`/${locale ?? 'es'}/sign-in`);
     } catch (error) {
       console.error('Error al cerrar sesión:', error);
-      notify({ type: 'error', title: 'No se pudo cerrar sesión', description: 'Inténtalo de nuevo en unos segundos.' });
+      notify({ type: 'error', title: t('errorTitle'), description: t('errorDescription') });
     } finally {
       setLoading(false);
     }
@@ -36,11 +43,11 @@ export default function LogoutButton({ className = '', isNavOpen = true }: Logou
       onClick={handleLogout}
       disabled={loading}
       className={`w-full flex items-center justify-center gap-2 px-3 py-2.5 text-sm text-gray-700
-        hover:text-gray-900 hover:bg-gray-50 border border-gray-200 rounded-md 
+        hover:text-gray-900 hover:bg-gray-50 border border-gray-200 rounded-md
         transition-all duration-200 font-medium ${!isNavOpen ? 'p-2 justify-center' : 'justify-start'} ${className}`}
     >
       <LogOut className="w-4 h-4 flex-shrink-0" />
-      {isNavOpen && <span>{loading ? 'Cerrando...' : 'Cerrar sesión'}</span>}
+      {isNavOpen && <span>{loading ? t('loading') : t('buttonLabel')}</span>}
     </button>
   );
 }
