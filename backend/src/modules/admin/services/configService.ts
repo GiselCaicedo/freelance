@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 // =================== Usuarios ===================
 export async function fetchUsers(empresaId: string) {
   return prisma.user.findMany({
-    where: { business_id: empresaId },
+    where: { client_id: empresaId },
     select: {
       id: true,
       user: true,
@@ -151,7 +151,7 @@ export async function getUserById(id: string) {
     where: { id },
     include: {
       role: { select: { id: true, name: true } },
-      business: { select: { id: true, name: true } },
+      client: { select: { id: true, name: true } },
     },
   })
 }

@@ -217,12 +217,9 @@ export async function saveRolePermissionsApi(roleId: string, permissionIds: stri
 }
 
 
-/* ============================================================
- * 🏢 Empresas (utils)
- * ============================================================ */
 export async function getBusinessApi(): Promise<Business[]> {
   try {
-    const { data } = await api.get('/utils/get-business');
+    const { data } = await api.get('/utils/get-client');
     if (!Array.isArray(data)) throw new Error('Respuesta inesperada del servidor');
     return data;
   } catch (error: any) {

@@ -1,9 +1,9 @@
 import { Router } from 'express'
-import { getRoles, getBusiness } from '../controllers/utilsController.js'
+import { getRoles, getclient } from '../controllers/utilsController.js'
 
 const utilsRoutes = Router()
 
 utilsRoutes.get('/get-roles', getRoles)
-utilsRoutes.get('/get-business', getBusiness)
+utilsRoutes.get('/get-client', getclient)
 
 export default utilsRoutes

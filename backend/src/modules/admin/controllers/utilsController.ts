@@ -7,8 +7,8 @@ export const getRoles = async (req: Request, res: Response) => {
     res.status(200).json(roles);
 }
 
-export const getBusiness = async (req: Request, res: Response) => {
+export const getclient = async (req: Request, res: Response) => {
 
-    const business = await utilsService.getBusinessFromDB()
-    res.status(200).json(business);
+    const client = await utilsService.getclientFromDB()
+    res.status(200).json(client);
 }

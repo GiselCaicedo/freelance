@@ -10,8 +10,8 @@ export const getRolesFromDB = async () => {
     return roles;
 }
 
-export const getBusinessFromDB = async () => {
-    const business = await prisma.business.findMany({
+export const getclientFromDB = async () => {
+    const client = await prisma.client.findMany({
         select: {
             id: true,
             name: true
@@ -20,5 +20,5 @@ export const getBusinessFromDB = async () => {
             status:true
         }
     });
-    return business;
+    return client;
 }

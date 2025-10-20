@@ -33,13 +33,13 @@ export const login = async (req: Request, res: Response) => {
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { user, name, password, role_id, business_id, ...rest } = req.body
+    const { user, name, password, role_id, client_id, ...rest } = req.body
 
     if (!user || !password) {
       return res.status(400).json({ message: 'Usuario y contraseña son obligatorios' })
     }
 
-    const newUser = await authService.registerUser({ user, name, password, role_id, business_id, ...rest })
+    const newUser = await authService.registerUser({ user, name, password, role_id, client_id, ...rest })
 
     res.status(201).json({
       message: 'Usuario registrado correctamente',

@@ -18,7 +18,7 @@ export const loginUser = async (identifier: string, password: string) => {
           },
         },
       },
-      business: true,
+      client: true,
     },
   });
 
@@ -30,7 +30,7 @@ export const loginUser = async (identifier: string, password: string) => {
   const permissions =
     user.role?.role_permission.map((rp) => rp.permission.name) ?? [];
 
-  console.log(user.business)
+  console.log(user.client)
 
   const token = jwt.sign(
     {
@@ -38,8 +38,8 @@ export const loginUser = async (identifier: string, password: string) => {
       name: user.name,
       role: user.role?.name,
       permissions,
-      empresaid: user.business?.id || null,
-      empresa: user.business?.name || null,
+      empresaid: user.client?.id || null,
+      empresa: user.client?.name || null,
     },
     process.env.JWT_SECRET!,
     { expiresIn: '1d' }
@@ -58,8 +58,8 @@ export const loginUser = async (identifier: string, password: string) => {
       user: user.user,
       name: user.name,
       role: user.role?.name,
-      business_id: user.business_id,
-      business_name: user.business?.name,
+      client_id: user.client_id,
+      client_name: user.client?.name,
       permissions,
     },
   };
@@ -71,9 +71,9 @@ export const registerUser = async (data: {
   name: string
   password: string
   role_id?: number
-  business_id?: number
+  client_id?: number
 }) => {
-  const { user, name, password, role_id, business_id, ...rest } = data
+  const { user, name, password, role_id, client_id, ...rest } = data
 
   const existing = await prisma.user.findFirst({
     where: { OR: [{ user }, { name }] },
@@ -88,7 +88,7 @@ export const registerUser = async (data: {
       name,
       pass: hash,
       role_id,
-      business_id,
+      client_id,
       created: new Date(),
       updated: new Date(),
       status: true,
