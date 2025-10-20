@@ -1,5 +1,74 @@
+import type { Prisma } from '@prisma/client'
 import { prisma } from '../../../config/db.ts'
 import bcrypt from 'bcrypt'
+
+const PANEL_ROLE_CATEGORIES = ['admin', 'client'] as const
+type PanelRoleCategory = (typeof PANEL_ROLE_CATEGORIES)[number]
+
+const PANEL_PERMISSION_NAME_ALIASES: Record<PanelRoleCategory, string[]> = {
+  admin: ['admin', 'panel_admin'],
+  client: ['client', 'cliente', 'panel_client'],
+}
+
+const PANEL_PERMISSION_FILTER = Object.values(PANEL_PERMISSION_NAME_ALIASES).flat()
+
+const buildPanelPermissionWhere = (category?: PanelRoleCategory) => {
+  const aliases = category ? PANEL_PERMISSION_NAME_ALIASES[category] : PANEL_PERMISSION_FILTER
+  return {
+    OR: aliases.map((name) => ({
+      name: { equals: name, mode: 'insensitive' as const },
+    })),
+  }
+}
+
+const normalizeRoleCategory = (raw?: string | null): PanelRoleCategory => {
+  const value = (raw ?? '').trim().toLowerCase()
+  for (const category of PANEL_ROLE_CATEGORIES) {
+    if (PANEL_PERMISSION_NAME_ALIASES[category].some((alias) => alias.toLowerCase() === value)) {
+      return category
+    }
+  }
+  if (PANEL_ROLE_CATEGORIES.includes(value as PanelRoleCategory)) {
+    return value as PanelRoleCategory
+  }
+  throw new Error('Categoría de rol inválida. Debe ser "admin" o "client".')
+}
+
+const detectCategoryFromPermissionName = (name?: string | null): PanelRoleCategory | null => {
+  if (!name) return null
+  const normalized = name.trim().toLowerCase()
+  for (const category of PANEL_ROLE_CATEGORIES) {
+    if (PANEL_PERMISSION_NAME_ALIASES[category].some((alias) => alias.toLowerCase() === normalized)) {
+      return category
+    }
+  }
+  return null
+}
+
+const safeNormalizeRoleCategory = (raw?: string | null): PanelRoleCategory | null => {
+  if (!raw) return null
+  try {
+    return normalizeRoleCategory(raw)
+  } catch {
+    return null
+  }
+}
+
+const resolvePanelPermissionId = async (
+  tx: Prisma.TransactionClient,
+  category: PanelRoleCategory,
+): Promise<string> => {
+  const permission = await tx.permission.findFirst({
+    where: buildPanelPermissionWhere(category),
+    select: { id: true },
+  })
+
+  if (!permission) {
+    throw new Error(`No se encontró el permiso del panel para la categoría "${category}".`)
+  }
+
+  return permission.id
+}
 
 // =================== Usuarios ===================
 export async function fetchUsers(empresaId: string) {
@@ -24,37 +93,33 @@ export async function fetchRoles() {
       description: true,
       status: true,
       updated: true,
+      role_category: true,
       // solo necesitamos saber si tiene uno de estos permisos
       role_permission: {
         where: {
-          permission: {
-            name: { in: ["admin", "client"] },
-          },
+          permission: buildPanelPermissionWhere(),
         },
         select: {
-          permission: { select: { name: true } },
+          permission: { select: { id: true, name: true } },
         },
       },
     },
     orderBy: { name: "asc" },
   });
+  return roles.map((role) => {
+    const storedCategory = safeNormalizeRoleCategory(role.role_category)
+    const permissionCategory = detectCategoryFromPermissionName(role.role_permission[0]?.permission?.name)
+    const roleCategory = storedCategory ?? permissionCategory ?? null
 
-  console.log('Roles obtenidos de DB:', roles[0].role_permission);
-
-  // campo role_category segun el permiso que tenga
-  return roles.map((role) => ({
-    id: role.id,
-    name: role.name,
-    description: role.description,
-    status: role.status,
-    updated: role.updated,
-    role_category:
-      role.role_permission[0]?.permission.name === "admin"
-        ? "admin"
-        : role.role_permission[0]?.permission.name === "client"
-        ? "client"
-        : null,
-  }));
+    return {
+      id: role.id,
+      name: role.name,
+      description: role.description,
+      status: role.status,
+      updated: role.updated,
+      role_category: roleCategory,
+    }
+  })
 }
 
 
@@ -91,69 +156,116 @@ export async function fetchPermissionsGrouped() {
 }
 
 // =================== CRUD de Roles ===================
-export function fetchRoleByIdSvc(id: string) {
-  return prisma.role.findUnique({
+export async function fetchRoleByIdSvc(id: string) {
+  const role = await prisma.role.findUnique({
     where: { id },
-    select: { id: true, name: true, description: true, status: true, updated: true },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      status: true,
+      updated: true,
+      role_category: true,
+      role_permission: {
+        where: { permission: { is: buildPanelPermissionWhere() } },
+        select: { permission: { select: { name: true } } },
+      },
+    },
   })
+
+  if (!role) return null
+
+  const storedCategory = safeNormalizeRoleCategory(role.role_category)
+  const permissionCategory = detectCategoryFromPermissionName(role.role_permission[0]?.permission?.name)
+
+  return {
+    id: role.id,
+    name: role.name,
+    description: role.description,
+    status: role.status,
+    updated: role.updated,
+    role_category: storedCategory ?? permissionCategory ?? null,
+  }
 }
 
 export async function createRoleSvc(data: {
-  name: string;
-  description?: string | null;
-  status?: boolean;
-  role_category?: string | null; // "client" o "admin"
+  name: string
+  description?: string | null
+  status?: boolean
+  role_category?: string | null // "client" o "admin"
 }) {
   return prisma.$transaction(async (tx) => {
-    // 1️⃣ Crear el rol
+    const category = normalizeRoleCategory(data.role_category)
+
     const role = await tx.role.create({
       data: {
         name: data.name,
         description: data.description ?? null,
-        status: typeof data.status === "boolean" ? data.status : true,
+        status: typeof data.status === 'boolean' ? data.status : true,
         updated: new Date(),
+        role_category: category,
       },
-    });
+      select: { id: true, name: true, description: true, status: true, updated: true, role_category: true },
+    })
 
-    // 2️⃣ Asignar permiso de categoría (si aplica)
-    if (data.role_category) {
-      const permission = await tx.permission.findFirst({
-        where: { name: data.role_category },
-        select: { id: true },
-      });
+    const permissionId = await resolvePanelPermissionId(tx, category)
 
-      if (!permission) {
-        throw new Error(`Permiso no encontrado para la categoría: ${data.role_category}`);
-      }
+    await tx.role_permission.create({
+      data: {
+        role_id: role.id,
+        permission_id: permissionId,
+      },
+    })
 
-      await tx.role_permission.create({
-        data: {
-          role_id: role.id,
-          permission_id: permission.id,
-        },
-      });
-    }
-
-    // 3️⃣ Retornar rol con su id
-    return role;
-  });
+    return role
+  })
 }
 
 
 
-export function updateRoleSvc(
+export async function updateRoleSvc(
   id: string,
-  payload: { name?: string; description?: string | null; status?: boolean },
+  payload: { name?: string; description?: string | null; status?: boolean; role_category?: string | null },
 ) {
-  const data: any = { updated: new Date() }
-  if (typeof payload.name !== 'undefined') data.name = payload.name
-  if (typeof payload.description !== 'undefined') data.description = payload.description
-  if (typeof payload.status !== 'undefined') data.status = payload.status
+  return prisma.$transaction(async (tx) => {
+    const data: Prisma.RoleUpdateInput = { updated: new Date() }
 
-  return prisma.role.update({
-    where: { id },
-    data,
-    select: { id: true, name: true, description: true, status: true, updated: true },
+    if (typeof payload.name !== 'undefined') data.name = payload.name
+    if (typeof payload.description !== 'undefined') data.description = payload.description
+    if (typeof payload.status !== 'undefined') data.status = payload.status
+
+    let category: PanelRoleCategory | null = null
+
+    if (typeof payload.role_category !== 'undefined') {
+      category = normalizeRoleCategory(payload.role_category)
+      data.role_category = category
+    }
+
+    const updated = await tx.role.update({
+      where: { id },
+      data,
+      select: { id: true, name: true, description: true, status: true, updated: true, role_category: true },
+    })
+
+    if (category) {
+      const permissionId = await resolvePanelPermissionId(tx, category)
+
+      await tx.role_permission.deleteMany({
+        where: {
+          role_id: id,
+          permission: { is: buildPanelPermissionWhere() },
+        },
+      })
+
+      await tx.role_permission.create({
+        data: {
+          role_id: id,
+          permission_id: permissionId,
+        },
+      })
+    }
+
+    return updated
   })
 }
 
@@ -175,41 +287,65 @@ export async function fetchRolePermissionsSvc(roleId: string) {
 }
 
 export async function replaceRolePermissionsSvc(roleId: string, permissionIds: string[]) {
-  const incoming = Array.from(new Set(permissionIds))
+  return prisma.$transaction(async (tx) => {
+    const incoming = Array.from(
+      new Set(permissionIds.filter((id) => typeof id === 'string' && id.trim().length > 0)),
+    )
 
-  // Valida que existan en BD
-  const validIds = new Set(
-    (await prisma.permission.findMany({
+    if (incoming.length === 0) {
+      throw new Error('Debes seleccionar al menos un permiso para el rol.')
+    }
+
+    const permissions = await tx.permission.findMany({
       where: { id: { in: incoming } },
-      select: { id: true },
-    })).map(p => p.id)
-  )
-  const validArray = [...validIds]
+      select: { id: true, name: true },
+    })
 
-  const existing = await prisma.role_permission.findMany({
-    where: { role_id: roleId },
-    select: { permission_id: true },
-  })
-  const existingIds = new Set(existing.map(e => e.permission_id))
+    if (permissions.length !== incoming.length) {
+      throw new Error('Algunos permisos seleccionados no existen o fueron eliminados.')
+    }
 
-  const toDelete = [...existingIds].filter(id => !validIds.has(id))
-  const toCreate = validArray.filter(id => !existingIds.has(id))
+    const panelFromIncoming = permissions
+      .map((permission) => ({
+        id: permission.id,
+        category: detectCategoryFromPermissionName(permission.name),
+      }))
+      .filter((item): item is { id: string; category: PanelRoleCategory } => Boolean(item.category))
 
-  await prisma.$transaction([
-    ...(toDelete.length
-      ? [prisma.role_permission.deleteMany({
+    if (panelFromIncoming.length !== 1) {
+      throw new Error('Cada rol debe tener exactamente un permiso de panel (admin o client).')
+    }
+
+    const panelCategory = panelFromIncoming[0].category
+    const validIds = new Set(permissions.map((permission) => permission.id))
+
+    const existing = await tx.role_permission.findMany({
+      where: { role_id: roleId },
+      select: { permission_id: true },
+    })
+
+    const existingIds = new Set(existing.map((item) => item.permission_id).filter(Boolean) as string[])
+    const toDelete = [...existingIds].filter((id) => !validIds.has(id))
+    const toCreate = [...validIds].filter((id) => !existingIds.has(id))
+
+    if (toDelete.length > 0) {
+      await tx.role_permission.deleteMany({
         where: { role_id: roleId, permission_id: { in: toDelete } },
-      })]
-      : []),
-    ...(toCreate.length
-      ? [prisma.role_permission.createMany({
-        data: toCreate.map(pid => ({ role_id: roleId, permission_id: pid })),
-        skipDuplicates: true,
-      })]
-      : []),
-    prisma.role.update({ where: { id: roleId }, data: { updated: new Date() } }),
-  ])
+      })
+    }
 
+    if (toCreate.length > 0) {
+      await tx.role_permission.createMany({
+        data: toCreate.map((permissionId) => ({ role_id: roleId, permission_id: permissionId })),
+        skipDuplicates: true,
+      })
+    }
+
+    await tx.role.update({
+      where: { id: roleId },
+      data: { updated: new Date(), role_category: panelCategory },
+    })
+  })
 }
 
 // =================== Usuario puntual ===================

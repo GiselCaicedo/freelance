@@ -42,11 +42,7 @@ export default function SignInPage() {
         const hasAdminPanel = normalized.includes('admin');
         const hasClientPanel = normalized.includes('cliente') || normalized.includes('client');
 
-        const target = hasAdminPanel
-          ? `/${locale}/dashboard`
-          : hasClientPanel
-            ? `/${locale}/client`
-            : `/${locale}`;
+        const target = `/${locale}`;
 
         notify({
           type: 'success',

@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { Role, updateRoleApi, createRoleApi } from '@/shared/services/conexion';
+import { Role, RoleCategory, updateRoleApi, createRoleApi } from '@/shared/services/conexion';
+import { useAlerts } from '@/shared/components/common/AlertsProvider';
 
 type Props = {
   role: Role | null;
@@ -10,10 +11,28 @@ type Props = {
   onSaved: (updated: Role) => void;
 };
 
+const PANEL_CATEGORY_ALIASES: Record<RoleCategory, string[]> = {
+  admin: ['admin', 'panel_admin'],
+  client: ['client', 'cliente', 'panel_client'],
+};
+
+const normalizeCategory = (value?: string | null): RoleCategory | '' => {
+  if (!value) return '';
+  const normalized = value.trim().toLowerCase();
+  if (PANEL_CATEGORY_ALIASES.admin.some((alias) => alias.toLowerCase() === normalized)) {
+    return 'admin';
+  }
+  if (PANEL_CATEGORY_ALIASES.client.some((alias) => alias.toLowerCase() === normalized)) {
+    return 'client';
+  }
+  return '';
+};
+
 export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
-  const [form, setForm] = useState({ name: '', description: '', status: true, role_category: '' });
+  const [form, setForm] = useState({ name: '', description: '', status: true, role_category: '' as '' | RoleCategory });
   const [saving, setSaving] = useState(false);
   const t = useTranslations('Roles.Form');
+  const { notify } = useAlerts();
 
   useEffect(() => {
     if (!open) return;
@@ -22,7 +41,7 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
         name: role.name ?? '',
         description: role.description ?? '',
         status: role.status ?? true,
-        role_category: role.role_category ?? '',
+        role_category: normalizeCategory(role.role_category),
       });
     } else {
       setForm({ name: '', description: '', status: true, role_category: '' });
@@ -34,14 +53,17 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    if (!form.role_category) {
+      setSaving(false);
+      return;
+    }
     try {
       const payload = {
         name: form.name.trim(),
-        description: form.description.trim(),
+        description: form.description.trim() || null,
         status: form.status,
         role_category: form.role_category,
       };
-      console.log('Payload enviado:', payload);
 
       const result = role?.id
         ? await updateRoleApi(role.id, payload)
@@ -49,6 +71,9 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
 
       onSaved(result);
       onClose();
+    } catch (error: any) {
+      const message = error?.response?.data?.message ?? error?.message ?? t('alerts.saveError.description');
+      notify({ type: 'error', title: t('alerts.saveError.title'), description: message });
     } finally {
       setSaving(false);
     }
@@ -82,14 +107,18 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">role_category</label>
+        <label className="block text-sm font-medium text-gray-700">{t('panel.label')}</label>
         <select
           className={field}
           value={form.role_category}
-          onChange={(e) => setForm({ ...form, role_category: e.target.value })}
+          onChange={(e) => setForm({ ...form, role_category: e.target.value as RoleCategory | '' })}
+          required
         >
-          <option value="admin">Administrador</option>
-          <option value="client">Cliente</option>
+          <option value="" disabled hidden>
+            {t('panel.placeholder')}
+          </option>
+          <option value="admin">{t('panel.options.admin')}</option>
+          <option value="client">{t('panel.options.client')}</option>
         </select>
       </div>
 
@@ -107,7 +136,7 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
       <div className="pt-2 flex gap-3">
         <button
           type="submit"
-          disabled={saving}
+          disabled={saving || !form.role_category || !form.name.trim()}
           className="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
         >
           {saving

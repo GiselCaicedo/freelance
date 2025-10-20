@@ -69,14 +69,37 @@ export interface BackendUser {
   client?: { id: string; name: string } | null;
 }
 
+export type RoleCategory = 'admin' | 'client'
+
 export interface Role {
-  id: string;
-  name: string;
-  description?: string | null;
-  status?: boolean;
-  updated?: string | null;
-  role_category?: string | null;
+  id: string
+  name: string
+  description?: string | null
+  status?: boolean
+  updated?: string | null
+  role_category?: RoleCategory | null
 }
+
+const ROLE_CATEGORY_ALIASES: Record<RoleCategory, string[]> = {
+  admin: ['admin', 'panel_admin'],
+  client: ['client', 'cliente', 'panel_client'],
+}
+
+const normalizeRoleCategoryValue = (value: unknown): RoleCategory | null => {
+  if (typeof value !== 'string') return null
+  const normalized = value.trim().toLowerCase()
+  for (const [category, aliases] of Object.entries(ROLE_CATEGORY_ALIASES)) {
+    if (aliases.some((alias) => alias.toLowerCase() === normalized)) {
+      return category as RoleCategory
+    }
+  }
+  return null
+}
+
+const withNormalizedRole = <T extends Role>(role: T): T => ({
+  ...role,
+  role_category: normalizeRoleCategoryValue(role.role_category ?? null),
+})
 
 export interface Permission {
   id: string;
@@ -155,14 +178,14 @@ export async function deleteUserApi(id: string): Promise<boolean> {
 export async function listRolesApi(): Promise<Role[]> {
   try {
     const { data } = await api.get('/config/roles');
-    if (Array.isArray(data)) return data;
-    if (data?.success && Array.isArray(data?.data)) return data.data;
+    if (Array.isArray(data)) return data.map((role) => withNormalizedRole(role as Role));
+    if (data?.success && Array.isArray(data?.data)) return data.data.map((role: Role) => withNormalizedRole(role));
     throw new Error('Formato inesperado en /config/roles');
   } catch (err) {
     // Fallback al endpoint legado
     const { data } = await api.get('/config/get-roles');
-    if (data?.success && Array.isArray(data?.data)) return data.data;
-    if (Array.isArray(data)) return data;
+    if (data?.success && Array.isArray(data?.data)) return data.data.map((role: Role) => withNormalizedRole(role));
+    if (Array.isArray(data)) return data.map((role) => withNormalizedRole(role as Role));
     throw err;
   }
 }
@@ -173,23 +196,23 @@ export const getRolesApi = listRolesApi;
 // Obtener un rol
 export async function getRoleApi(id: string): Promise<Role> {
   const { data } = await api.get(`/config/roles/${id}`);
-  return data as Role;
+  return withNormalizedRole(data as Role);
 }
 
 // Crear rol
 export async function createRoleApi(payload: {
-  name: string; description?: string | null; status?: boolean; role_category?: string | null;
+  name: string; description?: string | null; status?: boolean; role_category: RoleCategory;
 }): Promise<Role> {
   const { data } = await api.post('/config/roles', payload);
-  return data as Role;
+  return withNormalizedRole(data as Role);
 }
 
 // Actualizar rol
 export async function updateRoleApi(id: string, payload: {
-  name?: string; description?: string | null; status?: boolean;
+  name?: string; description?: string | null; status?: boolean; role_category?: RoleCategory;
 }): Promise<Role> {
   const { data } = await api.put(`/config/roles/${id}`, payload);
-  return data as Role;
+  return withNormalizedRole(data as Role);
 }
 
 // Eliminar rol
@@ -205,10 +228,10 @@ export async function listPermissionsApi(): Promise<Permission[]> {
 }
 
 // Permisos asignados a un rol
-export async function getRolePermissionsApi(roleId: string): Promise<Permission[]> {
+export async function getRolePermissionsApi(roleId: string): Promise<string[]> {
   const { data } = await api.get(`/config/roles/${roleId}/permissions`);
   if (!Array.isArray(data)) throw new Error('Respuesta inesperada al listar permisos del rol');
-  return data as Permission[];
+  return data as string[];
 }
 
 // Guardar permisos del rol (replace all)
@@ -274,9 +297,9 @@ export interface Permission {
   module?: string | null
 }
 
-export async function getRoleByIdApi(id: string) {
+export async function getRoleByIdApi(id: string): Promise<Role> {
   const { data } = await api.get(`/config/roles/${id}`)
-  return data as { id: string; name: string; description?: string | null; status: boolean }
+  return withNormalizedRole(data as Role)
 }
 
 export async function getRolePermissionIdsApi(roleId: string) {

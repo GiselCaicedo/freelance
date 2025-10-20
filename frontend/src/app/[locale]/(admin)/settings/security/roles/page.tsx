@@ -13,19 +13,36 @@ import PageHeader from '@/shared/components/common/PageHeader';
 import ConfirmDialog from '@/shared/components/common/ConfirmDialog';
 import { useAlerts } from '@/shared/components/common/AlertsProvider';
 import RoleFormModal from '@/panels/admin/components/roles/RoleFormModal';
-import { listRolesApi, deleteRoleApi, Role } from '@/shared/services/conexion';
+import { listRolesApi, deleteRoleApi, Role, RoleCategory } from '@/shared/services/conexion';
 
 type RoleRow = {
-  id: string;
-  name: string;
-  description: string;
-  isActive: boolean;
-  updatedAt: string;
+  id: string
+  name: string
+  description: string
+  isActive: boolean
+  updatedAt: string
+  role_category: RoleCategory | null
 };
 
 type ConfirmState = {
   open: boolean;
   role: RoleRow | null;
+};
+
+const PANEL_CATEGORY_ALIASES: Record<RoleCategory, string[]> = {
+  admin: ['admin', 'panel_admin'],
+  client: ['client', 'cliente', 'panel_client'],
+};
+
+const normalizeCategory = (value?: string | null): RoleCategory | null => {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  for (const [category, aliases] of Object.entries(PANEL_CATEGORY_ALIASES)) {
+    if (aliases.some((alias) => alias.toLowerCase() === normalized)) {
+      return category as RoleCategory;
+    }
+  }
+  return null;
 };
 
 export default function RolesPage() {
@@ -54,6 +71,7 @@ export default function RolesPage() {
       description: (role as any).description ?? '',
       isActive: (role.status ?? true) === true,
       updatedAt: (role.updated ?? (role as any).updatedAt ?? new Date().toISOString()).slice(0, 10),
+      role_category: normalizeCategory(role.role_category),
     }));
 
   const fetchRoles = useCallback(async () => {
@@ -82,6 +100,7 @@ export default function RolesPage() {
       description: row.description,
       status: row.isActive,
       updated: row.updatedAt,
+      role_category: row.role_category,
     } as Role);
     setOpenCreate(false);
     setOpenEdit(true);
@@ -139,6 +158,32 @@ export default function RolesPage() {
         flex: 1.4,
         minWidth: 200,
         cellClass: 'text-gray-700',
+      },
+      {
+        headerName: t('table.columns.panel'),
+        field: 'role_category',
+        flex: 0.9,
+        minWidth: 150,
+        cellRenderer: (params: any) => {
+          const category = params.value as RoleCategory | null;
+          if (!category) {
+            return <span className="text-gray-500">—</span>;
+          }
+          const isAdmin = category === 'admin';
+          const badgeClasses = isAdmin
+            ? 'bg-slate-100 text-slate-700 ring-slate-200'
+            : 'bg-emerald-50 text-emerald-700 ring-emerald-200';
+          const dotClass = isAdmin ? 'bg-slate-500' : 'bg-emerald-500';
+          const label = isAdmin ? t('table.panelBadges.admin') : t('table.panelBadges.client');
+          return (
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ${badgeClasses}`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${dotClass}`} />
+              {label}
+            </span>
+          );
+        },
       },
       {
         headerName: t('table.columns.status'),
@@ -247,7 +292,7 @@ export default function RolesPage() {
 
       <SidePanel title={t('panels.createTitle')} open={openCreate} onClose={() => setOpenCreate(false)} reserveRef={containerRef}>
         <RoleFormModal
-          role={null as any}
+          role={null}
           open={openCreate}
           onClose={() => setOpenCreate(false)}
           onSaved={async () => {
