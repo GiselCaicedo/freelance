@@ -98,20 +98,38 @@ export async function getRoleById(req: Request, res: Response) {
 }
 
 export async function createRole(req: Request, res: Response) {
-  const { name, description, status, role_category} = req.body as {
-    name: string; description?: string | null; status?: boolean, role_category?: string
+  try {
+    const { name, description, status, role_category } = req.body as {
+      name: string
+      description?: string | null
+      status?: boolean
+      role_category?: string | null
+    }
+
+    const created = await createRoleSvc({ name, description, status, role_category })
+    return res.status(201).json(created)
+  } catch (error: any) {
+    const message = error?.message ?? 'No fue posible crear el rol'
+    return res.status(400).json({ message })
   }
-  const created = await createRoleSvc({ name, description, status, role_category })
-  return res.status(201).json(created)
 }
 
 export async function updateRoleCtrl(req: Request, res: Response) {
-  const { id } = req.params
-  const { name, description, status } = req.body as {
-    name?: string; description?: string | null; status?: boolean
+  try {
+    const { id } = req.params
+    const { name, description, status, role_category } = req.body as {
+      name?: string
+      description?: string | null
+      status?: boolean
+      role_category?: string | null
+    }
+
+    const updated = await updateRoleSvc(id, { name, description, status, role_category })
+    return res.json(updated)
+  } catch (error: any) {
+    const message = error?.message ?? 'No fue posible actualizar el rol'
+    return res.status(400).json({ message })
   }
-  const updated = await updateRoleSvc(id, { name, description, status })
-  return res.json(updated)
 }
 
 export async function deleteRoleCtrl(req: Request, res: Response) {
@@ -138,8 +156,13 @@ export async function getRolePermissionsCtrl(req: Request, res: Response) {
 }
 
 export async function replaceRolePermissionsCtrl(req: Request, res: Response) {
-  const { id } = req.params
-  const { permissionIds } = req.body as { permissionIds: string[] }
-  await replaceRolePermissionsSvc(id, permissionIds ?? [])
-  return res.json({ success: true })
+  try {
+    const { id } = req.params
+    const { permissionIds } = req.body as { permissionIds: string[] }
+    await replaceRolePermissionsSvc(id, permissionIds ?? [])
+    return res.json({ success: true })
+  } catch (error: any) {
+    const message = error?.message ?? 'No fue posible actualizar los permisos del rol'
+    return res.status(400).json({ message })
+  }
 }

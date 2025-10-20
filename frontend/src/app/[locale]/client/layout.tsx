@@ -37,9 +37,10 @@ export default function CoreLayout({
   const canAccessAdminPanel = useMemo(() => can('admin'), [can]);
   const canAccessClientPanel = useMemo(() => can('cliente') || can('client'), [can]);
 
+  // Client layout: ensure only client users stay here
   useEffect(() => {
-    if (!canAccessAdminPanel) {
-      const fallback = canAccessClientPanel ? `/${locale}` : `/${locale}/sign-in`;
+    if (!canAccessClientPanel) {
+      const fallback = canAccessAdminPanel ? `/${locale}/dashboard` : `/${locale}/sign-in`;
       router.replace(fallback);
     }
   }, [canAccessAdminPanel, canAccessClientPanel, locale, router]);
@@ -89,7 +90,7 @@ export default function CoreLayout({
 
   const buildHref = (slug: string) => {
     if (slug === 'dashboard') {
-      return `/${locale}/dashboard`;
+      return `/${locale}/client/inicio`;
     }
 
     return `/${locale}/${slug}`;
@@ -97,11 +98,12 @@ export default function CoreLayout({
 
   const isActive = (slug: string) => {
     if (slug === 'dashboard') {
-      const base = `/${locale}`;
+      const base = `/${locale}/client`;
       return (
         pathname === base ||
         pathname === `${base}/` ||
-        pathname.startsWith(`${base}/dashboard`)
+        pathname === `${base}/inicio` ||
+        pathname.startsWith(`${base}/inicio/`)
       );
     }
 
@@ -135,7 +137,7 @@ export default function CoreLayout({
     );
   };
 
-  if (!canAccessAdminPanel) {
+  if (!canAccessClientPanel) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
         {t('nav.redirecting') ?? 'Redirigiendo…'}
