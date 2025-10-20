@@ -46,23 +46,6 @@ const AUTH_PAGES = [
   /^\/[a-z]{2}\/sign-up(.*)/,
 ];
 
-// Mapeo de rutas públicas (sin prefijo) -> rutas internas
-// Soporta slugs en ES/EN y decide panel según JWT
-const PUBLIC_SLUG_MAP: Record<string, 'dashboard' | 'quotes' | 'payments' | 'services' | 'settings' | 'dashboard'> = {
-  // ES
-  cotizaciones: 'quotes',
-  pagos: 'payments',
-  servicios: 'services',
-  ajustes: 'settings',
-  dashboard: 'dashboard',
-  // EN/canonicals
-  quotes: 'quotes',
-  payments: 'payments',
-  services: 'services',
-  settings: 'settings',
-  dashboard: 'dashboard',
-};
-
 // Verificar JWT
 async function verifyJWT(token: string): Promise<{ permissions?: string[] } | null> {
   try {
@@ -87,6 +70,8 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     }
   }
 
+  const isProtected = PROTECTED_ROUTES.some((r) => r.test(pathname));
+  console.log('Ruta protegida:', isProtected);
   const isAuthPage = AUTH_PAGES.some((r) => r.test(pathname));
 
   const token = request.cookies.get('auth_token')?.value ?? null;
@@ -99,58 +84,6 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   const localeMatch = pathname.match(/^\/([a-z]{2})(\/|$)/);
   const detectedLocale = localeMatch ? localeMatch[1] : 'es';
 
-  // Normalizar permisos para decidir panel
-  const permissions = payload?.permissions ?? [];
-  const normalized = permissions
-    .map((permission) => (typeof permission === 'string' ? permission.trim().toLowerCase() : ''))
-    .filter((permission) => permission.length > 0);
-
-  const hasAdminPanel = normalized.includes('admin');
-  const hasClientPanel = normalized.includes('cliente') || normalized.includes('client');
-
-  // Analizar ruta pública sin prefijo y preparar reescritura interna
-  const segments = pathname.replace(/^\//, '').split('/');
-  const hasLocalePrefix = /^[a-z]{2}$/.test(segments[0] || '');
-  const head = hasLocalePrefix ? (segments[1] || '') : (segments[0] || '');
-  const tail = hasLocalePrefix ? segments.slice(2) : segments.slice(1);
-  const publicCanonical = PUBLIC_SLUG_MAP[head?.toLowerCase?.() || ''] || null;
-
-  let effectivePathname = pathname; // para comprobaciones de protección/roles
-  let rewriteTarget: string | null = null; // a dónde reescribir internamente
-
-  if (publicCanonical) {
-    const locale = detectedLocale;
-    const suffix = tail.length ? `/${tail.join('/')}` : '';
-
-    if (publicCanonical === 'dashboard' || publicCanonical === 'dashboard') {
-      if (hasAdminPanel) {
-        rewriteTarget = `/${locale}/dashboard${suffix}`;
-      } else if (hasClientPanel) {
-        rewriteTarget = `/${locale}/client/dashboard${suffix}`;
-      } else {
-        rewriteTarget = `/${locale}/sign-in`;
-      }
-    } else {
-      // quotes | payments | services | settings
-      if (hasAdminPanel) {
-        rewriteTarget = `/${locale}/${publicCanonical}${suffix}`;
-      } else if (hasClientPanel) {
-        rewriteTarget = `/${locale}/client/dashboard`;
-      } else {
-        rewriteTarget = `/${locale}/sign-in`;
-      }
-    }
-
-    if (rewriteTarget) {
-      const url = new URL(rewriteTarget, request.url);
-      effectivePathname = url.pathname;
-    }
-  }
-
-  // A partir de aquí, usar el pathname efectivo para seguridad y roles
-  const isProtected = PROTECTED_ROUTES.some((r) => r.test(effectivePathname));
-  console.log('Ruta protegida:', isProtected, '->', effectivePathname);
-
   // --- Verificación JWT ---
   if (isProtected && devMode !== 'true') {
     if (!token || !payload) {
@@ -160,23 +93,25 @@ export default async function middleware(request: NextRequest, event: NextFetchE
     }
   }
 
-  // matches con la ruta efectiva (posible reescritura)
-  const matchesAdminRoute = ADMIN_ROUTES.some((route) => route.test(effectivePathname));
-  const matchesClientRoute = CLIENT_ROUTES.some((route) => route.test(effectivePathname));
+  const permissions = payload?.permissions ?? [];
+  const normalized = permissions
+    .map((permission) => (typeof permission === 'string' ? permission.trim().toLowerCase() : ''))
+    .filter((permission) => permission.length > 0);
+
+  const hasAdminPanel = normalized.includes('admin');
+  const hasClientPanel = normalized.includes('cliente') || normalized.includes('client');
+
+  const matchesAdminRoute = ADMIN_ROUTES.some((route) => route.test(pathname));
+  const matchesClientRoute = CLIENT_ROUTES.some((route) => route.test(pathname));
 
   if (matchesAdminRoute && !hasAdminPanel) {
-    const fallback = hasClientPanel ? `/${detectedLocale}/dashboard` : `/${detectedLocale}/sign-in`;
+    const fallback = hasClientPanel ? `/${detectedLocale}/inicio` : `/${detectedLocale}/sign-in`;
     return NextResponse.redirect(new URL(fallback, request.url));
   }
 
   if (matchesClientRoute && !hasClientPanel) {
     const fallback = hasAdminPanel ? `/${detectedLocale}/dashboard` : `/${detectedLocale}/sign-in`;
     return NextResponse.redirect(new URL(fallback, request.url));
-  }
-
-  // Si identificamos una ruta pública y existe un target interno, reescribir preservando la URL pública
-  if (rewriteTarget) {
-    return NextResponse.rewrite(new URL(rewriteTarget, request.url));
   }
 
   // --- Evitar bucle: no aplicar handleI18nRouting en páginas de auth ---
@@ -201,3 +136,4 @@ export const config = {
   matcher: '/((?!_next|_vercel|monitoring|.*\\..*).*)',
   runtime: 'nodejs',
 };
+

@@ -1,21 +1,8 @@
 // backend/src/modules/admin/controllers/configController.ts
 import { Request, Response } from 'express'
-import {
-  fetchUsers,
-  fetchRoles,
-  fetchPermisosByRole,
-  getUserById,
-  updateUserById,
-  deleteUserById,
-  fetchAllPermissions,
-  fetchPermissionsGrouped,
-  fetchRoleByIdSvc,
-  createRoleSvc,
-  updateRoleSvc,
-  deleteRoleSvc,
-  fetchRolePermissionsSvc,
-  replaceRolePermissionsSvc,
-} from '../services/configService.js'
+import { fetchUsers, getUserById, updateUserById, deleteUserById } from '../../shared/services/user.service.js'
+import { fetchAllPermissions, fetchPermissionsGrouped, fetchRolePermissionsSvc, replaceRolePermissionsSvc } from '../../shared/services/permission.service.js'
+import { fetchRoles, fetchRoleByIdSvc, createRoleSvc, updateRoleSvc, deleteRoleSvc } from '../../shared/services/role.service.js'
 
 export async function getUsers(req: Request, res: Response) {
   try {

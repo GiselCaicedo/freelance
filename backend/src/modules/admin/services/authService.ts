@@ -1,7 +1,7 @@
 
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 export const loginUser = async (identifier: string, password: string) => {
   const user = await prisma.user.findFirst({

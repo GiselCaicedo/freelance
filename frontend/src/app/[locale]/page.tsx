@@ -30,7 +30,7 @@ export default async function LocalePanelRedirect({
   }
 
   if (normalized.includes('client')) {
-   redirect(`/${locale}/client/inicio`);
+   redirect(`/${locale}/client/dashboard`);
   }
 
   redirect(`/${locale}/sign-in`);

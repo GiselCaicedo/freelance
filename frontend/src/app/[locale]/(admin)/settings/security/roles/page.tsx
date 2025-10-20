@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { ColDef, RowClassRules } from 'ag-grid-community';
 import { Plus, Search } from 'lucide-react';
 
-import AgTable from '@/panels/admin/components/datagrid/AgTable';
+import AgTable from '@/shared/components/datagrid/AgTable';
 import ActionsCell from '@/shared/components/common/ActionsCell';
 import SidePanel from '@/shared/components/common/SidePanel';
 import PageHeader from '@/shared/components/common/PageHeader';
@@ -14,6 +14,7 @@ import ConfirmDialog from '@/shared/components/common/ConfirmDialog';
 import { useAlerts } from '@/shared/components/common/AlertsProvider';
 import RoleFormModal from '@/panels/admin/components/roles/RoleFormModal';
 import { listRolesApi, deleteRoleApi, Role, RoleCategory } from '@/shared/services/conexion';
+import { normalizeRoleCategory } from '@/shared/utils/roles';
 
 type RoleRow = {
   id: string
@@ -27,22 +28,6 @@ type RoleRow = {
 type ConfirmState = {
   open: boolean;
   role: RoleRow | null;
-};
-
-const PANEL_CATEGORY_ALIASES: Record<RoleCategory, string[]> = {
-  admin: ['admin', 'panel_admin'],
-  client: ['client', 'cliente', 'panel_client'],
-};
-
-const normalizeCategory = (value?: string | null): RoleCategory | null => {
-  if (!value) return null;
-  const normalized = value.trim().toLowerCase();
-  for (const [category, aliases] of Object.entries(PANEL_CATEGORY_ALIASES)) {
-    if (aliases.some((alias) => alias.toLowerCase() === normalized)) {
-      return category as RoleCategory;
-    }
-  }
-  return null;
 };
 
 export default function RolesPage() {
@@ -71,7 +56,7 @@ export default function RolesPage() {
       description: (role as any).description ?? '',
       isActive: (role.status ?? true) === true,
       updatedAt: (role.updated ?? (role as any).updatedAt ?? new Date().toISOString()).slice(0, 10),
-      role_category: normalizeCategory(role.role_category),
+      role_category: normalizeRoleCategory(role.role_category),
     }));
 
   const fetchRoles = useCallback(async () => {

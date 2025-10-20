@@ -6,7 +6,7 @@ import { useTranslations } from 'next-intl';
 import { ColDef, RowClassRules } from 'ag-grid-community';
 import { Plus, Search } from 'lucide-react';
 
-import AgTable from '@/panels/admin/components/datagrid/AgTable';
+import AgTable from '@/shared/components/datagrid/AgTable';
 import ActionsCell from '@/shared/components/common/ActionsCell';
 import SidePanel from '@/shared/components/common/SidePanel';
 import PageHeader from '@/shared/components/common/PageHeader';

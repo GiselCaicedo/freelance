@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as utilsService from '../services/utilsService.js'
+import * as utilsService from '../../shared/services/utilsService.js'
 
 export const getRoles = async (req: Request, res: Response) => {
 

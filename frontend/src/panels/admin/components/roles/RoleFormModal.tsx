@@ -1,31 +1,15 @@
-'use client'
+"use client";
 import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Role, RoleCategory, updateRoleApi, createRoleApi } from '@/shared/services/conexion';
 import { useAlerts } from '@/shared/components/common/AlertsProvider';
+import { normalizeRoleCategoryOrEmpty } from '@/shared/utils/roles';
 
 type Props = {
   role: Role | null;
   open: boolean;
   onClose: () => void;
   onSaved: (updated: Role) => void;
-};
-
-const PANEL_CATEGORY_ALIASES: Record<RoleCategory, string[]> = {
-  admin: ['admin', 'panel_admin'],
-  client: ['client', 'cliente', 'panel_client'],
-};
-
-const normalizeCategory = (value?: string | null): RoleCategory | '' => {
-  if (!value) return '';
-  const normalized = value.trim().toLowerCase();
-  if (PANEL_CATEGORY_ALIASES.admin.some((alias) => alias.toLowerCase() === normalized)) {
-    return 'admin';
-  }
-  if (PANEL_CATEGORY_ALIASES.client.some((alias) => alias.toLowerCase() === normalized)) {
-    return 'client';
-  }
-  return '';
 };
 
 export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
@@ -41,7 +25,7 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
         name: role.name ?? '',
         description: role.description ?? '',
         status: role.status ?? true,
-        role_category: normalizeCategory(role.role_category),
+        role_category: normalizeRoleCategoryOrEmpty(role.role_category),
       });
     } else {
       setForm({ name: '', description: '', status: true, role_category: '' });
