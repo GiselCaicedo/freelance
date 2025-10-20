@@ -20,10 +20,22 @@ const aj = arcjet.withRule(
 );
 
 const PROTECTED_ROUTES = [
-  /^\/$/, 
-  /^\/(dashboard|settings|quotes|payments|services)(.*)/,
+  /^\/$/,
+  /^\/client(?:\/.*)?$/,
+  /^\/(dashboard|settings|quotes|payments|services)(?:\/.*)?$/,
   /^\/[a-z]{2}\/$/, // protege /es o /en
-  /^\/[a-z]{2}\/(dashboard|settings|quotes|payments|services)(.*)/,
+  /^\/[a-z]{2}\/client(?:\/.*)?$/,
+  /^\/[a-z]{2}\/(dashboard|settings|quotes|payments|services)(?:\/.*)?$/,
+];
+
+const ADMIN_ROUTES = [
+  /^\/(dashboard|settings|quotes|payments|services)(?:\/.*)?$/,
+  /^\/[a-z]{2}\/(dashboard|settings|quotes|payments|services)(?:\/.*)?$/,
+];
+
+const CLIENT_ROUTES = [
+  /^\/client(?:\/.*)?$/,
+  /^\/[a-z]{2}\/client(?:\/.*)?$/,
 ];
 
 
@@ -35,13 +47,13 @@ const AUTH_PAGES = [
 ];
 
 // Verificar JWT
-async function verifyJWT(token: string): Promise<boolean> {
+async function verifyJWT(token: string): Promise<{ permissions?: string[] } | null> {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
-    await jwtVerify(token, secret);
-    return true;
+    const { payload } = await jwtVerify(token, secret);
+    return payload as { permissions?: string[] };
   } catch {
-    return false;
+    return null;
   }
 }
 
@@ -62,17 +74,44 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   console.log('Ruta protegida:', isProtected);
   const isAuthPage = AUTH_PAGES.some((r) => r.test(pathname));
 
+  const token = request.cookies.get('auth_token')?.value ?? null;
+  let payload: { permissions?: string[] } | null = null;
+
+  if (token) {
+    payload = await verifyJWT(token);
+  }
+
+  const localeMatch = pathname.match(/^\/([a-z]{2})(\/|$)/);
+  const detectedLocale = localeMatch ? localeMatch[1] : 'es';
+
   // --- Verificación JWT ---
   if (isProtected && devMode !== 'true') {
-    const token = request.cookies.get('auth_token')?.value;
-    const valid = token ? await verifyJWT(token) : false;
-
-    if (!valid) {
-      const defaultLocale = 'es';
-      const signInUrl = new URL(`/${defaultLocale}/sign-in`, request.url);
+    if (!token || !payload) {
+      const signInUrl = new URL(`/${detectedLocale}/sign-in`, request.url);
       console.log(`🔁 Redirigiendo a ${signInUrl.href}`);
       return NextResponse.redirect(signInUrl);
     }
+  }
+
+  const permissions = payload?.permissions ?? [];
+  const normalized = permissions
+    .map((permission) => (typeof permission === 'string' ? permission.trim().toLowerCase() : ''))
+    .filter((permission) => permission.length > 0);
+
+  const hasAdminPanel = normalized.includes('admin');
+  const hasClientPanel = normalized.includes('cliente') || normalized.includes('client');
+
+  const matchesAdminRoute = ADMIN_ROUTES.some((route) => route.test(pathname));
+  const matchesClientRoute = CLIENT_ROUTES.some((route) => route.test(pathname));
+
+  if (matchesAdminRoute && !hasAdminPanel) {
+    const fallback = hasClientPanel ? `/${detectedLocale}/client` : `/${detectedLocale}/sign-in`;
+    return NextResponse.redirect(new URL(fallback, request.url));
+  }
+
+  if (matchesClientRoute && !hasClientPanel) {
+    const fallback = hasAdminPanel ? `/${detectedLocale}/dashboard` : `/${detectedLocale}/sign-in`;
+    return NextResponse.redirect(new URL(fallback, request.url));
   }
 
   // --- Evitar bucle: no aplicar handleI18nRouting en páginas de auth ---

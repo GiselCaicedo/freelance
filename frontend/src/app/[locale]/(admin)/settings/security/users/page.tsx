@@ -258,7 +258,7 @@ export default function UsersPage() {
         reserveRef={containerRef}
       >
         <CreateUserForm
-          defaultBusinessId={empresaId ?? undefined}
+          defaultClientId={empresaId ?? undefined}
           onClose={() => setOpenCreate(false)}
           onSuccess={async () => {
             await fetchUsers();

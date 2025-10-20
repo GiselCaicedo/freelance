@@ -34,12 +34,26 @@ export default function SignInPage() {
     try {
       const response = await login(form);
       if (response.success) {
+        const permissions: unknown = response.data?.user?.permissions;
+        const list = Array.isArray(permissions) ? permissions : [];
+        const normalized = list
+          .map((permission) => (typeof permission === 'string' ? permission.trim().toLowerCase() : ''))
+          .filter(Boolean);
+        const hasAdminPanel = normalized.includes('admin');
+        const hasClientPanel = normalized.includes('cliente') || normalized.includes('client');
+
+        const target = hasAdminPanel
+          ? `/${locale}/dashboard`
+          : hasClientPanel
+            ? `/${locale}/client`
+            : `/${locale}`;
+
         notify({
           type: 'success',
           title: t('alerts.success.title'),
           description: t('alerts.success.description'),
         });
-        router.push(`/${locale}/dashboard`);
+        router.push(target);
         router.refresh();
         return;
       }

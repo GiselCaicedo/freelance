@@ -2,7 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ChevronDown, CreditCard, FileText, Home, Menu, Settings, Zap } from 'lucide-react';
 import LogoutButton from '@/shared/components/auth/LogoutButton';
@@ -27,11 +27,22 @@ export default function CoreLayout({
   const { locale: rawLocale } = useParams() as { locale: string };
   const locale = rawLocale ?? 'es';
   const pathname = usePathname();
+  const router = useRouter();
   const t = useTranslations('Layout');
   const [isEnterpriseOpen, setIsEnterpriseOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(true);
   const navStateRef = useRef(isNavOpen);
   const manualStateRef = useRef(isNavOpen);
+
+  const canAccessAdminPanel = useMemo(() => can('admin'), [can]);
+  const canAccessClientPanel = useMemo(() => can('cliente') || can('client'), [can]);
+
+  useEffect(() => {
+    if (!canAccessAdminPanel) {
+      const fallback = canAccessClientPanel ? `/${locale}/client` : `/${locale}/sign-in`;
+      router.replace(fallback);
+    }
+  }, [canAccessAdminPanel, canAccessClientPanel, locale, router]);
 
   useEffect(() => {
     navStateRef.current = isNavOpen;
@@ -123,6 +134,14 @@ export default function CoreLayout({
       </Link>
     );
   };
+
+  if (!canAccessAdminPanel) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 text-sm text-slate-500">
+        {t('nav.redirecting') ?? 'Redirigiendo…'}
+      </div>
+    );
+  }
 
   return (
     <BaseTemplate

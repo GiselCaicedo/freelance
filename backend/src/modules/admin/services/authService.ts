@@ -70,8 +70,8 @@ export const registerUser = async (data: {
   user: string
   name: string
   password: string
-  role_id?: number
-  client_id?: number
+  role_id?: string
+  client_id?: string
 }) => {
   const { user, name, password, role_id, client_id, ...rest } = data
 

@@ -48,7 +48,7 @@ back-cifra-pay/
 ├── src
 │   ├── __mocks__
 │   │   ├── authMockData.js
-│   │   ├── businessMockData.js
+│   │   ├── clientMockData.js
 │   │   ├── paymentMockData.js
 │   │   ├── prismaMock.js
 │   │   └── userMockData.js
@@ -58,7 +58,7 @@ back-cifra-pay/
 │   │   └── env.js
 │   ├── controllers
 │   │   ├── authController.js
-│   │   ├── businessController.js
+│   │   ├── clientController.js
 │   │   ├── paymentController.js
 │   │   ├── serviceController.js
 │   │   └── userController.js
@@ -68,7 +68,7 @@ back-cifra-pay/
 │   │   ├── loggerMiddleware.js
 │   │   └── validateRequest.js
 │   ├── models
-│   │   ├── businessModel.js
+│   │   ├── clientModel.js
 │   │   ├── paymentModel.js
 │   │   ├── serviceModel.js
 │   │   └── userModel.js
@@ -78,7 +78,7 @@ back-cifra-pay/
 │   │   └── seed.js
 │   ├── routes
 │   │   ├── authRoutes.js
-│   │   ├── businessRoutes.js
+│   │   ├── clientRoutes.js
 │   │   ├── index.js
 │   │   ├── paymentRoutes.js
 │   │   ├── serviceRoutes.js
@@ -86,18 +86,18 @@ back-cifra-pay/
 │   ├── server.js
 │   ├── services
 │   │   ├── authService.js
-│   │   ├── businessService.js
+│   │   ├── clientService.js
 │   │   ├── paymentService.js
 │   │   ├── serviceService.js
 │   │   └── userService.js
 │   ├── tests
 │   │   ├── e2e
 │   │   │   ├── authFlow.test.js
-│   │   │   ├── businessFlow.test.js
+│   │   │   ├── clientFlow.test.js
 │   │   │   └── paymentFlow.test.js
 │   │   ├── integration
 │   │   │   ├── authRoutes.test.js
-│   │   │   ├── businessRoutes.test.js
+│   │   │   ├── clientRoutes.test.js
 │   │   │   ├── paymentRoutes.test.js
 │   │   │   ├── serviceRoutes.test.js
 │   │   │   └── userRoutes.test.js
@@ -107,7 +107,7 @@ back-cifra-pay/
 │   │   │   └── prismaMock.js
 │   │   └── unit
 │   │       ├── authService.test.js
-│   │       ├── businessService.test.js
+│   │       ├── clientService.test.js
 │   │       ├── paymentService.test.js
 │   │       ├── serviceService.test.js
 │   │       └── userService.test.js

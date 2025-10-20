@@ -98,10 +98,10 @@ export async function getRoleById(req: Request, res: Response) {
 }
 
 export async function createRole(req: Request, res: Response) {
-  const { name, description, status } = req.body as {
-    name: string; description?: string | null; status?: boolean
+  const { name, description, status, role_category} = req.body as {
+    name: string; description?: string | null; status?: boolean, role_category?: string
   }
-  const created = await createRoleSvc({ name, description, status })
+  const created = await createRoleSvc({ name, description, status, role_category })
   return res.status(201).json(created)
 }
 
@@ -133,7 +133,7 @@ export async function listPermissionsGrouped(_req: Request, res: Response) {
 
 export async function getRolePermissionsCtrl(req: Request, res: Response) {
   const { id } = req.params
-  const result = await fetchRolePermissionsSvc(id) 
+  const result = await fetchRolePermissionsSvc(id)
   return res.json(result)
 }
 

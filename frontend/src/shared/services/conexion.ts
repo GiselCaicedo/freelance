@@ -66,7 +66,7 @@ export interface BackendUser {
   updated?: string | null;
   updatedAt?: string | null;
   role?: { id?: string; name: string };
-  business?: { id: string; name: string } | null;
+  client?: { id: string; name: string } | null;
 }
 
 export interface Role {
@@ -75,6 +75,7 @@ export interface Role {
   description?: string | null;
   status?: boolean;
   updated?: string | null;
+  role_category?: string | null;
 }
 
 export interface Permission {
@@ -83,7 +84,7 @@ export interface Permission {
   description?: string | null;
 }
 
-export interface Business {
+export interface Client {
   id: string;
   name: string;
 }
@@ -93,7 +94,7 @@ export interface RegisterUserDto {
   name: string;
   password: string;
   role_id: string;
-  business_id: string;
+  client_id: string;
   status: boolean;
 }
 
@@ -177,7 +178,7 @@ export async function getRoleApi(id: string): Promise<Role> {
 
 // Crear rol
 export async function createRoleApi(payload: {
-  name: string; description?: string | null; status?: boolean;
+  name: string; description?: string | null; status?: boolean; role_category?: string | null;
 }): Promise<Role> {
   const { data } = await api.post('/config/roles', payload);
   return data as Role;
@@ -217,15 +218,15 @@ export async function saveRolePermissionsApi(roleId: string, permissionIds: stri
 }
 
 
-export async function getBusinessApi(): Promise<Business[]> {
+export async function getClientsApi(): Promise<Client[]> {
   try {
     const { data } = await api.get('/utils/get-client');
     if (!Array.isArray(data)) throw new Error('Respuesta inesperada del servidor');
     return data;
   } catch (error: any) {
-    console.error('getBusinessApi error:', error);
-    throw new Error(error?.response?.data?.message || 'Error al obtener empresas');
- }
+    console.error('getClientsApi error:', error);
+    throw new Error(error?.response?.data?.message || 'Error al obtener clientes');
+  }
 }
 
 export async function login(credentials: {

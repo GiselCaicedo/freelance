@@ -8,7 +8,7 @@ datasource db {
 }
 
 model client {
-  id             String           @id @db.Uuid
+  id             String           @id @default(uuid())
   name           String?          @db.VarChar
   created        DateTime?        @db.Timestamptz(6)
   updated        DateTime?        @db.Timestamptz(6)
@@ -172,7 +172,7 @@ model quote_detail {
 }
 
 model role {
-  id              String            @id @db.Uuid
+  id              String            @id @default(uuid())
   name            String?           @db.VarChar
   role_category   String?           @db.VarChar
   created         DateTime?         @db.Timestamptz(6)
@@ -185,7 +185,7 @@ model role {
 }
 
 model role_permission {
-  id            String      @id @db.Uuid
+  id            String      @id @default(uuid())
   role_id       String?     @db.Uuid
   permission_id String?     @db.Uuid
   permission    permission? @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -228,7 +228,7 @@ model service_usage {
 }
 
 model user {
-  id        String    @id @db.Uuid
+  id        String    @id @default(uuid())
   role_id   String?   @db.Uuid
   client_id String?   @db.Uuid
   user      String?   @db.VarChar

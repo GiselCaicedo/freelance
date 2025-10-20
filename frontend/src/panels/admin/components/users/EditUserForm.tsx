@@ -5,10 +5,10 @@ import {
   BackendUser,
   getUserByIdApi,
   getRolesApi,
-  getBusinessApi,
+  getClientsApi,
   updateUserApi,
   Role,
-  Business
+  Client
 } from '@/shared/services/conexion';
 import { useAlerts } from '@/shared/components/common/AlertsProvider';
 import { useTranslations } from 'next-intl';
@@ -24,7 +24,7 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
   const t = useTranslations('Users.EditForm');
   const [user, setUser] = useState<BackendUser | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
-  const [business, setBusiness] = useState<Business[]>([]);
+  const [, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -38,14 +38,14 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
     (async () => {
       try {
         setLoading(true);
-        const [u, r, b] = await Promise.all([
+        const [u, r, c] = await Promise.all([
           getUserByIdApi(userId),
           getRolesApi(),
-          getBusinessApi(),
+          getClientsApi(),
         ]);
         setUser(u);
         setRoles(r);
-        setBusiness(b);
+        setClients(c);
 
         setName(u.name || '');
         const initialRole = (u as any).role_id ?? u.role?.id ?? '';

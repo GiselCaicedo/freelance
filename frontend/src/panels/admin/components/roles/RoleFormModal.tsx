@@ -11,7 +11,7 @@ type Props = {
 };
 
 export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
-  const [form, setForm] = useState({ name: '', description: '', status: true });
+  const [form, setForm] = useState({ name: '', description: '', status: true, role_category: '' });
   const [saving, setSaving] = useState(false);
   const t = useTranslations('Roles.Form');
 
@@ -22,9 +22,10 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
         name: role.name ?? '',
         description: role.description ?? '',
         status: role.status ?? true,
+        role_category: role.role_category ?? '',
       });
     } else {
-      setForm({ name: '', description: '', status: true });
+      setForm({ name: '', description: '', status: true, role_category: '' });
     }
   }, [open, role]);
 
@@ -38,7 +39,10 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
         name: form.name.trim(),
         description: form.description.trim(),
         status: form.status,
+        role_category: form.role_category,
       };
+      console.log('Payload enviado:', payload);
+
       const result = role?.id
         ? await updateRoleApi(role.id, payload)
         : await createRoleApi(payload);
@@ -75,6 +79,18 @@ export default function RoleFormModal({ role, open, onClose, onSaved }: Props) {
           onChange={(e) => setForm({ ...form, description: e.target.value })}
           placeholder={t('descriptionPlaceholder')}
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700">role_category</label>
+        <select
+          className={field}
+          value={form.role_category}
+          onChange={(e) => setForm({ ...form, role_category: e.target.value })}
+        >
+          <option value="admin">Administrador</option>
+          <option value="client">Cliente</option>
+        </select>
       </div>
 
       <div className="flex items-center gap-2">

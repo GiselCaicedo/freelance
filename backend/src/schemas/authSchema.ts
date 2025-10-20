@@ -22,14 +22,15 @@ export const registerSchema = z.object({
   name: z
     .string()
     .min(3, { message: 'El nombre es obligatorio' })
-
     .trim(),
+
   password: z
     .string()
     .min(8, { message: 'La contraseña debe tener al menos 8 caracteres' })
     .trim(),
+
   role_id: z.string(),
-  business_id: z.string(),
+  client_id: z.string(),
 })
 
 

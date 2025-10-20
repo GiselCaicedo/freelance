@@ -5,17 +5,17 @@ import { Combobox } from '@headlessui/react';
 import { useTranslations } from 'next-intl';
 import {
   getRolesApi,
-  getBusinessApi,
+  getClientsApi,
   registerUser,
   Role,
-  Business,
+  Client,
 } from '@/shared/services/conexion';
 import { useAlerts } from '@/shared/components/common/AlertsProvider';
 
 type Props = {
   onClose?: () => void;
   onSuccess?: () => void;
-  defaultBusinessId?: string;
+  defaultClientId?: string;
 };
 
 type FormData = {
@@ -23,10 +23,10 @@ type FormData = {
   name: string;
   password: string;
   role_id: string;
-  business_id: string;
+  client_id: string;
 };
 
-export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }: Props) {
+export default function CreateUserForm({ onClose, onSuccess, defaultClientId }: Props) {
   const t = useTranslations('Users.CreateForm');
   const { notify } = useAlerts();
   const [form, setForm] = useState<FormData>({
@@ -34,17 +34,17 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
     name: '',
     password: '',
     role_id: '',
-    business_id: defaultBusinessId ?? '',
+    client_id: defaultClientId ?? '',
   });
 
   const [roles, setRoles] = useState<Role[]>([]);
-  const [business, setBusiness] = useState<Business[]>([]);
+  const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingLists, setLoadingLists] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [queryRole, setQueryRole] = useState('');
-  const [queryBusiness, setQueryBusiness] = useState('');
+  const [queryClient, setQueryClient] = useState('');
   const [formKey, setFormKey] = useState(0);
 
   const userRef = useRef<HTMLInputElement>(null);
@@ -53,9 +53,9 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
     (async () => {
       try {
         setLoadingLists(true);
-        const [rolesResponse, businessResponse] = await Promise.all([getRolesApi(), getBusinessApi()]);
+        const [rolesResponse, clientsResponse] = await Promise.all([getRolesApi(), getClientsApi()]);
         setRoles(rolesResponse);
-        setBusiness(businessResponse);
+        setClients(clientsResponse);
       } catch (e: any) {
         const message = e?.message || t('errors.loadLists');
         setError(message);
@@ -67,17 +67,17 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
   }, [notify, t]);
 
   useEffect(() => {
-    if (defaultBusinessId && !form.business_id) {
-      setForm((current) => ({ ...current, business_id: defaultBusinessId }));
+    if (defaultClientId && !form.client_id) {
+      setForm((current) => ({ ...current, client_id: defaultClientId }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [defaultBusinessId]);
+  }, [defaultClientId]);
 
   const filteredRoles =
     queryRole === '' ? roles : roles.filter((role) => role.name.toLowerCase().includes(queryRole.toLowerCase()));
 
-  const filteredBusiness =
-    queryBusiness === '' ? business : business.filter((item) => item.name.toLowerCase().includes(queryBusiness.toLowerCase()));
+  const filteredClients =
+    queryClient === '' ? clients : clients.filter((item) => item.name.toLowerCase().includes(queryClient.toLowerCase()));
 
   const valid = useMemo(
     () =>
@@ -85,7 +85,7 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
       form.name.trim().length >= 3 &&
       form.password.trim().length >= 8 &&
       !!form.role_id &&
-      !!form.business_id,
+      !!form.client_id,
     [form],
   );
 
@@ -95,10 +95,10 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
       name: '',
       password: '',
       role_id: '',
-      business_id: defaultBusinessId ?? '',
+      client_id: defaultClientId ?? '',
     });
     setQueryRole('');
-    setQueryBusiness('');
+    setQueryClient('');
     setFormKey((key) => key + 1);
     requestAnimationFrame(() => userRef.current?.focus());
   };
@@ -232,22 +232,22 @@ export default function CreateUserForm({ onClose, onSuccess, defaultBusinessId }
         </div>
 
         <div className="space-y-1">
-          <label className="block text-sm font-medium">{t('fields.business.label')}</label>
+          <label className="block text-sm font-medium">{t('fields.client.label')}</label>
           <Combobox
-            value={business.find((item) => item.id === form.business_id) ?? null}
-            onChange={(value: Business | null) => setForm((current) => ({ ...current, business_id: value?.id ?? '' }))}
+            value={clients.find((item) => item.id === form.client_id) ?? null}
+            onChange={(value: Client | null) => setForm((current) => ({ ...current, client_id: value?.id ?? '' }))}
           >
             <div className="relative">
               <Combobox.Input
-                key={`business-${formKey}`}
+                key={`client-${formKey}`}
                 className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-200"
-                displayValue={(item: Business) => item?.name ?? ''}
-                onChange={(event) => setQueryBusiness(event.target.value)}
-                placeholder={t('fields.business.searchPlaceholder')}
+                displayValue={(item: Client) => item?.name ?? ''}
+                onChange={(event) => setQueryClient(event.target.value)}
+                placeholder={t('fields.client.searchPlaceholder')}
               />
               <Combobox.Options className="absolute z-10 mt-1 max-h-40 w-full overflow-auto rounded-md border border-gray-200 bg-white py-1 text-sm shadow-lg">
-                {filteredBusiness.length === 0 && <div className="px-3 py-2 text-gray-500">{t('fields.business.empty')}</div>}
-                {filteredBusiness.map((item) => (
+                {filteredClients.length === 0 && <div className="px-3 py-2 text-gray-500">{t('fields.client.empty')}</div>}
+                {filteredClients.map((item) => (
                   <Combobox.Option
                     key={item.id}
                     value={item}

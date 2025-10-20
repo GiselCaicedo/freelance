@@ -16,13 +16,47 @@ export async function fetchUsers(empresaId: string) {
   })
 }
 
-// =================== Roles y permisos ===================
 export async function fetchRoles() {
-  return prisma.role.findMany({
-    select: { id: true, name: true, description: true, status: true, updated: true },
-    orderBy: { name: 'asc' },
-  })
+  const roles = await prisma.role.findMany({
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      status: true,
+      updated: true,
+      // solo necesitamos saber si tiene uno de estos permisos
+      role_permission: {
+        where: {
+          permission: {
+            name: { in: ["admin", "client"] },
+          },
+        },
+        select: {
+          permission: { select: { name: true } },
+        },
+      },
+    },
+    orderBy: { name: "asc" },
+  });
+
+  console.log('Roles obtenidos de DB:', roles[0].role_permission);
+
+  // campo role_category segun el permiso que tenga
+  return roles.map((role) => ({
+    id: role.id,
+    name: role.name,
+    description: role.description,
+    status: role.status,
+    updated: role.updated,
+    role_category:
+      role.role_permission[0]?.permission.name === "admin"
+        ? "admin"
+        : role.role_permission[0]?.permission.name === "client"
+        ? "client"
+        : null,
+  }));
 }
+
 
 export async function fetchPermisosByRole(roleId: string) {
   return prisma.role_permission.findMany({
@@ -36,20 +70,20 @@ export async function fetchPermisosByRole(roleId: string) {
 // =================== Permisos (con modulo) ===================
 export async function fetchAllPermissions() {
   return prisma.permission.findMany({
-    select: { id: true, name: true, module: true },
-    orderBy: [{ module: 'asc' }, { name: 'asc' }],
+    select: { id: true, name: true, section: true },
+    orderBy: [{ section: 'asc' }, { name: 'asc' }],
   })
 }
 
 export async function fetchPermissionsGrouped() {
   const rows = await prisma.permission.findMany({
-    select: { id: true, name: true, module: true },
-    orderBy: [{ module: 'asc' }, { name: 'asc' }],
+    select: { id: true, name: true, section: true },
+    orderBy: [{ section: 'asc' }, { name: 'asc' }],
   })
 
   const grouped: Record<string, { id: string; name: string }[]> = {}
   for (const r of rows) {
-    const key = r.module ?? 'General'
+    const key = r.section ?? 'General'
     if (!grouped[key]) grouped[key] = []
     grouped[key].push({ id: r.id, name: r.name })
   }
@@ -64,18 +98,48 @@ export function fetchRoleByIdSvc(id: string) {
   })
 }
 
-export function createRoleSvc(data: { name: string; description?: string | null; status?: boolean }) {
-  return prisma.role.create({
-    data: {
-      name: data.name,
-      description: data.description ?? null,
-      status: typeof data.status === 'boolean' ? data.status : true,
-      created: new Date(),
-      updated: new Date(),
-    },
-    select: { id: true, name: true, description: true, status: true, updated: true },
-  })
+export async function createRoleSvc(data: {
+  name: string;
+  description?: string | null;
+  status?: boolean;
+  role_category?: string | null; // "client" o "admin"
+}) {
+  return prisma.$transaction(async (tx) => {
+    // 1️⃣ Crear el rol
+    const role = await tx.role.create({
+      data: {
+        name: data.name,
+        description: data.description ?? null,
+        status: typeof data.status === "boolean" ? data.status : true,
+        updated: new Date(),
+      },
+    });
+
+    // 2️⃣ Asignar permiso de categoría (si aplica)
+    if (data.role_category) {
+      const permission = await tx.permission.findFirst({
+        where: { name: data.role_category },
+        select: { id: true },
+      });
+
+      if (!permission) {
+        throw new Error(`Permiso no encontrado para la categoría: ${data.role_category}`);
+      }
+
+      await tx.role_permission.create({
+        data: {
+          role_id: role.id,
+          permission_id: permission.id,
+        },
+      });
+    }
+
+    // 3️⃣ Retornar rol con su id
+    return role;
+  });
 }
+
+
 
 export function updateRoleSvc(
   id: string,
@@ -94,9 +158,12 @@ export function updateRoleSvc(
 }
 
 export async function deleteRoleSvc(id: string) {
-  await prisma.role_permission.deleteMany({ where: { role_id: id } })
-  await prisma.role.delete({ where: { id } })
+  return prisma.$transaction(async (tx) => {
+    await tx.role_permission.deleteMany({ where: { role_id: id } });
+    await tx.role.delete({ where: { id } });
+  });
 }
+
 
 // =================== Permisos por Rol ===================
 export async function fetchRolePermissionsSvc(roleId: string) {
