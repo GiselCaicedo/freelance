@@ -124,9 +124,23 @@
       "namePlaceholder": "Ej. Administrador",
       "descriptionLabel": "Descripción",
       "descriptionPlaceholder": "Descripción breve (opcional)",
+      "panel": {
+        "label": "Panel asignado",
+        "placeholder": "Selecciona un panel",
+        "options": {
+          "admin": "Panel de administración",
+          "client": "Panel de clientes"
+        }
+      },
       "status": {
         "active": "Rol activo",
         "inactive": "Rol inactivo"
+      },
+      "alerts": {
+        "saveError": {
+          "title": "No se pudo guardar el rol",
+          "description": "Inténtalo nuevamente."
+        }
       },
       "actions": {
         "create": "Crear rol",
@@ -244,11 +258,16 @@
         "columns": {
           "role": "Rol",
           "description": "Comentario",
+          "panel": "Panel",
           "status": "Estado",
           "updatedAt": "Últ. actualización",
           "actions": "Acciones"
         },
         "searchPlaceholder": "Buscar por rol o comentario…"
+      },
+      "panelBadges": {
+        "admin": "Administración",
+        "client": "Clientes"
       },
       "status": {
         "active": "Activo",

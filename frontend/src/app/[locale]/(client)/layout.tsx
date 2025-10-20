@@ -35,7 +35,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
       <header className="border-b border-white/10 bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
           <div>
-            asdasd
             <p className="text-xs uppercase tracking-[0.35em] text-emerald-300/80">{t('badge')}</p>
             <h1 className="text-lg font-semibold text-white/90">{t('title')}</h1>
           </div>

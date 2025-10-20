@@ -124,9 +124,23 @@
       "namePlaceholder": "e.g. Administrator",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "Short description (optional)",
+      "panel": {
+        "label": "Assigned panel",
+        "placeholder": "Select a panel",
+        "options": {
+          "admin": "Admin panel",
+          "client": "Client panel"
+        }
+      },
       "status": {
         "active": "Role enabled",
         "inactive": "Role disabled"
+      },
+      "alerts": {
+        "saveError": {
+          "title": "Could not save the role",
+          "description": "Please try again."
+        }
       },
       "actions": {
         "create": "Create role",
@@ -232,11 +246,16 @@
         "columns": {
           "role": "Role",
           "description": "Notes",
+          "panel": "Panel",
           "status": "Status",
           "updatedAt": "Last update",
           "actions": "Actions"
         },
         "searchPlaceholder": "Search by role or description…"
+      },
+      "panelBadges": {
+        "admin": "Administration",
+        "client": "Clients"
       },
       "status": {
         "active": "Active",

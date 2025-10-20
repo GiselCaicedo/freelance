@@ -39,7 +39,7 @@ export default function CoreLayout({
 
   useEffect(() => {
     if (!canAccessAdminPanel) {
-      const fallback = canAccessClientPanel ? `/${locale}/client` : `/${locale}/sign-in`;
+      const fallback = canAccessClientPanel ? `/${locale}` : `/${locale}/sign-in`;
       router.replace(fallback);
     }
   }, [canAccessAdminPanel, canAccessClientPanel, locale, router]);

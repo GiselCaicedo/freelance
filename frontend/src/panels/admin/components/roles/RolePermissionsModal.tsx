@@ -7,6 +7,7 @@ import {
   saveRolePermissionsApi,
   Role
 } from '@/shared/services/conexion';
+import { useAlerts } from '@/shared/components/common/AlertsProvider';
 
 type Props = {
   role: Role | null;
@@ -20,6 +21,7 @@ export default function RolePermissionsModal({ role, open, onClose }: Props) {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(false);
   const [q, setQ] = useState('');
+  const { notify } = useAlerts();
 
   useEffect(() => {
     if (!open || !role?.id) return;
@@ -31,7 +33,7 @@ export default function RolePermissionsModal({ role, open, onClose }: Props) {
           getRolePermissionsApi(role.id),
         ]);
         setAll(catalog);
-        setChecked(new Set(current.map(p => p.id)));
+        setChecked(new Set(current));
       } finally {
         setLoading(false);
       }
@@ -52,6 +54,9 @@ export default function RolePermissionsModal({ role, open, onClose }: Props) {
     try {
       await saveRolePermissionsApi(role.id, Array.from(checked));
       onClose();
+    } catch (error: any) {
+      const message = error?.response?.data?.message ?? error?.message ?? 'Unable to save permissions.';
+      notify({ type: 'error', title: 'Error', description: message });
     } finally {
       setSaving(false);
     }

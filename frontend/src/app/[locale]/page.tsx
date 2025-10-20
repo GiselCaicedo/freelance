@@ -1,6 +1,8 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifyToken } from '@/libs/Auth';
+import ClientLayout from './(client)/layout';
+import ClientDashboard from '@/panels/client/pages/Dashboard';
 
 const normalizePermission = (value: unknown) =>
   typeof value === 'string' ? value.trim().toLowerCase() : '';
@@ -28,7 +30,11 @@ export default async function LocalePanelRedirect({
   }
 
   if (normalized.includes('cliente') || normalized.includes('client')) {
-    redirect(`/${locale}/client`);
+    return (
+      <ClientLayout>
+        <ClientDashboard />
+      </ClientLayout>
+    );
   }
 
   redirect(`/${locale}/sign-in`);

@@ -105,7 +105,7 @@ export default async function middleware(request: NextRequest, event: NextFetchE
   const matchesClientRoute = CLIENT_ROUTES.some((route) => route.test(pathname));
 
   if (matchesAdminRoute && !hasAdminPanel) {
-    const fallback = hasClientPanel ? `/${detectedLocale}/client` : `/${detectedLocale}/sign-in`;
+    const fallback = hasClientPanel ? `/${detectedLocale}` : `/${detectedLocale}/sign-in`;
     return NextResponse.redirect(new URL(fallback, request.url));
   }
 
