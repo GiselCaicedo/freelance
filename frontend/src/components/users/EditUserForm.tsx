@@ -10,11 +10,8 @@ import {
   Role,
   Business
 } from '@/services/conexion';
-<<<<<<< HEAD
 import { useAlerts } from '@/components/common/AlertsProvider';
 import { useTranslations } from 'next-intl';
-=======
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
 
 type Props = {
   userId: string;
@@ -23,11 +20,8 @@ type Props = {
 };
 
 export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
-<<<<<<< HEAD
   const { notify } = useAlerts();
   const t = useTranslations('Users.EditForm');
-=======
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
   const [user, setUser] = useState<BackendUser | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
   const [business, setBusiness] = useState<Business[]>([]);
@@ -54,7 +48,6 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
         setBusiness(b);
 
         setName(u.name || '');
-<<<<<<< HEAD
         const initialRole = (u as any).role_id ?? u.role?.id ?? '';
         setRoleId(initialRole ? String(initialRole) : '');
         setStatus(!!u.status);
@@ -63,38 +56,22 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
         const message = e?.message || t('errors.load');
         setErr(message);
         notify({ type: 'error', title: t('alerts.loadError.title'), description: message });
-=======
-        setRoleId((u as any).role_id || u.role?.name || '');
-        setStatus(!!u.status);
-        setErr(null);
-      } catch (e: any) {
-        setErr(e?.message || 'No se pudo cargar la información');
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
       } finally {
         setLoading(false);
       }
     })();
-<<<<<<< HEAD
   }, [userId, notify]);
-=======
-  }, [userId]);
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setSaving(true);
-<<<<<<< HEAD
       const response = await updateUserApi(userId, {
-=======
-      await updateUserApi(userId, {
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
         name,
         role_id: roleId || undefined,
         status,
         password: password || undefined, // opcional
       });
-<<<<<<< HEAD
       if (!response.success) {
         notify({ type: 'error', title: t('alerts.updateError.title'), description: response.message || t('alerts.updateError.description') });
         return;
@@ -103,17 +80,11 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
       onSuccess?.();
     } catch (e: any) {
       notify({ type: 'error', title: t('alerts.updateError.title'), description: e?.message || t('errors.unexpected') });
-=======
-      onSuccess?.();
-    } catch (e: any) {
-      alert(e?.message || 'No fue posible actualizar el usuario');
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
     } finally {
       setSaving(false);
     }
   };
 
-<<<<<<< HEAD
   if (loading) return <div className="pl-2 text-sm text-gray-600">{t('states.loading')}</div>;
   if (err) return <div className="text-sm text-red-600">{err}</div>;
   if (!user) return null;
@@ -124,17 +95,7 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
     <form onSubmit={submit} className="p-5 space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700">{t('fields.username.label')}</label>
-=======
-  if (loading) return <div className="pl-2 text-sm text-gray-600">Cargando…</div>;
-  if (err) return <div className="text-sm text-red-600">{err}</div>;
-  if (!user) return null;
-
-  return (
-    <form onSubmit={submit} className="p-5 space-y-4">
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Usuario</label>
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
-        <input
+       <input
           value={user.user || (user as any).usuario || ''}
           disabled
           className="mt-1 w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700"
@@ -142,41 +103,25 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
       </div>
 
       <div>
-<<<<<<< HEAD
         <label className="block text-sm font-medium text-gray-700">{t('fields.name.label')}</label>
-=======
-        <label className="block text-sm font-medium text-gray-700">Nombre</label>
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900"
-<<<<<<< HEAD
           placeholder={t('fields.name.placeholder')}
-=======
-          placeholder="Nombre completo"
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
           required
         />
       </div>
 
       <div>
-<<<<<<< HEAD
         <label className="block text-sm font-medium text-gray-700">{t('fields.role.label')}</label>
-=======
-        <label className="block text-sm font-medium text-gray-700">Rol</label>
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
         <select
           value={roleId}
           onChange={(e) => setRoleId(e.target.value)}
           className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900"
           required
         >
-<<<<<<< HEAD
           <option value="" disabled>{t('fields.role.placeholder')}</option>
-=======
-          <option value="" disabled>Selecciona un rol…</option>
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
           {roles.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
         </select>
       </div>
@@ -189,29 +134,17 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
           onChange={(e) => setStatus(e.target.checked)}
           className="h-4 w-4 rounded border-gray-300"
         />
-<<<<<<< HEAD
         <label htmlFor="status" className="text-sm text-gray-700 select-none">{statusLabel}</label>
       </div>
 
       <div>
         <label className="block text-sm font-medium text-gray-700">{t('fields.password.label')}</label>
-=======
-        <label htmlFor="status" className="text-sm text-gray-700 select-none">Activo</label>
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700">Nuevo password (opcional)</label>
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="mt-1 w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm text-gray-900"
-<<<<<<< HEAD
           placeholder={t('fields.password.placeholder')}
-=======
-          placeholder="Dejar vacío para no cambiar"
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
         />
       </div>
 
@@ -221,22 +154,14 @@ export default function EditUserForm({ userId, onCancel, onSuccess }: Props) {
           disabled={saving}
           className="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
         >
-<<<<<<< HEAD
           {saving ? t('actions.saving') : t('actions.save')}
-=======
-          {saving ? 'Guardando…' : 'Guardar cambios'}
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
         </button>
         <button
           type="button"
           onClick={onCancel}
           className="inline-flex items-center px-4 py-2 rounded-lg border border-gray-200 bg-white hover:bg-gray-50"
         >
-<<<<<<< HEAD
           {t('actions.cancel')}
-=======
-          Cancelar
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
         </button>
       </div>
     </form>

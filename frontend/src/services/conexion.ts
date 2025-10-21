@@ -1,10 +1,7 @@
 import axios from 'axios';
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-<<<<<<< HEAD
 const TOKEN_STORAGE_KEY = 'auth_token';
-=======
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -12,7 +9,6 @@ export const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-<<<<<<< HEAD
 const AUTH_COOKIE = 'auth_token';
 
 const getStoredToken = () => {
@@ -50,8 +46,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-=======
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
 // Sattus 401 (sesion expirada)
 api.interceptors.response.use(
   (response) => response,
@@ -223,9 +217,6 @@ export async function saveRolePermissionsApi(roleId: string, permissionIds: stri
 }
 
 
-/* ============================================================
- * 🏢 Empresas (utils)
- * ============================================================ */
 export async function getBusinessApi(): Promise<Business[]> {
   try {
     const { data } = await api.get('/utils/get-business');
@@ -243,7 +234,6 @@ export async function login(credentials: {
 }): Promise<{ success: boolean; data?: any; message?: string }> {
   try {
     const response = await api.post('/auth/login', credentials);
-<<<<<<< HEAD
     const token: string | undefined = response?.data?.token;
 
     if (token && typeof window !== 'undefined') {
@@ -252,8 +242,6 @@ export async function login(credentials: {
       api.defaults.headers.common.Authorization = `Bearer ${token}`;
       setAuthCookie(token);
     }
-=======
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
     return { success: true, data: response.data };
   } catch (error: any) {
     console.error('Login error:', error);
@@ -264,15 +252,12 @@ export async function login(credentials: {
 export async function logout(): Promise<{ success: boolean; message?: string }> {
   try {
     const response = await api.post('/auth/logout');
-<<<<<<< HEAD
     if (typeof window !== 'undefined') {
       window.sessionStorage.removeItem(TOKEN_STORAGE_KEY);
       window.localStorage.removeItem(TOKEN_STORAGE_KEY);
     }
     delete api.defaults.headers.common.Authorization;
     clearAuthCookie();
-=======
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
     return { success: true, data: response.data };
   } catch (error: any) {
     console.error('Logout error:', error);

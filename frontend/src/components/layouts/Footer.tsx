@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import React from 'react';
 
 export default function Footer() {
@@ -9,12 +8,4 @@ export default function Footer() {
       </span>
     </footer>
   );
-=======
-import React from 'react'
-
-export default function Footer() {
-  return (
-    <div className='flex border-t py-[10px] justify-center'>Footer</div>
-  )
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
 }

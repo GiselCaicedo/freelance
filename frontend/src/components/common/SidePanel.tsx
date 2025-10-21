@@ -19,13 +19,10 @@ export default function SidePanel({
 }: Props) {
   // Reserva espacio en desktop (md+) aplicando padding-right al contenedor
   useEffect(() => {
-<<<<<<< HEAD
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent('app:sidepanel', { detail: { open } }));
     }
 
-=======
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
     const el = reserveRef?.current;
     const isDesktop = typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches;
 
@@ -37,16 +34,12 @@ export default function SidePanel({
       el.style.paddingRight = ''; // reset
     }
 
-<<<<<<< HEAD
     return () => {
       if (el) el.style.paddingRight = '';
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('app:sidepanel', { detail: { open: false } }));
       }
     };
-=======
-    return () => { if (el) el.style.paddingRight = ''; };
->>>>>>> db7e40d232016157f662ce52dc4b65c786d02ea8
   }, [open, width, gap, reserveRef]);
 
   return (
