@@ -1,0 +1,249 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model client {
+  id             String           @id @default(uuid())
+  name           String?          @db.VarChar
+  created        DateTime?        @db.Timestamptz(6)
+  updated        DateTime?        @db.Timestamptz(6)
+  status         Boolean?
+  client_details client_details[]
+  client_service client_service[]
+  invoice        invoice[]
+  log            log[]
+  payment        payment[]
+  quote          quote[]
+  service_usage  service_usage[]
+  user           user[]
+}
+
+model client_details {
+  id               String            @id @db.Uuid
+  client_id        String?           @db.Uuid
+  c_parameter_id   String?           @db.Uuid
+  value            String?           @db.VarChar
+  client_parameter client_parameter? @relation(fields: [c_parameter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  client           client?           @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model client_parameter {
+  id             String           @id @db.Uuid
+  name           String?          @db.VarChar
+  client_details client_details[]
+}
+
+model client_service {
+  id         String    @id @db.Uuid
+  client_id  String?   @db.Uuid
+  service_id String?   @db.Uuid
+  created    DateTime? @db.Timestamptz(6)
+  updated    DateTime? @db.Timestamptz(6)
+  started    DateTime? @db.Timestamptz(6)
+  delivery   DateTime? @db.Timestamptz(6)
+  expiry     DateTime? @db.Timestamptz(6)
+  frequency  String?   @db.VarChar
+  unit       String?   @db.VarChar
+  url_api    String?   @db.VarChar
+  token_api  String?   @db.VarChar
+  client     client?   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service    service?  @relation(fields: [service_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model invoice {
+  id                 String               @id @db.Uuid
+  client_id          String?              @db.Uuid
+  description        String?              @db.VarChar
+  value              String?              @db.VarChar
+  url                String?              @db.VarChar
+  created            DateTime?            @db.Timestamptz(6)
+  updated            DateTime?            @db.Timestamptz(6)
+  status             Boolean?
+  client             client?              @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoice_detail     invoice_detail[]
+  payment_attachment payment_attachment[]
+  quote_attachment   quote_attachment[]
+}
+
+model invoice_detail {
+  id          String    @id @db.Uuid
+  invoice_id  String?   @db.Uuid
+  service_id  String?   @db.Uuid
+  item        Int?
+  quantity    Int?
+  total_value Float?
+  created     DateTime? @db.Timestamptz(6)
+  updated     DateTime? @db.Timestamptz(6)
+  status      Boolean?
+  invoice     invoice?  @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service     service?  @relation(fields: [service_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model log {
+  id        String    @id @db.Uuid
+  user_id   String?   @db.Uuid
+  role_id   String?   @db.Uuid
+  client_id String?   @db.Uuid
+  user_name String?   @db.VarChar
+  ip        String?   @db.VarChar
+  type      String?   @db.VarChar
+  detail    String?   @db.VarChar
+  created   DateTime? @db.Timestamptz(6)
+  client    client?   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role      role?     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user      user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payment {
+  id                String          @id @db.Uuid
+  client_id         String?         @db.Uuid
+  code              String?         @db.VarChar
+  value             String?         @db.VarChar
+  status_pay        String?         @db.VarChar
+  method            String?         @db.VarChar
+  payment_method_id String?         @db.Uuid
+  type              String?         @db.VarChar
+  url               String?         @db.VarChar
+  created           DateTime?       @db.Timestamptz(6)
+  updated           DateTime?       @db.Timestamptz(6)
+  status            Boolean?
+  client            client?         @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment_method    payment_method? @relation(fields: [payment_method_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payment_attachment {
+  id         String   @id @db.Uuid
+  invoice_id String?  @db.Uuid
+  invoice    invoice? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payment_method {
+  id      String    @id @db.Uuid
+  name    String?   @unique @db.VarChar
+  payment payment[]
+}
+
+model permission {
+  id              String            @id @db.Uuid
+  name            String?           @db.VarChar
+  section         String?           @db.VarChar
+  role_permission role_permission[]
+}
+
+model quote {
+  id               String             @id @db.Uuid
+  client_id        String?            @db.Uuid
+  description      String?            @db.VarChar
+  value            String?            @db.VarChar
+  url              String?            @db.VarChar
+  created          DateTime?          @db.Timestamptz(6)
+  updated          DateTime?          @db.Timestamptz(6)
+  status           Boolean?
+  client           client?            @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quote_attachment quote_attachment[]
+  quote_detail     quote_detail[]
+}
+
+model quote_attachment {
+  id         String   @id @db.Uuid
+  quote_id   String?  @db.Uuid
+  invoice_id String?  @db.Uuid
+  invoice    invoice? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quote      quote?   @relation(fields: [quote_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model quote_detail {
+  id          String    @id @db.Uuid
+  quote_id    String?   @db.Uuid
+  service_id  String?   @db.Uuid
+  item        Int?
+  quantity    Int?
+  total_value Float?
+  created     DateTime? @db.Timestamptz(6)
+  updated     DateTime? @db.Timestamptz(6)
+  status      Boolean?
+  quote       quote?    @relation(fields: [quote_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service     service?  @relation(fields: [service_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model role {
+  id          String    @id @default(uuid())
+  name        String
+  description String?
+  role_category RoleCategory @default(client)
+  created     DateTime? @db.Timestamptz(6)
+  updated     DateTime? @db.Timestamptz(6)
+  status      Boolean?
+  role_permission role_permission[]
+  log            log[]
+  user           user[]
+}
+
+enum RoleCategory {
+  admin
+  client
+}
+
+
+model role_permission {
+  id            String      @id @default(uuid())
+  role_id       String?     @db.Uuid
+  permission_id String?     @db.Uuid
+  permission    permission? @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role          role?       @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model service {
+  id                  String            @id @db.Uuid
+  service_category_id String?           @db.Uuid
+  name                String?           @db.VarChar
+  unit                String?           @db.VarChar
+  description         String?
+  created             DateTime?         @db.Timestamptz(6)
+  updated             DateTime?         @db.Timestamptz(6)
+  status              Boolean?
+  client_service      client_service[]
+  invoice_detail      invoice_detail[]
+  quote_detail        quote_detail[]
+  service_category    service_category? @relation(fields: [service_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service_usage       service_usage[]
+}
+
+model service_category {
+  id      String    @id @db.Uuid
+  name    String?   @db.VarChar
+  service service[]
+}
+
+model service_usage {
+  id         String    @id @db.Uuid
+  client_id  String?   @db.Uuid
+  service_id String?   @db.Uuid
+  start_date DateTime? @db.Timestamptz(6)
+  end_date   DateTime? @db.Timestamptz(6)
+  usage      String?   @db.VarChar
+  created    DateTime? @db.Timestamptz(6)
+  status     String?   @db.VarChar
+  client     client?   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service    service?  @relation(fields: [service_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user {
+  id        String    @id @default(uuid())
+  role_id   String?   @db.Uuid
+  client_id String?   @db.Uuid
+  user      String?   @db.VarChar
+  pass      String?   @db.VarChar
+  name      String?   @db.VarChar
+  created   DateTime? @db.Timestamptz(6)
+  updated   DateTime? @db.Timestamptz(6)
+  status    Boolean?
+  log       log[]
+  client    client?   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role      role?     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
