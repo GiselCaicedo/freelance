@@ -11,19 +11,19 @@ export interface DashboardPeriod {
 export interface BillingTotalsResult {
   billed: number
   pending: number
+  total: number
 }
 
-export interface UpcomingServiceResult {
+export interface UpcomingInvoiceResult {
   id: string
   clientId: string | null
   clientName: string | null
-  serviceId: string | null
-  serviceName: string | null
+  invoiceNumber: string | null
+  amount: number
   expiry: string | null
   daysUntilExpiry: number | null
-  frequency: string | null
-  unit: string | null
-  started: string | null
+  status: 'pendiente' | 'pagada' | 'vencida'
+  url: string | null
 }
 
 export interface ClientStatusOverview {
@@ -48,7 +48,7 @@ export interface MonthlyBillingBucket {
 export interface DashboardSummaryResult {
   period: { from: string; to: string }
   totals: BillingTotalsResult
-  upcomingExpirations: UpcomingServiceResult[]
+  upcomingExpirations: UpcomingInvoiceResult[]
   clientStatus: ClientStatusOverview
   topServices: TopServiceResult[]
   monthlyComparison: MonthlyBillingBucket[]
@@ -101,6 +101,14 @@ function parseCurrency(value?: string | null): number {
   return Number.isFinite(parsed) ? parsed : 0
 }
 
+function normalizeText(value?: string | null, fallback = ''): string {
+  const trimmed = value?.trim()
+  if (trimmed && trimmed.length > 0) {
+    return trimmed
+  }
+  return fallback || '—'
+}
+
 export async function fetchBillingTotals(period: DashboardPeriod): Promise<BillingTotalsResult> {
   const payments = await prisma.payment.findMany({
     where: {
@@ -116,25 +124,30 @@ export async function fetchBillingTotals(period: DashboardPeriod): Promise<Billi
     },
   })
 
-  return payments.reduce<BillingTotalsResult>((acc, payment) => {
-    const amount = parseCurrency(payment.value)
-    const classification = classifyPaymentStatus(payment.status_pay, payment.status)
+  const totals = payments.reduce(
+    (acc, payment) => {
+      const amount = parseCurrency(payment.value)
+      const classification = classifyPaymentStatus(payment.status_pay, payment.status)
 
-    if (classification === 'paid') {
-      acc.billed += amount
-    } else if (classification === 'pending') {
-      acc.pending += amount
-    }
+      if (classification === 'paid') {
+        acc.billed += amount
+      } else if (classification === 'pending') {
+        acc.pending += amount
+      }
 
-    return acc
-  }, { billed: 0, pending: 0 })
+      return acc
+    },
+    { billed: 0, pending: 0 },
+  )
+
+  return { ...totals, total: totals.billed + totals.pending }
 }
 
-export async function fetchUpcomingExpirations(
+export async function fetchUpcomingInvoiceExpirations(
   referenceDate: Date,
   monthsAhead = 1,
   period?: { from: Date; to: Date },
-): Promise<UpcomingServiceResult[]> {
+): Promise<UpcomingInvoiceResult[]> {
   const safeMonths = Math.max(1, monthsAhead)
   const startBoundary = period ? new Date(period.from) : new Date(referenceDate)
   startBoundary.setHours(0, 0, 0, 0)
@@ -153,7 +166,7 @@ export async function fetchUpcomingExpirations(
     upperBoundary.setTime(startBoundary.getTime() + 24 * 60 * 60 * 1000)
   }
 
-  const services = await prisma.client_service.findMany({
+  const invoices = await prisma.invoice.findMany({
     where: {
       expiry: {
         gte: startBoundary,
@@ -162,27 +175,32 @@ export async function fetchUpcomingExpirations(
     },
     include: {
       client: { select: { id: true, name: true } },
-      service: { select: { id: true, name: true } },
     },
     orderBy: { expiry: 'asc' },
   })
 
-  return services.map((service) => {
-    const expiryDate = service.expiry ?? null
+  return invoices.map((invoice) => {
+    const expiryDate = invoice.expiry ?? null
     const diff = expiryDate ? expiryDate.getTime() - referenceDate.getTime() : null
     const daysUntilExpiry = diff !== null ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : null
+    let status: 'pendiente' | 'pagada' | 'vencida' = 'pendiente'
+
+    if (invoice.status === true) {
+      status = 'pagada'
+    } else if (expiryDate && expiryDate < referenceDate) {
+      status = 'vencida'
+    }
 
     return {
-      id: service.id,
-      clientId: service.client?.id ?? null,
-      clientName: service.client?.name ?? null,
-      serviceId: service.service?.id ?? null,
-      serviceName: service.service?.name ?? null,
+      id: invoice.id,
+      clientId: invoice.client?.id ?? null,
+      clientName: invoice.client?.name ?? null,
+      invoiceNumber: normalizeText(invoice.description, invoice.id),
+      amount: parseCurrency(invoice.value),
       expiry: expiryDate ? expiryDate.toISOString() : null,
       daysUntilExpiry,
-      frequency: service.frequency ?? null,
-      unit: service.unit ?? null,
-      started: service.started ? service.started.toISOString() : null,
+      status,
+      url: invoice.url ?? null,
     }
   })
 }
@@ -332,7 +350,7 @@ export async function fetchDashboardSummary(
 ): Promise<DashboardSummaryResult> {
   const [totals, upcomingExpirations, clientStatus, topServices, monthlyComparison] = await Promise.all([
     fetchBillingTotals(period),
-    fetchUpcomingExpirations(
+    fetchUpcomingInvoiceExpirations(
       options?.expirationReferenceDate ?? period.from,
       options?.expirationMonthsAhead,
       options?.expirationPeriod,

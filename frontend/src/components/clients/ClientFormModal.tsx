@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { X } from 'lucide-react';
 
 import type { ClientDetailValue, ClientParameter, ClientStatus, ClientType } from './types';
 
@@ -17,7 +16,7 @@ type ClientFormModalProps = {
   title: string;
   submitLabel: string;
   parameters: ClientParameter[];
-  onSubmit: (result: ClientFormResult) => void;
+  onSubmit: (result: ClientFormResult) => Promise<void>;
   onClose: () => void;
   defaultValues?: {
     name: string;
@@ -41,6 +40,8 @@ export default function ClientFormModal({
   const [type, setType] = useState<ClientType>(defaultValues?.type ?? 'juridica');
   const [status, setStatus] = useState<ClientStatus>(defaultValues?.status ?? 'active');
   const [detailValues, setDetailValues] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -93,6 +94,8 @@ export default function ClientFormModal({
       setType('juridica');
       setStatus('active');
     }
+    setFormError(null);
+    setIsSubmitting(false);
     const mapped: Record<string, string> = {};
     orderedParameters.forEach((parameter) => {
       mapped[parameter.id] = defaultValues?.details.find((detail) => detail.parameterId === parameter.id)?.value ?? '';
@@ -105,7 +108,7 @@ export default function ClientFormModal({
     onClose();
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const details: ClientDetailValue[] = orderedParameters
       .map((parameter) => ({
@@ -114,14 +117,22 @@ export default function ClientFormModal({
       }))
       .filter((detail) => detail.value.length > 0);
 
-    onSubmit({
-      name: name.trim(),
-      type,
-      status,
-      details,
-    });
-    resetState();
-    onClose();
+    try {
+      setIsSubmitting(true);
+      setFormError(null);
+      await onSubmit({
+        name: name.trim(),
+        type,
+        status,
+        details,
+      });
+      resetState();
+      onClose();
+    } catch (error: any) {
+      setFormError(error?.message ?? 'No fue posible guardar el cliente.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -214,7 +225,11 @@ export default function ClientFormModal({
           </div>
         </div>
 
-        <div className="mt-auto flex justify-end gap-3 border-t border-gray-100 px-5 py-4">
+        <div className="mt-auto space-y-3 border-t border-gray-100 px-5 py-4">
+          {formError ? (
+            <p className="text-xs text-red-600">{formError}</p>
+          ) : null}
+          <div className="flex justify-end gap-3">
           <button
             type="button"
             onClick={handleClose}
@@ -225,10 +240,11 @@ export default function ClientFormModal({
           <button
             type="submit"
             className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-500 disabled:cursor-not-allowed disabled:bg-emerald-300"
-            disabled={!name.trim()}
+            disabled={!name.trim() || isSubmitting}
           >
-            {submitLabel}
+            {isSubmitting ? 'Guardando…' : submitLabel}
           </button>
+          </div>
         </div>
       </form>
   );

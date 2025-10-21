@@ -46,9 +46,10 @@
     "heading": "Welcome back!",
     "subheading": "Check the status of your operations and jump into the most important sections of the platform.",
     "metrics": {
-      "totalBilled": "Total billed",
+      "totalBilling": "Total billing",
+      "totalBilled": "Total collected",
       "pendingCollection": "Pending collection",
-      "pendingHint": "Amounts waiting for confirmation within the selected period.",
+      "pendingHint": "Amounts still pending within the selected period.",
       "period": "Period: {from} – {to}"
     },
     "filters": {
@@ -79,14 +80,14 @@
       "soldLabel": "Times sold"
     },
     "expirations": {
-      "title": "Upcoming expirations",
-      "description": "Keep track of services that will expire soon.",
-      "empty": "No expirations are coming up in the selected range.",
+      "title": "Upcoming invoices",
+      "description": "Monitor invoices approaching their due date.",
+      "empty": "No invoices are due within the selected range.",
       "dueToday": "Due today",
       "dueTomorrow": "Due tomorrow",
       "dueIn": "Due in {count, plural, one {# day} other {# days}}",
       "clientFallback": "Unassigned client",
-      "serviceFallback": "Unnamed service"
+      "invoiceFallback": "Invoice without reference"
     },
     "clientStatus": {
       "title": "Client status",

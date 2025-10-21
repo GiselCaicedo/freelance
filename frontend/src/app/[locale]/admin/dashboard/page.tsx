@@ -82,6 +82,7 @@ export default async function Dashboard(props: {
     errorMessage = t('errors.load');
   }
 
+  const total = summary ? formatCurrency(summary.totals.total ?? 0, locale) : '—';
   const billed = summary ? formatCurrency(summary.totals.billed ?? 0, locale) : '—';
   const pending = summary ? formatCurrency(summary.totals.pending ?? 0, locale) : '—';
   const inclusiveToIso = summary ? shiftIso(summary.period.to, -1) : null;
@@ -112,13 +113,14 @@ export default async function Dashboard(props: {
           />
 
           {summary ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              <MetricCard title={t('metrics.totalBilled')} value={billed} hint={periodHint ?? undefined} />
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              <MetricCard title={t('metrics.totalBilling')} value={total} hint={periodHint ?? undefined} />
+              <MetricCard title={t('metrics.totalBilled')} value={billed} tone="secondary" />
               <MetricCard
                 title={t('metrics.pendingCollection')}
                 value={pending}
                 hint={t('metrics.pendingHint')}
-                tone="secondary"
+                tone="warning"
               />
             </div>
           ) : null}
@@ -169,7 +171,7 @@ export default async function Dashboard(props: {
                     dueTomorrow: t('expirations.dueTomorrow'),
                     dueIn: (days: number) => t('expirations.dueIn', { count: days }),
                     clientFallback: t('expirations.clientFallback'),
-                    serviceFallback: t('expirations.serviceFallback'),
+                    invoiceFallback: t('expirations.invoiceFallback'),
                   }}
                 />
               </SectionCard>

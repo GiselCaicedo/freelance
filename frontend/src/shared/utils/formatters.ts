@@ -1,11 +1,12 @@
 const DEFAULT_CURRENCIES: Record<string, string> = {
   es: 'COP',
   'es-CO': 'COP',
-  en: 'USD',
+  en: 'COP',
+  'en-US': 'COP',
 };
 
 export function formatCurrency(value: number, locale: string) {
-  const currency = DEFAULT_CURRENCIES[locale] ?? 'USD';
+  const currency = DEFAULT_CURRENCIES[locale] ?? 'COP';
   return new Intl.NumberFormat(locale, {
     style: 'currency',
     currency,

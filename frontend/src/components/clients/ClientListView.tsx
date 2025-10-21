@@ -1,20 +1,16 @@
 'use client';
 
-import { use, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { Plus, Search, SlidersHorizontal, Users, Eye, Trash2 } from 'lucide-react';
+import { Plus, Search, Users, Eye, Trash2 } from 'lucide-react';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import AgTable from '@/components/datagrid/AgTable';
 import ClientFormModal, { type ClientFormResult } from './ClientFormModal';
 import DeleteClientModal from './DeleteClientModal';
-import type {
-  ClientParameter,
-  ClientRecord,
-  ClientDetailValue,
-  ClientStatus,
-  ClientType,
-} from './types';
+import type { ClientParameter, ClientRecord, ClientStatus, ClientType } from './types';
 import SidePanel from '@/shared/components/common/SidePanel';
+import Breadcrumbs from '@/components/ui/Breadcrumbs';
+import { createAdminClientApi, deleteAdminClientApi } from '@/shared/services/conexion';
 
 type ClientListViewProps = {
   initialClients: ClientRecord[];
@@ -26,11 +22,11 @@ type ClientRow = ClientRecord & {
   parameterValues: Record<string, string>;
 };
 
-const formatDate = (value: string | null | undefined) => {
+const formatDate = (value: string | null | undefined, locale: string) => {
   if (!value) return '—';
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return '—';
-  return new Intl.DateTimeFormat('es-ES', { dateStyle: 'medium' }).format(date);
+  return new Intl.DateTimeFormat(locale, { dateStyle: 'medium' }).format(date);
 };
 
 const statusLabel: Record<ClientStatus, { label: string; tone: string }> = {
@@ -87,34 +83,31 @@ export default function ClientListView({ initialClients, initialParameters, init
   };
 
 
-  const handleCreateClient = (payload: ClientFormResult) => {
-    const now = new Date().toISOString();
-    const newClient: ClientRecord = {
-      id: `client-${Date.now()}`,
-      name: payload.name,
-      type: payload.type,
-      status: payload.status,
-      createdAt: now,
-      updatedAt: now,
-      details: parameters.map<ClientDetailValue>((parameter) => ({
-        parameterId: parameter.id,
-        value: payload.details.find((detail) => detail.parameterId === parameter.id)?.value ?? '',
-      })),
-      services: [],
-      quotes: [],
-      payments: [],
-      invoices: [],
-      reminders: [],
-    };
-    setClients((prev) => [...prev, newClient]);
-    setErrorMessage(null);
+  const handleCreateClient = async (payload: ClientFormResult) => {
+    try {
+      const result = await createAdminClientApi(payload);
+      setClients((prev) => [...prev, cloneClientRecord(result.client)]);
+      setErrorMessage(null);
+    } catch (error: any) {
+      console.error('Failed to create client', error);
+      const message = error instanceof Error ? error.message : 'No fue posible crear el cliente.';
+      setErrorMessage(message);
+      throw error instanceof Error ? error : new Error(message);
+    }
   };
 
-  const handleDeleteClient = (authCode: string) => {
-    console.info('Autenticación verificada con código', authCode);
+  const handleDeleteClient = async (_authCode: string) => {
     if (!clientToDelete) return;
-    setClients((prev) => prev.filter((client) => client.id !== clientToDelete.id));
-    setClientToDelete(null);
+    try {
+      await deleteAdminClientApi(clientToDelete.id);
+      setClients((prev) => prev.filter((client) => client.id !== clientToDelete.id));
+      setClientToDelete(null);
+    } catch (error: any) {
+      console.error('Failed to delete client', error);
+      const message = error instanceof Error ? error.message : 'No fue posible eliminar el cliente.';
+      setErrorMessage(message);
+      throw error instanceof Error ? error : new Error(message);
+    }
   };
 
   const columns = useMemo<ColDef<ClientRow>[]>(() => {
@@ -165,13 +158,13 @@ export default function ClientListView({ initialClients, initialParameters, init
         headerName: 'Creado',
         field: 'createdAt',
         minWidth: 140,
-        valueFormatter: (params) => formatDate(params.value as string | null | undefined),
+        valueFormatter: (params) => formatDate(params.value as string | null | undefined, locale),
       },
       {
         headerName: 'Actualizado',
         field: 'updatedAt',
         minWidth: 140,
-        valueFormatter: (params) => formatDate(params.value as string | null | undefined),
+        valueFormatter: (params) => formatDate(params.value as string | null | undefined, locale),
       },
     ];
 
@@ -213,7 +206,7 @@ export default function ClientListView({ initialClients, initialParameters, init
     };
 
     return [...baseColumns, ...dynamicColumns, actionsColumn];
-  }, [navigateToDetail, parameters]);
+  }, [navigateToDetail, parameters, locale]);
 
   return (
     <div className="space-y-6" ref={containerRef}>
@@ -221,9 +214,14 @@ export default function ClientListView({ initialClients, initialParameters, init
         <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">{errorMessage}</div>
       ) : null}
       <div className="flex flex-col gap-4 rounded-3xl bg-white p-6 border border-gray-200 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-
-          Gestion Clientes
+        <div className="space-y-2">
+          <Breadcrumbs
+            items={[
+              { label: 'Panel admin', href: `/${locale}/admin/dashboard` },
+              { label: 'Clientes' },
+            ]}
+          />
+          <h1 className="text-2xl font-bold text-gray-900">Gestión de clientes</h1>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
@@ -237,7 +235,16 @@ export default function ClientListView({ initialClients, initialParameters, init
       </div>
       <div>
         <div className="mb-3 flex items-center justify-between">
-
+          <div className="relative w-full max-w-sm">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+            <input
+              type="search"
+              value={quickFilter}
+              onChange={(event) => setQuickFilter(event.target.value)}
+              placeholder="Buscar cliente..."
+              className="w-full rounded-full border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+            />
+          </div>
         </div>
         <AgTable<ClientRow>
           rows={rows}

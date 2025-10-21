@@ -1,5 +1,12 @@
 import axios from 'axios';
-import type { ClientParameter, ClientRecord, ServiceCatalogEntry } from '@/components/clients/types';
+import type {
+  AssignServiceInput,
+  ClientDetailValue,
+  ClientParameter,
+  ClientRecord,
+  ClientService,
+  ServiceCatalogEntry,
+} from '@/components/clients/types';
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const TOKEN_STORAGE_KEY = 'auth_token';
@@ -123,6 +130,22 @@ export interface AdminClientDetailPayload {
   parameters: ClientParameter[];
   serviceCatalog: ServiceCatalogEntry[];
 }
+
+type AdminClientInput = {
+  name: string;
+  status: ClientRecord['status'];
+  type: ClientRecord['type'];
+  details: ClientDetailValue[];
+};
+
+type AdminClientMutationPayload = {
+  client: ClientRecord;
+};
+
+type AssignClientServicePayload = {
+  service: ClientService;
+  clientUpdatedAt: string | null;
+};
 
 export interface RegisterUserDto {
   user: string;
@@ -313,6 +336,137 @@ export async function getAdminClientDetailApi(
     console.error('getAdminClientDetailApi error:', error);
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.message ?? 'Error al obtener el cliente');
+    }
+    throw error;
+  }
+}
+
+const buildAuthConfig = (token?: string) =>
+  token
+    ? {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    : undefined;
+
+export async function createAdminClientApi(
+  payload: AdminClientInput,
+  token?: string,
+): Promise<AdminClientMutationPayload> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = {
+      name: payload.name,
+      status: payload.status,
+      type: payload.type,
+      details: payload.details.map((detail) => ({
+        parameterId: detail.parameterId,
+        value: detail.value,
+      })),
+    };
+    const { data } = await api.post('/clients', body, config);
+    if (data?.success === true && data?.data?.client) {
+      return data.data as AdminClientMutationPayload;
+    }
+    if (data?.client) {
+      return { client: data.client } as AdminClientMutationPayload;
+    }
+    if (data?.data) {
+      return data.data as AdminClientMutationPayload;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al crear el cliente');
+  } catch (error: any) {
+    console.error('createAdminClientApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible crear el cliente');
+    }
+    throw error;
+  }
+}
+
+export async function updateAdminClientApi(
+  id: string,
+  payload: AdminClientInput,
+  token?: string,
+): Promise<AdminClientMutationPayload> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = {
+      name: payload.name,
+      status: payload.status,
+      type: payload.type,
+      details: payload.details.map((detail) => ({
+        parameterId: detail.parameterId,
+        value: detail.value,
+      })),
+    };
+    const { data } = await api.put(`/clients/${id}`, body, config);
+    if (data?.success === true && data?.data?.client) {
+      return data.data as AdminClientMutationPayload;
+    }
+    if (data?.client) {
+      return { client: data.client } as AdminClientMutationPayload;
+    }
+    if (data?.data) {
+      return data.data as AdminClientMutationPayload;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al actualizar el cliente');
+  } catch (error: any) {
+    console.error('updateAdminClientApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible actualizar el cliente');
+    }
+    throw error;
+  }
+}
+
+export async function deleteAdminClientApi(id: string, token?: string): Promise<void> {
+  try {
+    const config = buildAuthConfig(token);
+    await api.delete(`/clients/${id}`, config);
+  } catch (error: any) {
+    console.error('deleteAdminClientApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible eliminar el cliente');
+    }
+    throw error;
+  }
+}
+
+export async function assignClientServiceApi(
+  clientId: string,
+  payload: AssignServiceInput,
+  token?: string,
+): Promise<AssignClientServicePayload> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = {
+      serviceId: payload.serviceId,
+      started: payload.started ?? null,
+      delivery: payload.delivery ?? null,
+      expiry: payload.expiry ?? null,
+      frequencyValue: payload.frequencyValue ?? null,
+      frequencyUnit: payload.frequencyUnit ?? null,
+      urlApi: payload.urlApi ?? null,
+      tokenApi: payload.tokenApi ?? null,
+    };
+    const { data } = await api.post(`/clients/${clientId}/services`, body, config);
+    if (data?.success === true && data?.data?.service) {
+      return data.data as AssignClientServicePayload;
+    }
+    if (data?.service) {
+      return {
+        service: data.service,
+        clientUpdatedAt: data.clientUpdatedAt ?? null,
+      } as AssignClientServicePayload;
+    }
+    if (data?.data) {
+      return data.data as AssignClientServicePayload;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al asignar el servicio');
+  } catch (error: any) {
+    console.error('assignClientServiceApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible asignar el servicio');
     }
     throw error;
   }
