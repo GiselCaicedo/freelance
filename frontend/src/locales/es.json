@@ -46,9 +46,10 @@
     "heading": "¡Bienvenido al panel administrador!",
     "subheading": "[Descripcion pendiente]",
     "metrics": {
+      "totalBilling": "Facturación total",
       "totalBilled": "Total facturado",
       "pendingCollection": "Pendiente de cobro",
-      "pendingHint": "[Descripcion pendiente] Cobros pendientes en el periodo seleccionado.",
+      "pendingHint": "Cobros aún por recaudar en el periodo seleccionado.",
       "period": "Periodo: {from} – {to}"
     },
     "filters": {
@@ -79,14 +80,14 @@
       "soldLabel": "Veces vendido"
     },
     "expirations": {
-      "title": "Vencimientos",
-      "description": "[Descripcion pendiente]",
-      "empty": "No hay vencimientos en el rango seleccionado.",
+      "title": "Facturas por vencer",
+      "description": "Próximos compromisos de facturación según su fecha de vencimiento.",
+      "empty": "No hay facturas próximas a vencer en el rango seleccionado.",
       "dueToday": "Vence hoy",
       "dueTomorrow": "Vence mañana",
       "dueIn": "Vence en {count, plural, one {# día} other {# días}}",
       "clientFallback": "...",
-      "serviceFallback": "..."
+      "invoiceFallback": "Factura sin referencia"
     },
     "clientStatus": {
       "title": "Estado de clientes",

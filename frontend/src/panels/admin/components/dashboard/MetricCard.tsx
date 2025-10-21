@@ -4,12 +4,13 @@ interface MetricCardProps {
   title: string;
   value: string;
   hint?: string;
-  tone?: 'primary' | 'secondary';
+  tone?: 'primary' | 'secondary' | 'warning';
 }
 
 const toneStyles: Record<NonNullable<MetricCardProps['tone']>, string> = {
   primary: 'bg-emerald-500 text-white',
   secondary: 'bg-sky-500 text-white',
+  warning: 'bg-amber-500 text-white',
 };
 
 export function MetricCard({ title, value, hint, tone = 'primary' }: MetricCardProps) {

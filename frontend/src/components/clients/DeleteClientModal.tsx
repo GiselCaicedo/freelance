@@ -7,7 +7,7 @@ import { AlertTriangle, ShieldCheck, X } from 'lucide-react';
 type DeleteClientModalProps = {
   open: boolean;
   clientName: string;
-  onConfirm: (authCode: string) => void;
+  onConfirm: (authCode: string) => Promise<void>;
   onClose: () => void;
   confirmLabel?: string;
 };
@@ -21,6 +21,8 @@ export default function DeleteClientModal({
 }: DeleteClientModalProps) {
   const [mounted, setMounted] = useState(false);
   const [authCode, setAuthCode] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -30,6 +32,8 @@ export default function DeleteClientModal({
   useEffect(() => {
     if (!open) {
       setAuthCode('');
+      setIsSubmitting(false);
+      setErrorMessage(null);
     }
   }, [open]);
 
@@ -45,8 +49,18 @@ export default function DeleteClientModal({
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!authCode.trim()) return;
-    onConfirm(authCode.trim());
-    setAuthCode('');
+    void (async () => {
+      try {
+        setIsSubmitting(true);
+        setErrorMessage(null);
+        await onConfirm(authCode.trim());
+        setAuthCode('');
+      } catch (error: any) {
+        setErrorMessage(error?.message ?? 'No fue posible eliminar al cliente.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    })();
   };
 
   const isValid = authCode.trim().length >= 6;
@@ -92,13 +106,16 @@ export default function DeleteClientModal({
           </div>
         </div>
 
-        <div className="mt-auto flex justify-end gap-3 border-t border-gray-100 px-5 py-4">
-          <button type="button" onClick={handleClose} className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50">
+        <div className="mt-auto space-y-3 border-t border-gray-100 px-5 py-4">
+          {errorMessage ? <p className="text-xs text-red-600">{errorMessage}</p> : null}
+          <div className="flex justify-end gap-3">
+            <button type="button" onClick={handleClose} className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition hover:bg-gray-50">
             Cancelar
-          </button>
-          <button type="submit" className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 disabled:cursor-not-allowed disabled:bg-red-300" disabled={!isValid}>
-            {confirmLabel}
-          </button>
+            </button>
+            <button type="submit" className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-500 disabled:cursor-not-allowed disabled:bg-red-300" disabled={!isValid || isSubmitting}>
+              {isSubmitting ? 'Eliminando…' : confirmLabel}
+            </button>
+          </div>
         </div>
       </form>
     </SidePanel>

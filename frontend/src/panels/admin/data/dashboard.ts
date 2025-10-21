@@ -6,18 +6,17 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL
 
 export interface AdminDashboardSummary {
   period: { from: string; to: string };
-  totals: { billed: number; pending: number };
+  totals: { billed: number; pending: number; total: number };
   upcomingExpirations: Array<{
     id: string;
     clientId: string | null;
     clientName: string | null;
-    serviceId: string | null;
-    serviceName: string | null;
+    invoiceNumber: string | null;
+    amount: number;
     expiry: string | null;
     daysUntilExpiry: number | null;
-    frequency: string | null;
-    unit: string | null;
-    started: string | null;
+    status: 'pendiente' | 'pagada' | 'vencida';
+    url: string | null;
   }>;
   clientStatus: {
     total: number;

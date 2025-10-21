@@ -1,7 +1,31 @@
+import { randomUUID } from 'node:crypto'
 import { prisma } from '../../../config/db.ts'
 
 export type ClientStatus = 'active' | 'inactive' | 'onboarding'
 export type ClientType = 'natural' | 'juridica'
+
+type ClientDetailInput = {
+  parameterId: string
+  value: string
+}
+
+type PersistClientPayload = {
+  name: string
+  status: ClientStatus
+  type?: ClientType
+  details?: ClientDetailInput[]
+}
+
+type ServiceAssignmentInput = {
+  serviceId: string
+  started?: string | null
+  delivery?: string | null
+  expiry?: string | null
+  frequencyValue?: string | null
+  frequencyUnit?: string | null
+  urlApi?: string | null
+  tokenApi?: string | null
+}
 
 const toIso = (value: Date | null | undefined): string | null =>
   value ? value.toISOString() : null
@@ -21,6 +45,12 @@ const mapClientStatus = (status: boolean | null | undefined): ClientStatus => {
   if (status === true) return 'active'
   if (status === false) return 'inactive'
   return 'onboarding'
+}
+
+const mapClientStatusToBoolean = (status: ClientStatus): boolean | null => {
+  if (status === 'active') return true
+  if (status === 'inactive') return false
+  return null
 }
 
 const guessClientType = (
@@ -44,6 +74,61 @@ const normalizeText = (value: string | null | undefined, fallback: string): stri
   return trimmed && trimmed.length > 0 ? trimmed : fallback
 }
 
+const sanitizeDetails = (details: ClientDetailInput[] | undefined): ClientDetailInput[] => {
+  if (!Array.isArray(details)) return []
+
+  const seen = new Set<string>()
+
+  return details
+    .map((detail) => ({
+      parameterId: detail.parameterId?.trim() ?? '',
+      value: detail.value?.trim() ?? '',
+    }))
+    .filter((detail) => {
+      if (!detail.parameterId || detail.value.length === 0) {
+        return false
+      }
+      if (seen.has(detail.parameterId)) {
+        return false
+      }
+      seen.add(detail.parameterId)
+      return true
+    })
+}
+
+const sanitizeString = (value: unknown): string | null => {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  return trimmed.length > 0 ? trimmed : null
+}
+
+const parseDateInput = (value: unknown): Date | null => {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  const parsed = new Date(trimmed)
+  if (Number.isNaN(parsed.getTime())) {
+    return null
+  }
+  return parsed
+}
+
+const mapServiceAssignment = (clientId: string, service: any) => ({
+  id: service.id,
+  clientId: service.client_id ?? clientId,
+  serviceId: service.service_id ?? '',
+  name: normalizeText(service.service?.name ?? null, 'Servicio sin nombre'),
+  createdAt: toIso(service.created),
+  updatedAt: toIso(service.updated),
+  started: toIso(service.started),
+  delivery: toIso(service.delivery),
+  expiry: toIso(service.expiry),
+  frequency: service.frequency ?? null,
+  unit: service.unit ?? service.service?.unit ?? null,
+  urlApi: service.url_api ?? null,
+  tokenApi: service.token_api ?? null,
+})
+
 export async function fetchClientParameters() {
   const parameters = await prisma.client_parameter.findMany({
     orderBy: { name: 'asc' },
@@ -65,6 +150,8 @@ const mapClientRecord = (
   const paymentEntries = Array.isArray(client.payment) ? client.payment : []
   const invoiceEntries = Array.isArray(client.invoice) ? client.invoice : []
 
+  const now = new Date()
+
   const details = detailEntries
     .filter((detail) => Boolean(detail.c_parameter_id))
     .map((detail) => ({
@@ -75,21 +162,7 @@ const mapClientRecord = (
       value: detail.value ?? '',
     }))
 
-  const services = serviceEntries.map((service) => ({
-    id: service.id,
-    clientId: service.client_id ?? client.id,
-    serviceId: service.service_id ?? '',
-    name: normalizeText(service.service?.name ?? null, 'Servicio sin nombre'),
-    createdAt: toIso(service.created),
-    updatedAt: toIso(service.updated),
-    started: toIso(service.started),
-    delivery: toIso(service.delivery),
-    expiry: toIso(service.expiry),
-    frequency: service.frequency ?? null,
-    unit: service.unit ?? service.service?.unit ?? null,
-    urlApi: service.url_api ?? null,
-    tokenApi: service.token_api ?? null,
-  }))
+  const services = serviceEntries.map((service) => mapServiceAssignment(client.id, service))
 
   const quotes = quoteEntries.map((quote) => ({
     id: quote.id,
@@ -111,10 +184,35 @@ const mapClientRecord = (
     id: invoice.id,
     number: normalizeText(invoice.description, invoice.id),
     issuedAt: toIso(invoice.created),
-    dueAt: toIso(invoice.updated),
+    dueAt: toIso(invoice.expiry ?? invoice.updated),
     amount: toNumber(invoice.value),
-    status: invoice.status === false ? 'pendiente' : invoice.status === true ? 'pagada' : 'pendiente',
+    status:
+      invoice.status === true
+        ? 'pagada'
+        : invoice.status === false && invoice.expiry && invoice.expiry < now
+          ? 'vencida'
+          : 'pendiente',
   }))
+
+  const reminders = invoiceEntries
+    .filter((invoice) => invoice.status !== true)
+    .map((invoice) => {
+      const dueAt = invoice.expiry ?? invoice.updated ?? invoice.created ?? null
+      const dueIso = dueAt ? dueAt.toISOString() : null
+      let status: 'pendiente' | 'enviado' | 'confirmado' = 'pendiente'
+
+      if (dueAt && dueAt < now) {
+        status = 'enviado'
+      }
+
+      return {
+        id: `reminder-${invoice.id}`,
+        concept: normalizeText(invoice.description, `Factura ${invoice.id}`),
+        dueAt: dueIso,
+        amount: toNumber(invoice.value),
+        status,
+      }
+    })
 
   return {
     id: client.id,
@@ -128,7 +226,7 @@ const mapClientRecord = (
     quotes,
     payments,
     invoices,
-    reminders: [],
+    reminders,
   }
 }
 
@@ -194,18 +292,167 @@ export async function fetchClientById(id: string) {
 
   const parameterNames = new Map(parameters.map((parameter) => [parameter.id, parameter.name]))
   const mappedClient = mapClientRecord(client as any, parameterNames)
-  const serviceCatalog = services.map((service) => ({
-    id: service.id,
-    name: normalizeText(service.name, 'Servicio sin nombre'),
-    description: service.description ?? '',
-    defaultFrequency: null as string | null,
-    defaultUnit: service.unit ?? null,
-    supportsApi: Boolean(service.status),
-  }))
+  const serviceCatalog = services
+    .filter((service, index, list) => list.findIndex((item) => item.id === service.id) === index)
+    .map((service) => ({
+      id: service.id,
+      name: normalizeText(service.name, 'Servicio sin nombre'),
+      description: service.description ?? '',
+      defaultFrequency: null as string | null,
+      defaultUnit: service.unit ?? null,
+      supportsApi: Boolean(service.status),
+    }))
 
   return {
     client: mappedClient,
     parameters,
     serviceCatalog,
   }
+}
+
+export async function assignServiceToClient(clientId: string, payload: ServiceAssignmentInput) {
+  const normalizedServiceId = sanitizeString(payload.serviceId)
+  if (!normalizedServiceId) {
+    throw new Error('SERVICE_ID_REQUIRED')
+  }
+
+  const client = await prisma.client.findUnique({ where: { id: clientId } })
+  if (!client) {
+    throw new Error('CLIENT_NOT_FOUND')
+  }
+
+  const service = await prisma.service.findUnique({ where: { id: normalizedServiceId } })
+  if (!service) {
+    throw new Error('SERVICE_NOT_FOUND')
+  }
+
+  const existingAssignment = await prisma.client_service.findFirst({
+    where: {
+      client_id: clientId,
+      service_id: normalizedServiceId,
+    },
+  })
+
+  if (existingAssignment) {
+    throw new Error('SERVICE_ALREADY_ASSIGNED')
+  }
+
+  const now = new Date()
+  const startedAt = parseDateInput(payload.started) ?? now
+  const deliveryAt = parseDateInput(payload.delivery)
+  const expiryAt = parseDateInput(payload.expiry)
+  const frequencyValue = sanitizeString(payload.frequencyValue)
+  const frequencyUnit = sanitizeString(payload.frequencyUnit) ?? service.unit ?? null
+  const urlApi = sanitizeString(payload.urlApi)
+  const tokenApi = sanitizeString(payload.tokenApi)
+
+  const result = await prisma.$transaction(async (tx) => {
+    const created = await tx.client_service.create({
+      data: {
+        id: randomUUID(),
+        client_id: clientId,
+        service_id: normalizedServiceId,
+        created: now,
+        updated: now,
+        started: startedAt,
+        delivery: deliveryAt,
+        expiry: expiryAt,
+        frequency: frequencyValue,
+        unit: frequencyUnit,
+        url_api: urlApi,
+        token_api: tokenApi,
+      },
+      include: {
+        service: true,
+      },
+    })
+
+    const updatedClient = await tx.client.update({
+      where: { id: clientId },
+      data: { updated: now },
+      select: { updated: true },
+    })
+
+    return {
+      assignment: created,
+      clientUpdatedAt: updatedClient.updated,
+    }
+  })
+
+  return {
+    service: mapServiceAssignment(clientId, result.assignment),
+    clientUpdatedAt: toIso(result.clientUpdatedAt),
+  }
+}
+
+export async function createClient(payload: PersistClientPayload) {
+  const details = sanitizeDetails(payload.details)
+  const now = new Date()
+
+  const created = await prisma.client.create({
+    data: {
+      name: payload.name.trim(),
+      status: mapClientStatusToBoolean(payload.status),
+      created: now,
+      updated: now,
+      client_details: {
+        create: details.map((detail) => ({
+          id: randomUUID(),
+          c_parameter_id: detail.parameterId,
+          value: detail.value,
+        })),
+      },
+    },
+  })
+
+  return fetchClientById(created.id)
+}
+
+export async function updateClient(id: string, payload: PersistClientPayload) {
+  const details = sanitizeDetails(payload.details)
+
+  await prisma.$transaction(async (tx) => {
+    await tx.client.update({
+      where: { id },
+      data: {
+        name: payload.name.trim(),
+        status: mapClientStatusToBoolean(payload.status),
+        updated: new Date(),
+      },
+    })
+
+    await tx.client_details.deleteMany({ where: { client_id: id } })
+
+    if (details.length > 0) {
+      await tx.client_details.createMany({
+        data: details.map((detail) => ({
+          id: randomUUID(),
+          client_id: id,
+          c_parameter_id: detail.parameterId,
+          value: detail.value,
+        })),
+      })
+    }
+  })
+
+  return fetchClientById(id)
+}
+
+export async function deleteClient(id: string) {
+  await prisma.$transaction([
+    prisma.client_details.deleteMany({ where: { client_id: id } }),
+    prisma.client_service.deleteMany({ where: { client_id: id } }),
+    prisma.invoice_detail.deleteMany({ where: { invoice: { client_id: id } } }),
+    prisma.payment_attachment.deleteMany({ where: { invoice: { client_id: id } } }),
+    prisma.quote_attachment.deleteMany({ where: { invoice: { client_id: id } } }),
+    prisma.quote_detail.deleteMany({ where: { quote: { client_id: id } } }),
+    prisma.invoice.deleteMany({ where: { client_id: id } }),
+    prisma.payment.deleteMany({ where: { client_id: id } }),
+    prisma.quote.deleteMany({ where: { client_id: id } }),
+    prisma.service_usage.deleteMany({ where: { client_id: id } }),
+    prisma.log.deleteMany({ where: { client_id: id } }),
+    prisma.client.delete({ where: { id } }),
+  ])
+
+  return { success: true }
 }

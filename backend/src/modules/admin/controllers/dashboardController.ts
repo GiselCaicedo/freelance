@@ -6,7 +6,7 @@ import {
   fetchDashboardSummary,
   fetchMonthlyBillingComparison,
   fetchTopServices,
-  fetchUpcomingExpirations,
+  fetchUpcomingInvoiceExpirations,
 } from '../services/dashboardService.js'
 
 function isValidDate(value: Date): boolean {
@@ -114,7 +114,7 @@ export async function getUpcomingExpirationsCtrl(req: Request, res: Response) {
     const referenceDate = parseDate(req.query.referenceDate) ?? new Date()
     const monthsAhead = parsePositiveInteger(req.query.monthsAhead, 1, { min: 1, max: 12 })
 
-    const expirations = await fetchUpcomingExpirations(referenceDate, monthsAhead, period ?? undefined)
+    const expirations = await fetchUpcomingInvoiceExpirations(referenceDate, monthsAhead, period ?? undefined)
     res.json({
       success: true,
       data: {

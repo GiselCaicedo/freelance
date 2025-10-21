@@ -91,3 +91,14 @@ export type ServiceCatalogEntry = {
   defaultUnit?: string | null;
   supportsApi?: boolean;
 };
+
+export type AssignServiceInput = {
+  serviceId: string;
+  started?: string | null;
+  delivery?: string | null;
+  expiry?: string | null;
+  frequencyValue?: string | null;
+  frequencyUnit?: string | null;
+  urlApi?: string | null;
+  tokenApi?: string | null;
+};
