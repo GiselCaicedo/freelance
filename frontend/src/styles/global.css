@@ -1,0 +1,146 @@
+@layer theme, base, clerk, components, utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@theme {
+    --font-sans: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    --font-heading: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+    --color-primary-50: #E8F6F0;
+    --color-primary-100: #C5EAD9;
+    --color-primary-200: #9CDDC1;
+    --color-primary-300: #72D0A9;
+    --color-primary-400: #48C391;
+    --color-primary-500: #17A76C;
+    --color-primary-600: #12885A;
+    --color-primary-700: #0C6A47;
+    --color-primary-800: #084C34;
+    --color-primary-900: #052F22;
+
+    --color-secondary-50: #EEF0FF;
+    --color-secondary-100: #DBDEFF;
+    --color-secondary-200: #B7BEFF;
+    --color-secondary-300: #929DFF;
+    --color-secondary-400: #6E7DFF;
+    --color-secondary-500: #1A20CC;
+    --color-secondary-600: #151AA3;
+    --color-secondary-700: #10137B;
+    --color-secondary-800: #090C52;
+    --color-secondary-900: #050629;
+
+    --color-gray-50: #F7F9FC;
+    --color-gray-100: #EDF2F7;
+    --color-gray-200: #E0E7F1;
+    --color-gray-300: #CDD5E1;
+    --color-gray-400: #A3AEC2;
+    --color-gray-500: #6E768A;
+    --color-gray-600: #4C5567;
+    --color-gray-700: #2F3644;
+    --color-gray-800: #1E232F;
+    --color-gray-900: #111722;
+
+    --color-emerald-50: #E8F6F0;
+    --color-emerald-100: #C5EAD9;
+    --color-emerald-200: #9CDDC1;
+    --color-emerald-300: #72D0A9;
+    --color-emerald-400: #48C391;
+    --color-emerald-500: #17A76C;
+    --color-emerald-600: #12885A;
+    --color-emerald-700: #0C6A47;
+    --color-emerald-800: #084C34;
+    --color-emerald-900: #052F22;
+
+    --color-green-50: #ECFDF3;
+    --color-green-100: #D1FADF;
+    --color-green-200: #A6F4C5;
+    --color-green-300: #72E9A6;
+    --color-green-400: #42DD87;
+    --color-green-500: #22C55E;
+    --color-green-600: #16A34A;
+    --color-green-700: #15803D;
+    --color-green-800: #166534;
+    --color-green-900: #14532D;
+
+    --color-amber-50: #FFFBEB;
+    --color-amber-100: #FEF3C7;
+    --color-amber-200: #FDE68A;
+    --color-amber-300: #FBDD4F;
+    --color-amber-400: #FBD335;
+    --color-amber-500: #FACC15;
+    --color-amber-600: #C49A0A;
+    --color-amber-700: #A47E07;
+    --color-amber-800: #866205;
+    --color-amber-900: #644803;
+
+    --color-red-50: #FFECEC;
+    --color-red-100: #FFD5D5;
+    --color-red-200: #FFB3B3;
+    --color-red-300: #FF8A8A;
+    --color-red-400: #FF6464;
+    --color-red-500: #F75555;
+    --color-red-600: #DC3B3B;
+    --color-red-700: #B62E2E;
+    --color-red-800: #8F2222;
+    --color-red-900: #6A1717;
+
+    --color-blue-50: #EEF4FF;
+    --color-blue-100: #D9E4FF;
+    --color-blue-200: #B4CAFF;
+    --color-blue-300: #8DAEFF;
+    --color-blue-400: #6792FF;
+    --color-blue-500: #0D62FF;
+    --color-blue-600: #0A4FD6;
+    --color-blue-700: #083CAC;
+    --color-blue-800: #052A82;
+    --color-blue-900: #031A59;
+
+    --color-purple-50: #F1E9FF;
+    --color-purple-100: #E1D1FF;
+    --color-purple-200: #C3A8FF;
+    --color-purple-300: #A57FFF;
+    --color-purple-400: #8757FF;
+    --color-purple-500: #8C52FF;
+    --color-purple-600: #6F3DCC;
+    --color-purple-700: #522C99;
+    --color-purple-800: #361C66;
+    --color-purple-900: #1C0D33;
+
+    --color-orange-50: #FFF4EC;
+    --color-orange-100: #FFE1D0;
+    --color-orange-200: #FFC2A1;
+    --color-orange-300: #FFA173;
+    --color-orange-400: #FF834D;
+    --color-orange-500: #FF6A3D;
+    --color-orange-600: #E4572D;
+    --color-orange-700: #BD4423;
+    --color-orange-800: #96341B;
+    --color-orange-900: #6F2412;
+
+    --color-white: #FFFFFF;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+  }
+}
+
+/* Tema base para todas las tablas */
+.ag-theme-cifra {
+  --ag-font-size: 13px;
+  --ag-font-family: 'Inter', 'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans';
+  --ag-header-background-color: #f9fafb;
+  --ag-header-foreground-color: #0f172a;
+  --ag-border-color: #e5e7eb;
+  --ag-row-hover-color: #f3f4f6;
+  --ag-odd-row-background-color: #ffffff;
+  --ag-even-row-background-color: #fafafa;
+  --ag-selected-row-background-color: #e0f2fe;
+}
+.ag-theme-cifra .ag-root-wrapper { border: none; }
+.ag-theme-cifra .ag-header { border-bottom: 1px solid #e5e7eb; }
+.ag-theme-cifra .ag-cell { display: flex; align-items: center; padding: 4px 8px; }
+.ag-theme-cifra .ag-paging-panel { justify-content: center; gap: 16px; padding: 8px 12px; }
+.ag-theme-cifra .ag-paging-page-size { display: inline-flex; align-items: center; gap: 6px; }
+.ag-theme-cifra .ag-paging-page-size > span:first-child { display: none; }
