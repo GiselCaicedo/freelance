@@ -1,0 +1,409 @@
+{
+  "Layout": {
+    "nav": {
+      "dashboard": "Home",
+      "services": "Services",
+      "payments": "Payments",
+      "quotes": "Quotes",
+      "settings": "Settings",
+      "collapse": "Collapse menu",
+      "expand": "Expand menu",
+      "redirecting": "Redirecting…",
+      "clients": "Clients"
+    },
+    "enterprise": {
+      "switcherLabel": "Select organisation",
+      "placeholder": "Organisation"
+    }
+  },
+  "Client": {
+    "Layout": {
+      "badge": "Client panel",
+      "title": "Cifra Pay",
+      "adminCta": "Go to the admin panel",
+      "redirecting": "Redirecting to your available panel…"
+    },
+    "Dashboard": {
+      "hero": {
+        "badge": "Welcome",
+        "heading": "Client overview",
+        "description": "This view highlights the key information for your account. Keep track of active services, review supporting documents and monitor payments without switching to the admin panel."
+      },
+      "status": {
+        "heading": "Connection with the service",
+        "description": "This summary confirms the client dashboard works independently from the admin panel.",
+        "messageLabel": "Latest update",
+        "timestamp": "Updated on {value}",
+        "noticesHeading": "Helpful notices",
+        "empty": "There are no notices to show right now.",
+        "error": "We couldn't fetch the client dashboard summary."
+      }
+    }
+  },
+  "Dashboard": {
+    "meta_title": "Dashboard",
+    "meta_description": "Activity overview",
+    "heading": "Welcome back!",
+    "subheading": "Check the status of your operations and jump into the most important sections of the platform.",
+    "metrics": {
+      "totalBilling": "Total billing",
+      "totalBilled": "Total collected",
+      "pendingCollection": "Pending collection",
+      "pendingHint": "Amounts still pending within the selected period.",
+      "period": "Period: {from} – {to}"
+    },
+    "filters": {
+      "title": "Filter period",
+      "hint": "Choose a date range up to 12 months long.",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply",
+      "applying": "Applying…",
+      "reset": "Reset",
+      "error": {
+        "required": "Select both dates.",
+        "range": "The start date must be before or equal to the end date."
+      }
+    },
+    "billing": {
+      "title": "Monthly billing comparison",
+      "description": "Compare billed versus pending amounts month over month.",
+      "billed": "Billed",
+      "pending": "Pending",
+      "empty": "No billing data is available for this period."
+    },
+    "topServices": {
+      "title": "Top selling services",
+      "description": "Services with the highest number of sales in the selected period.",
+      "empty": "No services were sold in this period.",
+      "fallback": "Service #{position}",
+      "soldLabel": "Times sold"
+    },
+    "expirations": {
+      "title": "Upcoming invoices",
+      "description": "Monitor invoices approaching their due date.",
+      "empty": "No invoices are due within the selected range.",
+      "dueToday": "Due today",
+      "dueTomorrow": "Due tomorrow",
+      "dueIn": "Due in {count, plural, one {# day} other {# days}}",
+      "clientFallback": "Unassigned client",
+      "invoiceFallback": "Invoice without reference"
+    },
+    "clientStatus": {
+      "title": "Client status",
+      "description": "Distribution of active, inactive and clients without a defined status.",
+      "active": "Active",
+      "inactive": "Inactive",
+      "unknown": "Unknown",
+      "total": "{count, plural, one {# client in total} other {# clients in total}}"
+    },
+    "errors": {
+      "load": "We couldn't load the dashboard information."
+    }
+  },
+  "Auth": {
+    "SignIn": {
+      "alerts": {
+        "success": {
+          "title": "Signed in successfully",
+          "description": "Welcome, loading your dashboard."
+        },
+        "error": {
+          "title": "We couldn't sign you in"
+        }
+      },
+      "errors": {
+        "invalidCredentials": "Incorrect username or password.",
+        "unexpected": "Something went wrong. Please try again later."
+      },
+      "hero": {
+        "badge": "Admin platform",
+        "heading": "Manage your payments from a single place",
+        "description": "...",
+        "tipTitle": "Did you know?",
+        "tipDescription": "You can enable or disable team access at any time from the security panel."
+      },
+      "form": {
+        "heading": "Welcome back",
+        "subheading": "Enter your credentials to continue.",
+        "usernameLabel": "Username",
+        "usernamePlaceholder": "your.username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "••••••••",
+        "submit": "Sign in",
+        "submitLoading": "Signing in…",
+        "footerNotice": "Forgot your password? Contact your company administrator to reset it."
+      }
+    },
+    "Logout": {
+      "successTitle": "Signed out",
+      "successDescription": "See you soon.",
+      "errorTitle": "Sign-out failed",
+      "errorDescription": "Please try again in a moment.",
+      "loading": "Signing out…",
+      "buttonLabel": "Sign out"
+    }
+  },
+  "Roles": {
+    "Form": {
+      "nameLabel": "Role name",
+      "namePlaceholder": "e.g. Administrator",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Short description (optional)",
+      "panel": {
+        "label": "Assigned panel",
+        "placeholder": "Select a panel",
+        "options": {
+          "admin": "Admin panel",
+          "client": "Client panel"
+        }
+      },
+      "status": {
+        "active": "Role enabled",
+        "inactive": "Role disabled"
+      },
+      "alerts": {
+        "saveError": {
+          "title": "Could not save the role",
+          "description": "Please try again."
+        }
+      },
+      "actions": {
+        "create": "Create role",
+        "update": "Save changes",
+        "saving": "Saving…",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "Users": {
+    "EditForm": {
+      "errors": {
+        "load": "We couldn't load the user information.",
+        "unexpected": "Something went wrong."
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Error loading user"
+        },
+        "updateError": {
+          "title": "User update failed",
+          "description": "Please try again."
+        },
+        "success": {
+          "title": "User updated",
+          "description": "Changes saved successfully."
+        }
+      },
+      "states": {
+        "loading": "Loading…"
+      },
+      "status": {
+        "active": "User active",
+        "inactive": "User inactive"
+      },
+      "fields": {
+        "username": {
+          "label": "Username"
+        },
+        "name": {
+          "label": "Name",
+          "placeholder": "Full name"
+        },
+        "role": {
+          "label": "Role",
+          "placeholder": "Select a role…"
+        },
+        "password": {
+          "label": "New password (optional)",
+          "placeholder": "Leave blank to keep it"
+        }
+      },
+      "actions": {
+        "save": "Save changes",
+        "saving": "Saving…",
+        "cancel": "Cancel"
+      }
+    },
+    "CreateForm": {
+      "errors": {
+        "loadLists": "We couldn't load the required lists.",
+        "unexpected": "Something went wrong."
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Error loading data"
+        },
+        "invalid": {
+          "title": "Incomplete form",
+          "description": "Complete all required fields. The password must be at least 8 characters long."
+        },
+        "success": {
+          "title": "User created",
+          "description": "The user was created successfully."
+        },
+        "createError": {
+          "title": "We couldn't create the user"
+        }
+      },
+      "states": {
+        "loadingLists": "Loading lists…"
+      },
+      "fields": {
+        "username": {
+          "label": "Username",
+          "placeholder": "Username"
+        },
+        "name": {
+          "label": "Full name",
+          "placeholder": "e.g. Jane Doe"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "••••••••",
+          "help": "At least 8 characters."
+        },
+        "role": {
+          "label": "Role",
+          "searchPlaceholder": "Search role…",
+          "empty": "No roles found"
+        },
+        "client": {
+          "label": "Client",
+          "searchPlaceholder": "Search client…",
+          "empty": "No clients found"
+        }
+      },
+      "actions": {
+        "create": "Create user",
+        "creating": "Creating…",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "Settings": {
+    "Roles": {
+      "breadcrumbs": {
+        "section": "Security & access",
+        "current": "Roles"
+      },
+      "pageTitle": "Roles",
+      "pageDescription": "Manage system roles and permissions",
+      "actions": {
+        "newRole": "New role"
+      },
+      "table": {
+        "columns": {
+          "role": "Role",
+          "description": "Notes",
+          "panel": "Panel",
+          "status": "Status",
+          "updatedAt": "Last update",
+          "actions": "Actions"
+        },
+        "searchPlaceholder": "Search by role or description…"
+      },
+      "panelBadges": {
+        "admin": "Administration",
+        "client": "Clients"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "states": {
+        "loading": "Loading roles…"
+      },
+      "panels": {
+        "createTitle": "Create role",
+        "editTitle": "Edit role"
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Unable to load roles",
+          "description": "Please try again."
+        },
+        "deleteSuccess": {
+          "title": "Role deleted",
+          "description": "{{role}} was deleted successfully."
+        },
+        "deleteError": {
+          "title": "Unable to delete role",
+          "description": "Something went wrong."
+        }
+      },
+      "confirm": {
+        "deleteTitle": "Delete role {{role}}",
+        "deleteDescription": "This action cannot be undone."
+      }
+    },
+    "Users": {
+      "breadcrumbs": {
+        "section": "Security & access",
+        "current": "Users"
+      },
+      "pageTitle": "Users",
+      "pageDescription": "Manage system users",
+      "actions": {
+        "newUser": "New user"
+      },
+      "table": {
+        "columns": {
+          "username": "Username",
+          "name": "Name",
+          "role": "Role",
+          "status": "Status",
+          "updatedAt": "Last update",
+          "actions": "Actions"
+        },
+        "searchPlaceholder": "Search by username, name or role…"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "states": {
+        "loading": "Loading users…"
+      },
+      "panels": {
+        "createTitle": "Create user",
+        "editTitle": "Edit user"
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Unable to load users",
+          "description": "Please try again."
+        },
+        "deleteSuccess": {
+          "title": "User deleted",
+          "description": "{{user}} was deleted successfully."
+        },
+        "deleteError": {
+          "title": "Unable to delete user",
+          "description": "Something went wrong."
+        }
+      },
+      "confirm": {
+        "deleteTitle": "Delete user {{user}}",
+        "deleteDescription": "This action cannot be undone."
+      }
+    }
+  },
+  "Common": {
+    "Actions": {
+      "edit": "Edit",
+      "permissions": "Permissions",
+      "delete": "Delete"
+    },
+    "confirm": {
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    }
+  },
+  "Clientes": {
+    "meta_title": "Clients",
+    "meta_description": "Manage clients, related services and custom fields in one place.",
+    "detail_meta_suffix": "Clients",
+    "detail_meta_description": "Full client profile with services, billing history and reminders."
+  }
+}
