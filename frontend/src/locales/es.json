@@ -790,6 +790,13 @@
     "detail_meta_suffix": "Clientes",
     "detail_meta_description": "Detalle completo del cliente, servicios asociados y flujos comerciales."
   },
+  "Pagos": {
+    "meta_title": "Pagos",
+    "meta_description": "Gestiona los registros de pagos y sus comprobantes.",
+    "list": {
+      "title": "Gestión de pagos",
+      "empty": "No hay pagos registrados por ahora.",
+      "error": "No fue posible cargar los pagos."
   "Servicios": {
     "meta_title": "Servicios",
     "List": {

@@ -8,6 +8,12 @@ import type {
   ClientService,
 } from '@/components/clients/types';
 import type {
+  PaymentClient,
+  PaymentFormValues,
+  PaymentListPayload,
+  PaymentMethod,
+  PaymentRecord,
+} from '@/components/payments/types';
   AdminInvoiceCatalog,
   AdminInvoiceListItem,
   AdminInvoiceRecord,
@@ -152,6 +158,11 @@ type AdminClientInput = {
 
 type AdminClientMutationPayload = {
   client: ClientRecord;
+};
+
+export type AdminPaymentMutationResult = {
+  payment: PaymentRecord;
+  methods: PaymentMethod[];
 };
 
 export interface RegisterUserDto {
@@ -435,6 +446,108 @@ export async function deleteAdminClientApi(id: string, token?: string): Promise<
     console.error('deleteAdminClientApi error:', error);
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.message ?? 'No fue posible eliminar el cliente');
+    }
+    throw error;
+  }
+}
+
+export async function getAdminPaymentsListApi(token?: string): Promise<PaymentListPayload> {
+  try {
+    const config = buildAuthConfig(token);
+    const { data } = await api.get('/payments', config);
+    if (data?.success === true && data?.data) {
+      return data.data as PaymentListPayload;
+    }
+    if (data?.payments && data?.clients && data?.methods) {
+      return data as PaymentListPayload;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al obtener pagos');
+  } catch (error: any) {
+    console.error('getAdminPaymentsListApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'Error al obtener pagos');
+    }
+    throw error;
+  }
+}
+
+const mapPaymentPayload = (payload: PaymentFormValues) => ({
+  clientId: payload.clientId,
+  value: payload.value,
+  status: payload.status ?? null,
+  reference: payload.reference ?? null,
+  methodId: payload.methodId ?? null,
+  methodName: payload.methodName ?? null,
+  receiptUrl: payload.receiptUrl ?? null,
+  type: payload.type ?? null,
+  paidAt: payload.paidAt ?? null,
+  confirmed: payload.confirmed ?? null,
+  attachments: Array.isArray(payload.attachments)
+    ? payload.attachments.map((attachment) => ({
+        id: attachment.id ?? null,
+        url: attachment.url,
+        invoiceId: attachment.invoiceId ?? null,
+      }))
+    : [],
+});
+
+export async function createAdminPaymentApi(
+  payload: PaymentFormValues,
+  token?: string,
+): Promise<AdminPaymentMutationResult> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = mapPaymentPayload(payload);
+    const { data } = await api.post('/payments', body, config);
+    if (data?.success === true && data?.data?.payment) {
+      return data.data as AdminPaymentMutationResult;
+    }
+    if (data?.payment && data?.methods) {
+      return data as AdminPaymentMutationResult;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al crear el pago');
+  } catch (error: any) {
+    console.error('createAdminPaymentApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible registrar el pago');
+    }
+    throw error;
+  }
+}
+
+export async function updateAdminPaymentApi(
+  id: string,
+  payload: PaymentFormValues,
+  token?: string,
+): Promise<AdminPaymentMutationResult> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = mapPaymentPayload(payload);
+    const { data } = await api.put(`/payments/${id}`, body, config);
+    if (data?.success === true && data?.data?.payment) {
+      return data.data as AdminPaymentMutationResult;
+    }
+    if (data?.payment && data?.methods) {
+      return data as AdminPaymentMutationResult;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al actualizar el pago');
+  } catch (error: any) {
+    console.error('updateAdminPaymentApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible actualizar el pago');
+    }
+    throw error;
+  }
+}
+
+export async function deleteAdminPaymentApi(id: string, token?: string): Promise<void> {
+  try {
+    const config = buildAuthConfig(token);
+    await api.delete(`/payments/${id}`, config);
+  } catch (error: any) {
+    console.error('deleteAdminPaymentApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible eliminar el pago');
     }
     throw error;
   }
