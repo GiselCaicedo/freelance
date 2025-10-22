@@ -168,7 +168,7 @@ export default function ModuleLayout({ variant, children }: ModuleLayoutProps) {
   return (
     <BaseTemplate
       leftNav={
-        <div className={`flex h-full flex-col bg-white transition-all duration-300 ${isNavOpen ? 'w-52' : 'w-16'}`}>
+        <div className={`flex h-screen flex-col bg-white transition-all duration-300 ${isNavOpen ? 'w-52' : 'w-16'}`}>
           <div className={`flex ${isNavOpen ? 'justify-end px-2 pt-2' : 'justify-center pt-2'}`}>
             <button
               onClick={() => setIsNavOpen(!isNavOpen)}

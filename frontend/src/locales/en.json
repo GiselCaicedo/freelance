@@ -389,6 +389,392 @@
         "deleteDescription": "This action cannot be undone."
       }
     }
+    ,
+    "General": {
+      "pageTitle": "General settings",
+      "pageDescription": "Manage default preferences for your company.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "General"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load settings",
+        "loadError": "We couldn't retrieve the current configuration.",
+        "invalidTitle": "Review the information",
+        "invalidDescription": "Complete the required fields before saving.",
+        "successTitle": "Settings saved",
+        "successDescription": "Changes were applied successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while saving the configuration."
+      },
+      "actions": {
+        "save": "Save changes",
+        "saving": "Saving…"
+      },
+      "states": {
+        "loading": "Loading configuration…"
+      },
+      "fields": {
+        "timezone": { "label": "Time zone", "placeholder": "America/Bogota" },
+        "locale": { "label": "Locale", "placeholder": "en-US" },
+        "currency": { "label": "Default currency", "placeholder": "USD" },
+        "primaryColor": { "label": "Primary color" },
+        "dateFormat": { "label": "Date format" },
+        "timeFormat": { "label": "Time format" },
+        "logoUrl": { "label": "Logo URL", "placeholder": "https://…" },
+        "firstDay": { "label": "First day of week" },
+        "decimals": { "label": "Number decimals" },
+        "active": { "label": "Active configuration" },
+        "status": { "label": "Record enabled" }
+      }
+    },
+    "Company": {
+      "pageTitle": "Company data",
+      "pageDescription": "Update the main details of your organization.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "Company data"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to fetch company",
+        "loadErrorDescription": "We couldn't retrieve the information.",
+        "noCompanyTitle": "No company selected",
+        "noCompanyDescription": "Select a company to edit its details.",
+        "invalidTitle": "Review the information",
+        "invalidDescription": "Provide a valid company name.",
+        "successTitle": "Company updated",
+        "successDescription": "Changes were saved successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while updating the company."
+      },
+      "states": {
+        "noCompany": "Select a company to continue.",
+        "loading": "Loading company data…",
+        "updatedAt": "Last updated: {value}"
+      },
+      "fields": {
+        "name": { "label": "Business name", "placeholder": "Company name" },
+        "status": {
+          "label": "Status",
+          "help": "Control whether the company is active.",
+          "active": "Active",
+          "inactive": "Inactive"
+        }
+      },
+      "actions": {
+        "save": "Save changes",
+        "saving": "Saving…"
+      }
+    },
+    "Alerts": {
+      "pageTitle": "Alerts & reminders",
+      "pageDescription": "Automate notifications for your team.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "Alerts & reminders"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load alerts",
+        "loadErrorDescription": "Try again in a few minutes.",
+        "noCompanyTitle": "No company selected",
+        "noCompanyDescription": "Select a company to manage alerts.",
+        "invalidTitle": "Review the information",
+        "invalidDescription": "Complete all required fields.",
+        "channelWarning": "Select at least one delivery channel.",
+        "successTitle": "Alert saved",
+        "successDescription": "Changes were stored successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while saving the alert.",
+        "deleteSuccessTitle": "Alert deleted",
+        "deleteSuccessDescription": "The alert was removed successfully.",
+        "deleteErrorTitle": "Unable to delete",
+        "deleteErrorDescription": "Something went wrong while deleting the alert."
+      },
+      "table": {
+        "title": "Configured alerts",
+        "new": "New alert",
+        "columns": {
+          "name": "Name",
+          "type": "Type",
+          "channels": "Channels",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "actions": {
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "empty": "No alerts configured yet.",
+        "loading": "Loading alerts…"
+      },
+      "form": {
+        "fields": {
+          "name": { "label": "Alert name", "placeholder": "e.g. Invoice due" },
+          "type": { "label": "Type", "placeholder": "invoice_due" },
+          "channels": { "label": "Channels" },
+          "remind": {
+            "label": "Remind before (minutes)",
+            "placeholder": "60, 30, 10",
+            "help": "Separate values with commas."
+          },
+          "conditions": { "label": "Conditions (JSON)", "placeholder": "{\"threshold\":1000}" },
+          "active": { "label": "Active alert" }
+        },
+        "actions": {
+          "reset": "Clear",
+          "create": "Create alert",
+          "update": "Update alert",
+          "saving": "Saving…"
+        }
+      },
+      "states": {
+        "loading": "Loading alerts…"
+      },
+      "confirm": {
+        "delete": "Delete alert {name}?"
+      }
+    },
+    "Smtp": {
+      "pageTitle": "SMTP mail",
+      "pageDescription": "Configure the outbound mail server for notifications.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "SMTP mail"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load SMTP",
+        "loadErrorDescription": "Review the configuration and try again.",
+        "invalidTitle": "Review the information",
+        "invalidDescription": "Complete the required fields to continue.",
+        "successTitle": "SMTP updated",
+        "successDescription": "Changes were saved successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while updating the SMTP settings."
+      },
+      "actions": {
+        "save": "Save configuration",
+        "saving": "Saving…"
+      },
+      "states": {
+        "loading": "Loading SMTP configuration…"
+      },
+      "fields": {
+        "host": { "label": "Server", "placeholder": "smtp.mailprovider.com" },
+        "port": { "label": "Port" },
+        "username": { "label": "Username", "placeholder": "user@company.com" },
+        "password": {
+          "label": "Password / token",
+          "placeholder": "••••••••",
+          "help": "Leave blank to keep the current value."
+        },
+        "fromName": { "label": "Sender name", "placeholder": "Billing team" },
+        "fromEmail": { "label": "Sender email" },
+        "replyTo": { "label": "Reply to" },
+        "rateLimit": { "label": "Rate limit per minute", "help": "Optional. Controls how many emails per minute are sent." },
+        "secure": { "label": "Require secure connection (SSL/TLS)" },
+        "active": { "label": "Active configuration" },
+        "status": { "label": "Record enabled" }
+      }
+    },
+    "Profile": {
+      "pageTitle": "User preferences",
+      "pageDescription": "Adjust personal settings and notifications for the team.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "User profile"
+      },
+      "alerts": {
+        "loadUsersTitle": "Unable to load users",
+        "loadUsersDescription": "Check the selected company.",
+        "loadSettingsTitle": "Unable to load preferences",
+        "loadSettingsDescription": "Something went wrong while fetching data.",
+        "invalidTitle": "Select a user",
+        "invalidDescription": "Choose a user before saving.",
+        "successTitle": "Preferences saved",
+        "successDescription": "Changes were stored successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Please review the information and try again."
+      },
+      "states": {
+        "loading": "Loading preferences…"
+      },
+      "fields": {
+        "user": { "label": "User", "loading": "Loading users…", "placeholder": "Select a user" },
+        "locale": { "label": "Locale" },
+        "timezone": { "label": "Time zone" },
+        "theme": {
+          "label": "Theme",
+          "options": {
+            "system": "Automatic",
+            "light": "Light",
+            "dark": "Dark"
+          }
+        },
+        "dateFormat": { "label": "Date format" },
+        "timeFormat": { "label": "Time format" },
+        "reminder": { "label": "Default reminders (min)" },
+        "digest": { "label": "Daily digest hour" },
+        "sessionTimeout": { "label": "Session timeout (min)" },
+        "notify": {
+          "email": "Email",
+          "push": "Push",
+          "whatsapp": "WhatsApp"
+        }
+      },
+      "notifications": {
+        "title": "Notifications",
+        "quietStart": "Quiet hours start",
+        "quietEnd": "Quiet hours end",
+        "digestHour": "Digest hour",
+        "channelsTitle": "Enabled channels"
+      },
+      "actions": {
+        "save": "Save preferences",
+        "saving": "Saving…"
+      }
+    },
+    "SecurityPolicy": {
+      "pageTitle": "Security policy",
+      "pageDescription": "Manage access requirements and two-factor authentication.",
+      "breadcrumbs": {
+        "section": "Security",
+        "current": "Security policy"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load policy",
+        "loadErrorDescription": "Try again in a few minutes.",
+        "successTitle": "Policy saved",
+        "successDescription": "Changes were applied successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while updating the policy."
+      },
+      "fields": {
+        "requireAll": "Require 2FA for all users",
+        "requireAdmin": "Require 2FA for administrators",
+        "methods": {
+          "label": "Allowed methods",
+          "options": {
+            "totp": "Authenticator app",
+            "email": "Email code",
+            "sms": "SMS code"
+          },
+          "help": "Select the methods available to users."
+        },
+        "allowedIps": {
+          "label": "Allowed IPs or ranges",
+          "help": "One IP or CIDR range per line. Leave blank to allow any origin."
+        },
+        "maxSessions": { "label": "Max concurrent sessions" },
+        "active": { "label": "Active policy" },
+        "status": { "label": "Record enabled" }
+      },
+      "actions": { "save": "Save", "saving": "Saving…" },
+      "states": { "loading": "Loading policy…" }
+    },
+    "Twofa": {
+      "pageTitle": "User 2FA settings",
+      "pageDescription": "Manage second-factor methods per user.",
+      "breadcrumbs": {
+        "section": "Security",
+        "current": "2FA"
+      },
+      "alerts": {
+        "loadUsersTitle": "Unable to load users",
+        "loadUsersDescription": "Check the selected company.",
+        "loadErrorTitle": "Unable to load settings",
+        "loadErrorDescription": "Something went wrong while fetching data.",
+        "invalidTitle": "Review the information",
+        "invalidDescription": "Select a user to continue.",
+        "invalidBackup": "Backup codes must be valid JSON.",
+        "successTitle": "Configuration updated",
+        "successDescription": "Changes were saved successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Please try again."
+      },
+      "fields": {
+        "user": { "label": "User", "loading": "Loading users…", "placeholder": "Select a user" },
+        "method": {
+          "label": "2FA method",
+          "options": {
+            "totp": "Authenticator app",
+            "email": "Email code",
+            "sms": "SMS code",
+            "none": "No 2FA"
+          }
+        },
+        "secret": { "label": "Secret / token", "placeholder": "Enter a value", "help": "Leave blank to keep the current value." },
+        "backupCodes": { "label": "Backup codes", "help": "Provide a JSON array with backup codes." },
+        "enabled": { "label": "2FA enabled" }
+      },
+      "actions": { "save": "Save", "saving": "Saving…" },
+      "states": { "loading": "Loading configuration…" }
+    },
+    "PasswordPolicy": {
+      "pageTitle": "Password policy",
+      "pageDescription": "Define complexity requirements for user passwords.",
+      "breadcrumbs": {
+        "section": "Security",
+        "current": "Password policy"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load policy",
+        "loadErrorDescription": "Try again later.",
+        "invalidTitle": "Invalid values",
+        "invalidDescription": "Minimum length must be at least 6 characters.",
+        "successTitle": "Policy updated",
+        "successDescription": "Changes were saved successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while updating the policy."
+      },
+      "fields": {
+        "minLength": { "label": "Minimum length" },
+        "history": { "label": "History to keep" },
+        "expire": { "label": "Expiration (days)", "help": "Defines how often passwords must be rotated. Leave blank to disable." },
+        "require": {
+          "uppercase": "Require uppercase letters",
+          "lowercase": "Require lowercase letters",
+          "number": "Require numbers",
+          "special": "Require special characters",
+          "common": "Block common passwords"
+        },
+        "active": { "label": "Active policy" },
+        "status": { "label": "Record enabled" }
+      },
+      "actions": { "save": "Save", "saving": "Saving…" },
+      "states": { "loading": "Loading policy…" }
+    },
+    "SessionPolicy": {
+      "pageTitle": "Session policy",
+      "pageDescription": "Control session duration and lock rules.",
+      "breadcrumbs": {
+        "section": "Security",
+        "current": "Session policy"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load policy",
+        "loadErrorDescription": "Something went wrong while fetching data.",
+        "successTitle": "Policy saved",
+        "successDescription": "Changes were applied successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Try again in a few minutes."
+      },
+      "fields": {
+        "idle": { "label": "Idle timeout (min)" },
+        "absolute": { "label": "Absolute session duration (min)" },
+        "remember": { "label": "Remember session for (days)" },
+        "lockAttempts": { "label": "Failed attempts before lock" },
+        "lockWindow": { "label": "Lock window (min)" },
+        "lockDuration": { "label": "Lock duration (min)" },
+        "active": { "label": "Active policy" },
+        "status": { "label": "Record enabled" }
+      },
+      "actions": { "save": "Save", "saving": "Saving…" },
+      "states": { "loading": "Loading policy…" }
+    }
   },
   "Common": {
     "Actions": {

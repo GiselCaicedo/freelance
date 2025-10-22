@@ -8,11 +8,12 @@ datasource db {
 }
 
 model client {
-  id             String           @id @default(uuid())
-  name           String?          @db.VarChar
-  created        DateTime?        @db.Timestamptz(6)
-  updated        DateTime?        @db.Timestamptz(6)
-  status         Boolean?
+  id      String    @id @default(uuid())
+  name    String?   @db.VarChar
+  created DateTime? @db.Timestamptz(6)
+  updated DateTime? @db.Timestamptz(6)
+  status  Boolean?
+
   client_details client_details[]
   client_service client_service[]
   invoice        invoice[]
@@ -21,6 +22,15 @@ model client {
   quote          quote[]
   service_usage  service_usage[]
   user           user[]
+
+  // 🔁 Relaciones añadidas
+  general_setting    general_setting?
+  smtp_config        smtp_config?
+  alert_rule         alert_rule[]
+  security_policy    security_policy?
+  session_policy     session_policy?
+  password_policy    password_policy?
+  user_module_policy user_module_policy?
 }
 
 model client_details {
@@ -173,23 +183,24 @@ model quote_detail {
 }
 
 model role {
-  id          String    @id @default(uuid())
+  id          String       @id @default(uuid())
   name        String
   description String?
-  panel RoleCategory @default(CLIENT)
-  created     DateTime? @db.Timestamptz(6)
-  updated     DateTime? @db.Timestamptz(6)
+  panel       RoleCategory @default(CLIENT)
+  created     DateTime?    @db.Timestamptz(6)
+  updated     DateTime?    @db.Timestamptz(6)
   status      Boolean?
-  role_permission role_permission[]
-  log            log[]
-  user           user[]
+
+  role_permission    role_permission[]
+  log                log[]
+  user               user[]
+  user_module_policy user_module_policy[]
 }
 
 enum RoleCategory {
   ADMIN
   CLIENT
 }
-
 
 model role_permission {
   id            String      @id @default(uuid())
@@ -244,42 +255,49 @@ model user {
   created   DateTime? @db.Timestamptz(6)
   updated   DateTime? @db.Timestamptz(6)
   status    Boolean?
-  log       log[]
-  client    client?   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  role      role?     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  log    log[]
+  client client? @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role   role?   @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  // 🔁 Lados opuestos añadidos
+  user_setting              user_setting?
+  user_twofa                user_twofa?
+  user_notification_setting user_notification_setting?
+  password_history          password_history[]
 }
 
 model user_setting {
-  id                      String   @id @default(uuid())
-  user_id                 String   @unique @db.Uuid
-  locale                  String?  @db.VarChar
-  timezone                String?  @db.VarChar
-  theme                   String?  @db.VarChar
-  date_format             String?  @db.VarChar
-  time_format             String?  @db.VarChar
-  dashboard_config        Json?
-  notify_email            Boolean? @default(true)
-  notify_push             Boolean? @default(true)
-  notify_whatsapp         Boolean? @default(false)
+  id                       String    @id @default(uuid())
+  user_id                  String    @unique @db.Uuid
+  locale                   String?   @db.VarChar
+  timezone                 String?   @db.VarChar
+  theme                    String?   @db.VarChar
+  date_format              String?   @db.VarChar
+  time_format              String?   @db.VarChar
+  dashboard_config         Json?
+  notify_email             Boolean?  @default(true)
+  notify_push              Boolean?  @default(true)
+  notify_whatsapp          Boolean?  @default(false)
   reminder_default_minutes Int?
-  digest_daily_hour       Int?
-  twofa_enabled           Boolean? @default(false)
-  twofa_method            String?  @db.VarChar
-  session_timeout_minutes Int?
-  created                 DateTime? @db.Timestamptz(6)
-  updated                 DateTime? @db.Timestamptz(6)
-  status                  Boolean?  @default(true)
+  digest_daily_hour        Int?
+  twofa_enabled            Boolean?  @default(false)
+  twofa_method             String?   @db.VarChar
+  session_timeout_minutes  Int?
+  created                  DateTime? @db.Timestamptz(6)
+  updated                  DateTime? @db.Timestamptz(6)
+  status                   Boolean?  @default(true)
 
   user user? @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model user_twofa {
-  id               String  @id @default(uuid())
-  user_id          String  @unique @db.Uuid
-  type             String  @db.VarChar
+  id               String    @id @default(uuid())
+  user_id          String    @unique @db.Uuid
+  type             String    @db.VarChar
   secret_encrypted String?
   backup_codes     Json?
-  enabled          Boolean? @default(false)
+  enabled          Boolean?  @default(false)
   created          DateTime? @db.Timestamptz(6)
   updated          DateTime? @db.Timestamptz(6)
 
@@ -287,40 +305,40 @@ model user_twofa {
 }
 
 model general_setting {
-  id                    String   @id @default(uuid())
-  client_id             String?  @db.Uuid
-  company_timezone      String?  @db.VarChar
-  company_locale        String?  @db.VarChar
-  currency              String?  @db.VarChar
-  first_day_of_week     Int?
-  number_decimals       Int?
-  date_format           String?  @db.VarChar
-  time_format           String?  @db.VarChar
-  branding_primary_color String? @db.VarChar
-  logo_url              String?
-  is_active             Boolean? @default(true)
-  created               DateTime? @db.Timestamptz(6)
-  updated               DateTime? @db.Timestamptz(6)
-  status                Boolean?  @default(true)
+  id                     String    @id @default(uuid())
+  client_id              String?   @unique @db.Uuid
+  company_timezone       String?   @db.VarChar
+  company_locale         String?   @db.VarChar
+  currency               String?   @db.VarChar
+  first_day_of_week      Int?
+  number_decimals        Int?
+  date_format            String?   @db.VarChar
+  time_format            String?   @db.VarChar
+  branding_primary_color String?   @db.VarChar
+  logo_url               String?
+  is_active              Boolean?  @default(true)
+  created                DateTime? @db.Timestamptz(6)
+  updated                DateTime? @db.Timestamptz(6)
+  status                 Boolean?  @default(true)
 
   client client? @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model smtp_config {
-  id                    String   @id @default(uuid())
-  client_id             String?  @db.Uuid
-  host                  String?  @db.VarChar
+  id                    String    @id @default(uuid())
+  client_id             String?   @unique @db.Uuid
+  host                  String?   @db.VarChar
   port                  Int?
   secure                Boolean?
-  username              String?  @db.VarChar
+  username              String?   @db.VarChar
   password_encrypted    String?
-  from_name             String?  @db.VarChar
-  from_email            String?  @db.VarChar
-  reply_to_email        String?  @db.VarChar
+  from_name             String?   @db.VarChar
+  from_email            String?   @db.VarChar
+  reply_to_email        String?   @db.VarChar
   rate_limit_per_minute Int?
-  last_test_status      String?  @db.VarChar
+  last_test_status      String?   @db.VarChar
   last_test_at          DateTime? @db.Timestamptz(6)
-  is_active             Boolean? @default(true)
+  is_active             Boolean?  @default(true)
   created               DateTime? @db.Timestamptz(6)
   updated               DateTime? @db.Timestamptz(6)
   status                Boolean?  @default(true)
@@ -329,26 +347,26 @@ model smtp_config {
 }
 
 model alert_rule {
-  id                     String   @id @default(uuid())
-  client_id              String   @db.Uuid
-  name                   String   @db.VarChar
-  type                   String   @db.VarChar
-  conditions             Json?
-  channels               String[]
-  remind_before_minutes  Int[]
-  is_active              Boolean? @default(true)
-  created                DateTime? @db.Timestamptz(6)
-  updated                DateTime? @db.Timestamptz(6)
+  id                    String    @id @default(uuid())
+  client_id             String    @db.Uuid
+  name                  String    @db.VarChar
+  type                  String    @db.VarChar
+  conditions            Json?
+  channels              String[]
+  remind_before_minutes Int[]
+  is_active             Boolean?  @default(true)
+  created               DateTime? @db.Timestamptz(6)
+  updated               DateTime? @db.Timestamptz(6)
 
   client client @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model user_notification_setting {
-  id                String   @id @default(uuid())
-  user_id           String   @unique @db.Uuid
-  channel_email     Boolean? @default(true)
-  channel_push      Boolean? @default(true)
-  channel_whatsapp  Boolean? @default(false)
+  id                String    @id @default(uuid())
+  user_id           String    @unique @db.Uuid
+  channel_email     Boolean?  @default(true)
+  channel_push      Boolean?  @default(true)
+  channel_whatsapp  Boolean?  @default(false)
   quiet_hours_start Int?
   quiet_hours_end   Int?
   digest_daily_hour Int?
@@ -359,14 +377,14 @@ model user_notification_setting {
 }
 
 model security_policy {
-  id                      String   @id @default(uuid())
-  client_id               String?  @db.Uuid
-  require_2fa_all         Boolean? @default(false)
-  require_2fa_admin       Boolean? @default(true)
+  id                      String    @id @default(uuid())
+  client_id               String?   @unique @db.Uuid
+  require_2fa_all         Boolean?  @default(false)
+  require_2fa_admin       Boolean?  @default(true)
   allowed_2fa_methods     String[]
-  allowed_ips             String[] // guarda CIDR/IPs como texto
+  allowed_ips             String[]
   max_concurrent_sessions Int?
-  is_active               Boolean? @default(true)
+  is_active               Boolean?  @default(true)
   created                 DateTime? @db.Timestamptz(6)
   updated                 DateTime? @db.Timestamptz(6)
   status                  Boolean?  @default(true)
@@ -375,15 +393,15 @@ model security_policy {
 }
 
 model session_policy {
-  id                         String   @id @default(uuid())
-  client_id                  String?  @db.Uuid
+  id                         String    @id @default(uuid())
+  client_id                  String?   @unique @db.Uuid
   idle_timeout_minutes       Int?
   absolute_session_minutes   Int?
   remember_me_days           Int?
   lock_after_failed_attempts Int?
   lock_window_minutes        Int?
   lock_duration_minutes      Int?
-  is_active                  Boolean? @default(true)
+  is_active                  Boolean?  @default(true)
   created                    DateTime? @db.Timestamptz(6)
   updated                    DateTime? @db.Timestamptz(6)
   status                     Boolean?  @default(true)
@@ -392,43 +410,43 @@ model session_policy {
 }
 
 model password_policy {
-  id                          String   @id @default(uuid())
-  client_id                   String?  @db.Uuid
-  min_length                  Int?     @default(10)
-  require_uppercase           Boolean? @default(true)
-  require_lowercase           Boolean? @default(true)
-  require_number              Boolean? @default(true)
-  require_special             Boolean? @default(true)
-  disallow_common_passwords   Boolean? @default(true)
-  expire_days                 Int?
-  history_last_n              Int?     @default(5)
-  is_active                   Boolean? @default(true)
-  created                     DateTime? @db.Timestamptz(6)
-  updated                     DateTime? @db.Timestamptz(6)
-  status                      Boolean?  @default(true)
+  id                        String    @id @default(uuid())
+  client_id                 String?   @unique @db.Uuid
+  min_length                Int?      @default(10)
+  require_uppercase         Boolean?  @default(true)
+  require_lowercase         Boolean?  @default(true)
+  require_number            Boolean?  @default(true)
+  require_special           Boolean?  @default(true)
+  disallow_common_passwords Boolean?  @default(true)
+  expire_days               Int?
+  history_last_n            Int?      @default(5)
+  is_active                 Boolean?  @default(true)
+  created                   DateTime? @db.Timestamptz(6)
+  updated                   DateTime? @db.Timestamptz(6)
+  status                    Boolean?  @default(true)
 
   client client? @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
 model password_history {
-  id          String   @id @default(uuid())
-  user_id     String   @db.Uuid
+  id            String    @id @default(uuid())
+  user_id       String    @db.Uuid
   password_hash String
-  changed_at  DateTime? @db.Timestamptz(6)
+  changed_at    DateTime? @db.Timestamptz(6)
 
   user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model user_module_policy {
-  id                 String   @id @default(uuid())
-  client_id          String?  @db.Uuid
-  allow_self_register Boolean? @default(false)
-  default_role_id    String?  @db.Uuid
-  invite_expire_hours Int?    @default(48)
-  is_active          Boolean? @default(true)
-  created            DateTime? @db.Timestamptz(6)
-  updated            DateTime? @db.Timestamptz(6)
-  status             Boolean?  @default(true)
+  id                  String    @id @default(uuid())
+  client_id           String?   @unique @db.Uuid
+  allow_self_register Boolean?  @default(false)
+  default_role_id     String?   @db.Uuid
+  invite_expire_hours Int?      @default(48)
+  is_active           Boolean?  @default(true)
+  created             DateTime? @db.Timestamptz(6)
+  updated             DateTime? @db.Timestamptz(6)
+  status              Boolean?  @default(true)
 
   client client? @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   role   role?   @relation(fields: [default_role_id], references: [id], onDelete: SetNull, onUpdate: NoAction)

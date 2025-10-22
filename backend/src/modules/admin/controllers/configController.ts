@@ -3,6 +3,30 @@ import { Request, Response } from 'express'
 import { fetchUsers, getUserById, updateUserById, deleteUserById } from '../../shared/services/user.service.js'
 import { fetchAllPermissions, fetchPermissionsGrouped, fetchRolePermissionsSvc, replaceRolePermissionsSvc } from '../../shared/services/permission.service.js'
 import { fetchRoles, fetchRoleByIdSvc, createRoleSvc, updateRoleSvc, deleteRoleSvc } from '../../shared/services/role.service.js'
+import {
+  fetchPermisosByRole,
+  getActiveGeneralSetting,
+  saveGeneralSetting,
+  getActiveSmtpConfig,
+  saveSmtpConfig,
+  listAlertRules,
+  saveAlertRule,
+  deleteAlertRule,
+  getUserSettingsSvc,
+  saveUserSettingsSvc,
+  getUserNotificationSettingsSvc,
+  saveUserNotificationSettingsSvc,
+  getUserTwofaSvc,
+  saveUserTwofaSvc,
+  getSecurityPolicy,
+  saveSecurityPolicy,
+  getSessionPolicy,
+  saveSessionPolicy,
+  getPasswordPolicy,
+  savePasswordPolicy,
+  getCompanyProfile,
+  updateCompanyProfile,
+} from '../services/configService.js'
 
 export async function getUsers(req: Request, res: Response) {
   try {
@@ -151,5 +175,252 @@ export async function replaceRolePermissionsCtrl(req: Request, res: Response) {
   } catch (error: any) {
     const message = error?.message ?? 'No fue posible actualizar los permisos del rol'
     return res.status(400).json({ message })
+  }
+}
+
+// =================== General settings ===================
+export async function getGeneralSettingsCtrl(req: Request, res: Response) {
+  try {
+    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
+    const data = await getActiveGeneralSetting(clientId)
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al obtener configuración general:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener configuración general' })
+  }
+}
+
+export async function saveGeneralSettingsCtrl(req: Request, res: Response) {
+  try {
+    const payload = req.body as any
+    const data = await saveGeneralSetting(payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al guardar configuración general:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar la configuración' })
+  }
+}
+
+// =================== SMTP ===================
+export async function getSmtpConfigCtrl(req: Request, res: Response) {
+  try {
+    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
+    const data = await getActiveSmtpConfig(clientId)
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al obtener configuración SMTP:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener configuración SMTP' })
+  }
+}
+
+export async function saveSmtpConfigCtrl(req: Request, res: Response) {
+  try {
+    const payload = req.body as any
+    const data = await saveSmtpConfig(payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al guardar configuración SMTP:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar configuración SMTP' })
+  }
+}
+
+// =================== Alert rules ===================
+export async function listAlertRulesCtrl(req: Request, res: Response) {
+  try {
+    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
+    if (!clientId) {
+      return res.status(400).json({ success: false, message: 'clientId es requerido' })
+    }
+    const data = await listAlertRules(clientId)
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al listar alertas:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener alertas y recordatorios' })
+  }
+}
+
+export async function saveAlertRuleCtrl(req: Request, res: Response) {
+  try {
+    const payload = req.body as any
+    const data = await saveAlertRule(payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al guardar alerta:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar la alerta' })
+  }
+}
+
+export async function deleteAlertRuleCtrl(req: Request, res: Response) {
+  try {
+    const { id } = req.params
+    await deleteAlertRule(id)
+    return res.json({ success: true })
+  } catch (error) {
+    console.error('Error al eliminar alerta:', error)
+    return res.status(500).json({ success: false, message: 'Error al eliminar la alerta' })
+  }
+}
+
+// =================== User preferences ===================
+export async function getUserSettingsCtrl(req: Request, res: Response) {
+  try {
+    const { userId } = req.params
+    const data = await getUserSettingsSvc(userId)
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al obtener preferencias de usuario:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener las preferencias del usuario' })
+  }
+}
+
+export async function saveUserSettingsCtrl(req: Request, res: Response) {
+  try {
+    const { userId } = req.params
+    const payload = req.body as any
+    const data = await saveUserSettingsSvc(userId, payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al guardar preferencias de usuario:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar las preferencias' })
+  }
+}
+
+export async function getUserNotificationSettingsCtrl(req: Request, res: Response) {
+  try {
+    const { userId } = req.params
+    const data = await getUserNotificationSettingsSvc(userId)
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al obtener notificaciones de usuario:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener las notificaciones del usuario' })
+  }
+}
+
+export async function saveUserNotificationSettingsCtrl(req: Request, res: Response) {
+  try {
+    const { userId } = req.params
+    const payload = req.body as any
+    const data = await saveUserNotificationSettingsSvc(userId, payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al guardar notificaciones de usuario:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar las notificaciones' })
+  }
+}
+
+export async function getUserTwofaCtrl(req: Request, res: Response) {
+  try {
+    const { userId } = req.params
+    const data = await getUserTwofaSvc(userId)
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al obtener configuración 2FA:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener configuración de 2FA' })
+  }
+}
+
+export async function saveUserTwofaCtrl(req: Request, res: Response) {
+  try {
+    const { userId } = req.params
+    const payload = req.body as any
+    const data = await saveUserTwofaSvc(userId, payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al guardar configuración 2FA:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar configuración de 2FA' })
+  }
+}
+
+// =================== Security policy ===================
+export async function getSecurityPolicyCtrl(req: Request, res: Response) {
+  try {
+    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
+    const data = await getSecurityPolicy(clientId)
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al obtener política de seguridad:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener política de seguridad' })
+  }
+}
+
+export async function saveSecurityPolicyCtrl(req: Request, res: Response) {
+  try {
+    const payload = req.body as any
+    const data = await saveSecurityPolicy(payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al guardar política de seguridad:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar política de seguridad' })
+  }
+}
+
+// =================== Session policy ===================
+export async function getSessionPolicyCtrl(req: Request, res: Response) {
+  try {
+    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
+    const data = await getSessionPolicy(clientId)
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al obtener política de sesión:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener política de sesión' })
+  }
+}
+
+export async function saveSessionPolicyCtrl(req: Request, res: Response) {
+  try {
+    const payload = req.body as any
+    const data = await saveSessionPolicy(payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al guardar política de sesión:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar política de sesión' })
+  }
+}
+
+// =================== Password policy ===================
+export async function getPasswordPolicyCtrl(req: Request, res: Response) {
+  try {
+    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
+    const data = await getPasswordPolicy(clientId)
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al obtener política de contraseñas:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener política de contraseñas' })
+  }
+}
+
+export async function savePasswordPolicyCtrl(req: Request, res: Response) {
+  try {
+    const payload = req.body as any
+    const data = await savePasswordPolicy(payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al guardar política de contraseñas:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar política de contraseñas' })
+  }
+}
+
+// =================== Company profile ===================
+export async function getCompanyProfileCtrl(req: Request, res: Response) {
+  try {
+    const { clientId } = req.params
+    const data = await getCompanyProfile(clientId)
+    if (!data) return res.status(404).json({ success: false, message: 'Empresa no encontrada' })
+    return res.json({ success: true, data })
+  } catch (error) {
+    console.error('Error al obtener datos de la empresa:', error)
+    return res.status(500).json({ success: false, message: 'Error al obtener datos de la empresa' })
+  }
+}
+
+export async function updateCompanyProfileCtrl(req: Request, res: Response) {
+  try {
+    const { clientId } = req.params
+    const payload = req.body as any
+    const data = await updateCompanyProfile(clientId, payload)
+    return res.json({ success: true, data })
+  } catch (error: any) {
+    console.error('Error al actualizar datos de la empresa:', error)
+    return res.status(400).json({ success: false, message: error?.message ?? 'Error al actualizar la empresa' })
   }
 }

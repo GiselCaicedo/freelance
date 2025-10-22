@@ -1,6 +1,20 @@
 'use client'
 
-import { Settings, Shield, Zap, ChevronRight, Users, UserCheck } from 'lucide-react'
+import {
+  Settings,
+  Shield,
+  ShieldCheck,
+  ChevronRight,
+  Users,
+  UserCheck,
+  Bell,
+  Mail,
+  UserCog,
+  KeyRound,
+  Clock,
+  Globe,
+  Building2,
+} from 'lucide-react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
@@ -10,34 +24,35 @@ export default function Configuracion() {
 
   const sections = [
     {
-      id: 'generales',
-      title: 'Generales',
-      description: 'Configuraciones básicas',
+      id: 'configuracion',
+      title: 'Configuración',
+      description: 'Preferencias generales del sistema',
       icon: Settings,
-      color: 'bg-orange-500',
-      borderColor: 'border-orange-200',
-      subItems: [],
+      color: 'bg-emerald-500',
+      borderColor: 'border-emerald-200',
+      subItems: [
+        { id: 'generales', label: 'Generales', icon: Globe, path: '/settings/general' },
+        { id: 'empresa', label: 'Datos Empresa', icon: Building2, path: '/settings/company' },
+        { id: 'alertas', label: 'Alertas y recordatorios', icon: Bell, path: '/settings/alerts' },
+        { id: 'smtp', label: 'Correo SMTP', icon: Mail, path: '/settings/smtp' },
+        { id: 'perfil', label: 'Perfil de usuario', icon: UserCog, path: '/settings/profile' },
+      ],
     },
     {
       id: 'seguridad',
       title: 'Seguridad y Accesos',
-      description: 'Usuarios, roles y permisos',
+      description: 'Usuarios, roles y políticas de acceso',
       icon: Shield,
       color: 'bg-blue-500',
       borderColor: 'border-blue-300',
       subItems: [
         { id: 'usuarios', label: 'Usuarios', icon: Users, path: '/settings/security/users' },
         { id: 'roles', label: 'Roles', icon: UserCheck, path: '/settings/security/roles' },
+        { id: 'seguridad', label: 'Seguridad', icon: ShieldCheck, path: '/settings/security/policy' },
+        { id: 'twofa', label: '2FA', icon: Shield, path: '/settings/security/twofa' },
+        { id: 'passwords', label: 'Política de contraseñas', icon: KeyRound, path: '/settings/security/password-policy' },
+        { id: 'inactividad', label: 'Inactividad', icon: Clock, path: '/settings/security/session-policy' },
       ],
-    },
-    {
-      id: 'utilidades',
-      title: 'Utilidades',
-      description: 'Herramientas del sistema',
-      icon: Zap,
-      color: 'bg-purple-500',
-      borderColor: 'border-purple-200',
-      subItems: [],
     },
   ]
 

@@ -10,7 +10,7 @@ export const BaseTemplate = ({
   leftNav?: React.ReactNode;
   rightNav?: React.ReactNode;
 }) => (
-  <div className="flex static flex-row ">
+  <div className="flex flex-row ">
     <Nav>
       {leftNav}
     </Nav>
