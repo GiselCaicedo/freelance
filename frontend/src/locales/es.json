@@ -789,5 +789,68 @@
     "meta_description": "Administra clientes, servicios y campos personalizados en un solo módulo.",
     "detail_meta_suffix": "Clientes",
     "detail_meta_description": "Detalle completo del cliente, servicios asociados y flujos comerciales."
+  },
+  "Servicios": {
+    "meta_title": "Servicios",
+    "List": {
+      "title": "Servicios",
+      "description": "Gestiona el catálogo de servicios disponibles para tus clientes.",
+      "searchPlaceholder": "Buscar servicios…",
+      "createButton": "Nuevo servicio",
+      "table": {
+        "name": "Nombre",
+        "category": "Categoría",
+        "unit": "Unidad",
+        "status": "Estado",
+        "clients": "Clientes",
+        "created": "Creado",
+        "updated": "Actualizado",
+        "actions": "Acciones",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "uncategorized": "Sin categoría",
+        "status": {
+          "active": "Activo",
+          "inactive": "Inactivo"
+        }
+      }
+    },
+    "Form": {
+      "createTitle": "Crear servicio",
+      "editTitle": "Editar servicio",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Nombre del servicio",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Describe el servicio",
+      "unitLabel": "Unidad",
+      "unitPlaceholder": "Ej. unidad, hora, licencia…",
+      "categoryLabel": "Categoría",
+      "categoryPlaceholder": "Sin categoría",
+      "statusActive": "Activo",
+      "statusInactive": "Inactivo",
+      "actions": {
+        "create": "Crear",
+        "update": "Guardar cambios",
+        "saving": "Guardando…",
+        "cancel": "Cancelar",
+        "delete": "Eliminar servicio",
+        "deleting": "Eliminando…"
+      }
+    },
+    "Alerts": {
+      "created": { "title": "Servicio creado", "description": "El servicio se creó correctamente." },
+      "updated": { "title": "Servicio actualizado", "description": "El servicio se actualizó correctamente." },
+      "deleted": { "title": "Servicio eliminado", "description": "El servicio se eliminó correctamente." },
+      "loadError": { "title": "Error al cargar", "description": "No fue posible obtener los servicios." },
+      "saveError": { "title": "Error al guardar", "description": "No fue posible guardar el servicio." },
+      "deleteError": { "title": "Error al eliminar", "description": "No fue posible eliminar el servicio." },
+      "assignedError": { "title": "No se puede eliminar", "description": "El servicio tiene clientes asignados." }
+    },
+    "ConfirmDelete": {
+      "title": "Eliminar servicio",
+      "description": "Esta acción no se puede deshacer. ¿Deseas eliminar este servicio?",
+      "confirm": "Eliminar",
+      "cancel": "Cancelar"
+    }
   }
 }

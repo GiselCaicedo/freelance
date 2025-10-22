@@ -786,5 +786,68 @@
     "meta_description": "Manage clients, related services and custom fields in one place.",
     "detail_meta_suffix": "Clients",
     "detail_meta_description": "Full client profile with services, billing history and reminders."
+  },
+  "Servicios": {
+    "meta_title": "Services",
+    "List": {
+      "title": "Services",
+      "description": "Manage the catalog of services available to your clients.",
+      "searchPlaceholder": "Search services…",
+      "createButton": "New service",
+      "table": {
+        "name": "Name",
+        "category": "Category",
+        "unit": "Unit",
+        "status": "Status",
+        "clients": "Clients",
+        "created": "Created",
+        "updated": "Updated",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "uncategorized": "No category",
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        }
+      }
+    },
+    "Form": {
+      "createTitle": "Create service",
+      "editTitle": "Edit service",
+      "nameLabel": "Name",
+      "namePlaceholder": "Service name",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the service",
+      "unitLabel": "Unit",
+      "unitPlaceholder": "e.g. unit, hour, license…",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "No category",
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "actions": {
+        "create": "Create",
+        "update": "Save changes",
+        "saving": "Saving…",
+        "cancel": "Cancel",
+        "delete": "Delete service",
+        "deleting": "Deleting…"
+      }
+    },
+    "Alerts": {
+      "created": { "title": "Service created", "description": "The service was created successfully." },
+      "updated": { "title": "Service updated", "description": "The service was updated successfully." },
+      "deleted": { "title": "Service deleted", "description": "The service was deleted successfully." },
+      "loadError": { "title": "Unable to load", "description": "We could not fetch the services." },
+      "saveError": { "title": "Unable to save", "description": "We could not save the service." },
+      "deleteError": { "title": "Unable to delete", "description": "We could not delete the service." },
+      "assignedError": { "title": "Cannot delete", "description": "The service is assigned to clients." }
+    },
+    "ConfirmDelete": {
+      "title": "Delete service",
+      "description": "This action cannot be undone. Do you want to delete this service?",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
   }
 }
