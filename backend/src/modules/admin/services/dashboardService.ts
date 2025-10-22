@@ -1,7 +1,7 @@
 import { prisma } from '../../../config/db.ts'
 
 const PAID_KEYWORDS = ['paid', 'pagado', 'aprob', 'complet', 'success', 'cobrad']
-const PENDING_KEYWORDS = ['pend', 'proces', 'waiting', 'hold', 'due', 'unpaid', 'por cobrar']
+const pendiente_KEYWORDS = ['pend', 'proces', 'waiting', 'hold', 'due', 'unpaid', 'por cobrar']
 
 export interface DashboardPeriod {
   from: Date
@@ -10,7 +10,7 @@ export interface DashboardPeriod {
 
 export interface BillingTotalsResult {
   billed: number
-  pending: number
+  pendiente: number
   total: number
 }
 
@@ -42,7 +42,7 @@ export interface TopServiceResult {
 export interface MonthlyBillingBucket {
   month: string
   billed: number
-  pending: number
+  pendiente: number
 }
 
 export interface DashboardSummaryResult {
@@ -58,7 +58,7 @@ function normalizeStatus(value?: string | null): string {
   return value ? value.trim().toLowerCase() : ''
 }
 
-function classifyPaymentStatus(statusPay?: string | null, statusFlag?: boolean | null): 'paid' | 'pending' | 'other' {
+function classifyPaymentStatus(statusPay?: string | null, statusFlag?: boolean | null): 'paid' | 'pendiente' | 'other' {
   const normalized = normalizeStatus(statusPay)
 
   if (normalized) {
@@ -66,13 +66,13 @@ function classifyPaymentStatus(statusPay?: string | null, statusFlag?: boolean |
       return 'paid'
     }
 
-    if (PENDING_KEYWORDS.some((keyword) => normalized.includes(keyword))) {
-      return 'pending'
+    if (pendiente_KEYWORDS.some((keyword) => normalized.includes(keyword))) {
+      return 'pendiente'
     }
   }
 
   if (typeof statusFlag === 'boolean') {
-    return statusFlag ? 'paid' : 'pending'
+    return statusFlag ? 'paid' : 'pendiente'
   }
 
   return 'other'
@@ -131,16 +131,16 @@ export async function fetchBillingTotals(period: DashboardPeriod): Promise<Billi
 
       if (classification === 'paid') {
         acc.billed += amount
-      } else if (classification === 'pending') {
-        acc.pending += amount
+      } else if (classification === 'pendiente') {
+        acc.pendiente += amount
       }
 
       return acc
     },
-    { billed: 0, pending: 0 },
+    { billed: 0, pendiente: 0 },
   )
 
-  return { ...totals, total: totals.billed + totals.pending }
+  return { ...totals, total: totals.billed + totals.pendiente }
 }
 
 export async function fetchUpcomingInvoiceExpirations(
@@ -179,7 +179,11 @@ export async function fetchUpcomingInvoiceExpirations(
     orderBy: { expiry: 'asc' },
   })
 
-  return invoices.map((invoice) => {
+  const pendienteInvoices = invoices.filter((invoice) =>
+    classifyPaymentStatus(invoice.status_pay, invoice.status) === 'pendiente',
+  )
+
+  return pendienteInvoices.map((invoice) => {
     const expiryDate = invoice.expiry ?? null
     const diff = expiryDate ? expiryDate.getTime() - referenceDate.getTime() : null
     const daysUntilExpiry = diff !== null ? Math.ceil(diff / (1000 * 60 * 60 * 24)) : null
@@ -312,7 +316,7 @@ export async function fetchMonthlyBillingComparison(
 
   while (cursor < end) {
     const key = formatMonthKey(cursor)
-    buckets.set(key, { month: key, billed: 0, pending: 0 })
+    buckets.set(key, { month: key, billed: 0, pendiente: 0 })
     cursor.setMonth(cursor.getMonth() + 1)
   }
 
@@ -328,8 +332,8 @@ export async function fetchMonthlyBillingComparison(
 
     if (classification === 'paid') {
       bucket.billed += amount
-    } else if (classification === 'pending') {
-      bucket.pending += amount
+    } else if (classification === 'pendiente') {
+      bucket.pendiente += amount
     }
   }
 
