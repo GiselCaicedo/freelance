@@ -7,6 +7,13 @@ import type {
   AssignServiceInput,
   ClientService,
 } from '@/components/clients/types';
+import type {
+  PersistServiceInput,
+  ServiceCategory,
+  ServiceDetail,
+  ServiceListPayload,
+  ServiceRecord,
+} from '@/components/services/types';
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const TOKEN_STORAGE_KEY = 'auth_token';
@@ -457,6 +464,125 @@ export async function assignClientServiceApi(
     console.error('assignClientServiceApi error:', error);
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.message ?? 'No fue posible asignar el servicio');
+    }
+    throw error;
+  }
+}
+
+export async function getAdminServicesListApi(token?: string): Promise<ServiceListPayload> {
+  try {
+    const config = buildAuthConfig(token);
+    const { data } = await api.get('/services', config);
+    if (data?.success === true && data?.data) {
+      const services = Array.isArray(data.data.services) ? (data.data.services as ServiceRecord[]) : [];
+      const categories = Array.isArray(data.data.categories) ? (data.data.categories as ServiceCategory[]) : [];
+      return { services, categories };
+    }
+    if (Array.isArray(data?.services) || Array.isArray(data?.categories)) {
+      return {
+        services: Array.isArray(data?.services) ? (data.services as ServiceRecord[]) : [],
+        categories: Array.isArray(data?.categories) ? (data.categories as ServiceCategory[]) : [],
+      };
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al obtener servicios');
+  } catch (error: any) {
+    console.error('getAdminServicesListApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible obtener los servicios');
+    }
+    throw error;
+  }
+}
+
+export async function getAdminServiceDetailApi(id: string, token?: string): Promise<ServiceDetail | null> {
+  try {
+    const config = buildAuthConfig(token);
+    const { data } = await api.get(`/services/${id}`, config);
+    if (data?.success === true && data?.data?.service) {
+      return data.data.service as ServiceDetail;
+    }
+    if (data?.service) {
+      return data.service as ServiceDetail;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al obtener el servicio');
+  } catch (error: any) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return null;
+    }
+    console.error('getAdminServiceDetailApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible obtener el servicio');
+    }
+    throw error;
+  }
+}
+
+export async function createAdminServiceApi(payload: PersistServiceInput, token?: string): Promise<ServiceRecord> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = {
+      name: payload.name,
+      description: payload.description ?? null,
+      unit: payload.unit ?? null,
+      status: payload.status,
+      categoryId: payload.categoryId ?? null,
+    };
+    const { data } = await api.post('/services', body, config);
+    if (data?.success === true && data?.data?.service) {
+      return data.data.service as ServiceRecord;
+    }
+    if (data?.service) {
+      return data.service as ServiceRecord;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al crear el servicio');
+  } catch (error: any) {
+    console.error('createAdminServiceApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible crear el servicio');
+    }
+    throw error;
+  }
+}
+
+export async function updateAdminServiceApi(
+  id: string,
+  payload: PersistServiceInput,
+  token?: string,
+): Promise<ServiceRecord> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = {
+      name: payload.name,
+      description: payload.description ?? null,
+      unit: payload.unit ?? null,
+      status: payload.status,
+      categoryId: payload.categoryId ?? null,
+    };
+    const { data } = await api.put(`/services/${id}`, body, config);
+    if (data?.success === true && data?.data?.service) {
+      return data.data.service as ServiceRecord;
+    }
+    if (data?.service) {
+      return data.service as ServiceRecord;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al actualizar el servicio');
+  } catch (error: any) {
+    console.error('updateAdminServiceApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible actualizar el servicio');
+    }
+    throw error;
+  }
+}
+
+export async function deleteAdminServiceApi(id: string, token?: string): Promise<void> {
+  try {
+    const config = buildAuthConfig(token);
+    await api.delete(`/services/${id}`, config);
+  } catch (error: any) {
+    console.error('deleteAdminServiceApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible eliminar el servicio');
     }
     throw error;
   }
