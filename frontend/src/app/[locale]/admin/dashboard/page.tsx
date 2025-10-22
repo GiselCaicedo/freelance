@@ -175,19 +175,6 @@ export default async function Dashboard(props: {
                   }}
                 />
               </SectionCard>
-
-              <SectionCard title={t('clientStatus.title')} description={t('clientStatus.description')}>
-                <ClientStatusCard
-                  locale={locale}
-                  status={summary.clientStatus}
-                  labels={{
-                    active: t('clientStatus.active'),
-                    inactive: t('clientStatus.inactive'),
-                    unknown: t('clientStatus.unknown'),
-                    total: (count: number) => t('clientStatus.total', { count }),
-                  }}
-                />
-              </SectionCard>
             </div>
           </div>
         ) : null}

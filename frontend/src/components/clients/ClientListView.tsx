@@ -242,7 +242,7 @@ export default function ClientListView({ initialClients, initialParameters, init
               value={quickFilter}
               onChange={(event) => setQuickFilter(event.target.value)}
               placeholder="Buscar cliente..."
-              className="w-full rounded-full border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 shadow-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+              className="w-full rounded-full border border-gray-200 bg-white py-2 pl-9 pr-3 text-sm text-gray-900 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
             />
           </div>
         </div>
@@ -250,7 +250,6 @@ export default function ClientListView({ initialClients, initialParameters, init
           rows={rows}
           columns={columns}
           quickFilterText={quickFilter}
-          enableColumnFilters
           getRowId={(data) => data.id}
           height={520}
         />

@@ -8,9 +8,6 @@ import {
   getGeneralSettingsCtrl, saveGeneralSettingsCtrl,
   getSmtpConfigCtrl, saveSmtpConfigCtrl,
   listAlertRulesCtrl, saveAlertRuleCtrl, deleteAlertRuleCtrl,
-  getUserSettingsCtrl, saveUserSettingsCtrl,
-  getUserNotificationSettingsCtrl, saveUserNotificationSettingsCtrl,
-  getUserTwofaCtrl, saveUserTwofaCtrl,
   getSecurityPolicyCtrl, saveSecurityPolicyCtrl,
   getSessionPolicyCtrl, saveSessionPolicyCtrl,
   getPasswordPolicyCtrl, savePasswordPolicyCtrl,
@@ -19,7 +16,7 @@ import {
 
 const configRoutes = Router()
 
-// Usuarios (legado + actual)
+// Usuarios
 configRoutes.get('/get-users/:empresaId', getUsers)
 configRoutes.get('/get-roles', getRoles)
 configRoutes.get('/get-permisos/:id', getPermisos)
@@ -36,7 +33,7 @@ configRoutes.delete('/roles/:id', deleteRoleCtrl)
 
 // Permisos (catálogo)
 configRoutes.get('/permissions', listAllPermissions)
-configRoutes.get('/permissions/grouped', listPermissionsGrouped)   // ← NUEVO
+configRoutes.get('/permissions/grouped', listPermissionsGrouped)   
 
 // Permisos del rol
 configRoutes.get('/roles/:id/permissions', getRolePermissionsCtrl)
@@ -50,20 +47,12 @@ configRoutes.post('/settings/general', saveGeneralSettingsCtrl)
 configRoutes.get('/settings/smtp', getSmtpConfigCtrl)
 configRoutes.post('/settings/smtp', saveSmtpConfigCtrl)
 
-// Alert rules
+// Alerta reglas
 configRoutes.get('/settings/alerts', listAlertRulesCtrl)
 configRoutes.post('/settings/alerts', saveAlertRuleCtrl)
 configRoutes.delete('/settings/alerts/:id', deleteAlertRuleCtrl)
 
-// User preferences
-configRoutes.get('/settings/user/:userId/preferences', getUserSettingsCtrl)
-configRoutes.post('/settings/user/:userId/preferences', saveUserSettingsCtrl)
-configRoutes.get('/settings/user/:userId/notifications', getUserNotificationSettingsCtrl)
-configRoutes.post('/settings/user/:userId/notifications', saveUserNotificationSettingsCtrl)
-configRoutes.get('/settings/user/:userId/twofa', getUserTwofaCtrl)
-configRoutes.post('/settings/user/:userId/twofa', saveUserTwofaCtrl)
-
-// Security policies
+// Security 
 configRoutes.get('/settings/security/policy', getSecurityPolicyCtrl)
 configRoutes.post('/settings/security/policy', saveSecurityPolicyCtrl)
 configRoutes.get('/settings/security/session', getSessionPolicyCtrl)
@@ -71,7 +60,7 @@ configRoutes.post('/settings/security/session', saveSessionPolicyCtrl)
 configRoutes.get('/settings/security/password', getPasswordPolicyCtrl)
 configRoutes.post('/settings/security/password', savePasswordPolicyCtrl)
 
-// Company data
+
 configRoutes.get('/settings/company/:clientId', getCompanyProfileCtrl)
 configRoutes.post('/settings/company/:clientId', updateCompanyProfileCtrl)
 

@@ -497,12 +497,16 @@
           "name": "Nombre",
           "type": "Tipo",
           "channels": "Canales",
+          "remind": "Recordatorios",
           "status": "Estado",
           "actions": "Acciones"
         },
         "status": {
           "active": "Activa",
           "inactive": "Inactiva"
+        },
+        "remind": {
+          "none": "Sin recordatorios"
         },
         "actions": {
           "edit": "Editar",
@@ -672,52 +676,42 @@
           "help": "Una IP o rango CIDR por línea. Deja vacío para permitir cualquier origen."
         },
         "maxSessions": { "label": "Sesiones concurrentes máximas" },
-        "active": { "label": "Política activa" },
-        "status": { "label": "Registro habilitado" }
+        "policyNote": "Estos límites se aplican a todos los usuarios del sistema."
       },
       "actions": { "save": "Guardar", "saving": "Guardando…" },
       "states": { "loading": "Cargando política…" }
     },
     "Twofa": {
-      "pageTitle": "Configuración 2FA por usuario",
-      "pageDescription": "Gestiona los métodos de doble autenticación para cada usuario.",
+      "pageTitle": "Política de autenticación 2FA",
+      "pageDescription": "Define los requisitos de segundo factor para todo el sistema.",
       "breadcrumbs": {
         "section": "Seguridad",
         "current": "2FA"
       },
       "alerts": {
-        "loadUsersTitle": "No se pudieron cargar los usuarios",
-        "loadUsersDescription": "Verifica la empresa seleccionada.",
         "loadErrorTitle": "No se pudo cargar la configuración",
         "loadErrorDescription": "Ocurrió un error al consultar los datos.",
-        "invalidTitle": "Revisa la información",
-        "invalidDescription": "Selecciona un usuario para continuar.",
-        "invalidBackup": "Los códigos de respaldo deben tener un JSON válido.",
-        "successTitle": "Configuración actualizada",
+        "successTitle": "Política actualizada",
         "successDescription": "Los cambios se guardaron correctamente.",
         "saveErrorTitle": "No se pudo guardar",
         "saveErrorDescription": "Inténtalo nuevamente."
       },
       "fields": {
-        "user": { "label": "Usuario", "loading": "Cargando usuarios…", "placeholder": "Selecciona un usuario" },
-        "method": {
-          "label": "Método de 2FA",
+        "requireAll": "Exigir 2FA a todos los usuarios",
+        "requireAdmin": "Exigir 2FA a administradores",
+        "methods": {
+          "label": "Métodos disponibles",
           "options": {
             "totp": "Aplicación de autenticación",
             "email": "Código por correo",
-            "sms": "Código por SMS",
-            "none": "Sin 2FA"
-          }
+            "sms": "Código por SMS"
+          },
+          "help": "Selecciona los métodos que los usuarios podrán activar."
         },
-        "secret": { "label": "Secreto / token", "placeholder": "Introduce un valor", "help": "Deja en blanco para mantener el actual." },
-        "backupCodes": {
-          "label": "Códigos de respaldo",
-          "help": "Ingresa un arreglo JSON con los códigos disponibles."
-        },
-        "enabled": { "label": "2FA habilitado" }
+        "policyNote": "Los cambios aplican inmediatamente a los próximos inicios de sesión."
       },
       "actions": { "save": "Guardar", "saving": "Guardando…" },
-      "states": { "loading": "Cargando configuración…" }
+      "states": { "loading": "Cargando política…" }
     },
     "PasswordPolicy": {
       "pageTitle": "Política de contraseñas",
@@ -746,9 +740,7 @@
           "number": "Requerir números",
           "special": "Requerir caracteres especiales",
           "common": "Bloquear contraseñas comunes"
-        },
-        "active": { "label": "Política activa" },
-        "status": { "label": "Registro habilitado" }
+        }
       },
       "actions": { "save": "Guardar", "saving": "Guardando…" },
       "states": { "loading": "Cargando política…" }
@@ -774,9 +766,7 @@
         "remember": { "label": "Recuerda sesión por (días)" },
         "lockAttempts": { "label": "Intentos fallidos antes de bloquear" },
         "lockWindow": { "label": "Ventana de conteo (min)" },
-        "lockDuration": { "label": "Duración del bloqueo (min)" },
-        "active": { "label": "Política activa" },
-        "status": { "label": "Registro habilitado" }
+        "lockDuration": { "label": "Duración del bloqueo (min)" }
       },
       "actions": { "save": "Guardar", "saving": "Guardando…" },
       "states": { "loading": "Cargando política…" }

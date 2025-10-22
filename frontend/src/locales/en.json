@@ -497,12 +497,16 @@
           "name": "Name",
           "type": "Type",
           "channels": "Channels",
+          "remind": "Reminders",
           "status": "Status",
           "actions": "Actions"
         },
         "status": {
           "active": "Active",
           "inactive": "Inactive"
+        },
+        "remind": {
+          "none": "No reminders"
         },
         "actions": {
           "edit": "Edit",
@@ -669,49 +673,42 @@
           "help": "One IP or CIDR range per line. Leave blank to allow any origin."
         },
         "maxSessions": { "label": "Max concurrent sessions" },
-        "active": { "label": "Active policy" },
-        "status": { "label": "Record enabled" }
+        "policyNote": "These limits apply to every user across the platform."
       },
       "actions": { "save": "Save", "saving": "Saving…" },
       "states": { "loading": "Loading policy…" }
     },
     "Twofa": {
-      "pageTitle": "User 2FA settings",
-      "pageDescription": "Manage second-factor methods per user.",
+      "pageTitle": "Two-factor authentication",
+      "pageDescription": "Define the global rules for second-factor verification across the platform.",
       "breadcrumbs": {
         "section": "Security",
         "current": "2FA"
       },
       "alerts": {
-        "loadUsersTitle": "Unable to load users",
-        "loadUsersDescription": "Check the selected company.",
-        "loadErrorTitle": "Unable to load settings",
-        "loadErrorDescription": "Something went wrong while fetching data.",
-        "invalidTitle": "Review the information",
-        "invalidDescription": "Select a user to continue.",
-        "invalidBackup": "Backup codes must be valid JSON.",
-        "successTitle": "Configuration updated",
-        "successDescription": "Changes were saved successfully.",
+        "loadErrorTitle": "Unable to load policy",
+        "loadErrorDescription": "Try again in a few minutes.",
+        "successTitle": "Policy saved",
+        "successDescription": "Changes were applied successfully.",
         "saveErrorTitle": "Unable to save",
-        "saveErrorDescription": "Please try again."
+        "saveErrorDescription": "Something went wrong while updating the policy."
       },
       "fields": {
-        "user": { "label": "User", "loading": "Loading users…", "placeholder": "Select a user" },
-        "method": {
-          "label": "2FA method",
+        "requireAll": "Require 2FA for all users",
+        "requireAdmin": "Always require 2FA for administrators",
+        "methods": {
+          "label": "Allowed methods",
           "options": {
             "totp": "Authenticator app",
             "email": "Email code",
-            "sms": "SMS code",
-            "none": "No 2FA"
-          }
+            "sms": "SMS code"
+          },
+          "help": "Select the second-factor methods that your users can enable."
         },
-        "secret": { "label": "Secret / token", "placeholder": "Enter a value", "help": "Leave blank to keep the current value." },
-        "backupCodes": { "label": "Backup codes", "help": "Provide a JSON array with backup codes." },
-        "enabled": { "label": "2FA enabled" }
+        "policyNote": "These requirements will apply the next time users sign in."
       },
       "actions": { "save": "Save", "saving": "Saving…" },
-      "states": { "loading": "Loading configuration…" }
+      "states": { "loading": "Loading policy…" }
     },
     "PasswordPolicy": {
       "pageTitle": "Password policy",
@@ -740,9 +737,7 @@
           "number": "Require numbers",
           "special": "Require special characters",
           "common": "Block common passwords"
-        },
-        "active": { "label": "Active policy" },
-        "status": { "label": "Record enabled" }
+        }
       },
       "actions": { "save": "Save", "saving": "Saving…" },
       "states": { "loading": "Loading policy…" }
@@ -768,9 +763,7 @@
         "remember": { "label": "Remember session for (days)" },
         "lockAttempts": { "label": "Failed attempts before lock" },
         "lockWindow": { "label": "Lock window (min)" },
-        "lockDuration": { "label": "Lock duration (min)" },
-        "active": { "label": "Active policy" },
-        "status": { "label": "Record enabled" }
+        "lockDuration": { "label": "Lock duration (min)" }
       },
       "actions": { "save": "Save", "saving": "Saving…" },
       "states": { "loading": "Loading policy…" }

@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import PageHeader from '@/shared/components/common/PageHeader';
+import { SettingsTabs } from '@/shared/components/settings/SettingsTabs';
 import { useAlerts } from '@/shared/components/common/AlertsProvider';
-import { useEnterprise } from '@/libs/acl/EnterpriseProvider';
 import { getGeneralSettingApi, saveGeneralSettingApi, GeneralSettingPayload } from '@/shared/services/settings';
+import { getSettingsBasePath } from '@/shared/settings/navigation';
 
 const weekDays = [
   { value: 0, label: 'Domingo' },
@@ -28,8 +30,7 @@ type FormState = {
   time_format: string;
   branding_primary_color: string;
   logo_url: string;
-  is_active: boolean;
-  status: boolean;
+  updated?: string | null;
 };
 
 const emptyState: FormState = {
@@ -43,14 +44,14 @@ const emptyState: FormState = {
   time_format: 'HH:mm',
   branding_primary_color: '#0ea5e9',
   logo_url: '',
-  is_active: true,
-  status: true,
+  updated: null,
 };
 
 export default function GeneralSettingsPage() {
   const t = useTranslations('Settings.General');
   const { notify } = useAlerts();
-  const { empresaId } = useEnterprise();
+  const pathname = usePathname();
+  const settingsBase = getSettingsBasePath(pathname ?? undefined);
 
   const [form, setForm] = useState<FormState>(emptyState);
   const [loading, setLoading] = useState(false);
@@ -61,7 +62,7 @@ export default function GeneralSettingsPage() {
     const load = async () => {
       try {
         setLoading(true);
-        const data = await getGeneralSettingApi(empresaId ?? null);
+        const data = await getGeneralSettingApi();
         if (data) {
           setForm({
             id: data.id,
@@ -74,8 +75,7 @@ export default function GeneralSettingsPage() {
             time_format: data.time_format ?? 'HH:mm',
             branding_primary_color: data.branding_primary_color ?? '#0ea5e9',
             logo_url: data.logo_url ?? '',
-            is_active: data.is_active !== false,
-            status: data.status !== false,
+            updated: data.updated ?? null,
           });
         } else {
           setForm(emptyState);
@@ -91,7 +91,7 @@ export default function GeneralSettingsPage() {
     };
 
     load();
-  }, [empresaId, notify, t]);
+  }, [notify, t]);
 
   const canSubmit = useMemo(() => {
     return form.company_timezone.trim().length > 0 && form.company_locale.trim().length > 0;
@@ -106,7 +106,6 @@ export default function GeneralSettingsPage() {
 
     const payload: GeneralSettingPayload = {
       id: form.id,
-      client_id: empresaId ?? null,
       company_timezone: form.company_timezone,
       company_locale: form.company_locale,
       currency: form.currency,
@@ -118,8 +117,6 @@ export default function GeneralSettingsPage() {
       time_format: form.time_format,
       branding_primary_color: form.branding_primary_color,
       logo_url: form.logo_url,
-      is_active: form.is_active,
-      status: form.status,
     };
 
     try {
@@ -128,6 +125,7 @@ export default function GeneralSettingsPage() {
       setForm((current) => ({
         ...current,
         id: response.id,
+        updated: response.updated ?? new Date().toISOString(),
       }));
       notify({ type: 'success', title: t('alerts.successTitle'), description: t('alerts.successDescription') });
     } catch (err: any) {
@@ -138,196 +136,179 @@ export default function GeneralSettingsPage() {
   };
 
   return (
-    <div className="py-8 px-4 sm:px-6 lg:px-8">
+    <div className="py-8 px-4 sm:px-6 lg:px-12">
       <PageHeader
         title={t('pageTitle')}
         description={t('pageDescription')}
-        breadcrumbs={[{ label: t('breadcrumbs.section'), href: '/settings' }, { label: t('breadcrumbs.current') }]}
+        breadcrumbs={[{ label: t('breadcrumbs.section'), href: settingsBase }, { label: t('breadcrumbs.current') }]}
       />
 
-      <div className="mx-auto mt-6 max-w-3xl">
-        {error && (
-          <p className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>
-        )}
+      <SettingsTabs className="mt-8" />
 
-        <form onSubmit={onSubmit} className="space-y-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="company_timezone">
-                {t('fields.timezone.label')}
-              </label>
-              <input
-                id="company_timezone"
-                type="text"
-                value={form.company_timezone}
-                onChange={(event) => setForm((current) => ({ ...current, company_timezone: event.target.value }))}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                placeholder={t('fields.timezone.placeholder')}
-                required
-              />
-            </div>
+      {error && (
+        <p className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-700">{error}</p>
+      )}
 
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="company_locale">
-                {t('fields.locale.label')}
-              </label>
-              <input
-                id="company_locale"
-                type="text"
-                value={form.company_locale}
-                onChange={(event) => setForm((current) => ({ ...current, company_locale: event.target.value }))}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                placeholder={t('fields.locale.placeholder')}
-                required
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="currency">
-                {t('fields.currency.label')}
-              </label>
-              <input
-                id="currency"
-                type="text"
-                value={form.currency}
-                onChange={(event) => setForm((current) => ({ ...current, currency: event.target.value }))}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                placeholder={t('fields.currency.placeholder')}
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="branding_primary_color">
-                {t('fields.primaryColor.label')}
-              </label>
-              <input
-                id="branding_primary_color"
-                type="color"
-                value={form.branding_primary_color}
-                onChange={(event) => setForm((current) => ({ ...current, branding_primary_color: event.target.value }))}
-                className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="date_format">
-                {t('fields.dateFormat.label')}
-              </label>
-              <input
-                id="date_format"
-                type="text"
-                value={form.date_format}
-                onChange={(event) => setForm((current) => ({ ...current, date_format: event.target.value }))}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="time_format">
-                {t('fields.timeFormat.label')}
-              </label>
-              <input
-                id="time_format"
-                type="text"
-                value={form.time_format}
-                onChange={(event) => setForm((current) => ({ ...current, time_format: event.target.value }))}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="logo_url">
-                {t('fields.logoUrl.label')}
-              </label>
-              <input
-                id="logo_url"
-                type="url"
-                value={form.logo_url}
-                onChange={(event) => setForm((current) => ({ ...current, logo_url: event.target.value }))}
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                placeholder={t('fields.logoUrl.placeholder')}
-              />
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="first_day_of_week">
-                {t('fields.firstDay.label')}
-              </label>
-              <select
-                id="first_day_of_week"
-                value={form.first_day_of_week}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    first_day_of_week: event.target.value === '' ? '' : Number(event.target.value),
-                  }))
-                }
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-              >
-                {weekDays.map((day) => (
-                  <option key={day.value} value={day.value}>
-                    {day.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="space-y-1">
-              <label className="block text-sm font-medium text-slate-700" htmlFor="number_decimals">
-                {t('fields.decimals.label')}
-              </label>
-              <input
-                id="number_decimals"
-                type="number"
-                min={0}
-                max={6}
-                value={form.number_decimals}
-                onChange={(event) =>
-                  setForm((current) => ({
-                    ...current,
-                    number_decimals: event.target.value === '' ? '' : Number(event.target.value),
-                  }))
-                }
-                className="w-full rounded-md border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-              />
-            </div>
+      <form onSubmit={onSubmit} className="mt-8 space-y-10">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="company_timezone">
+              {t('fields.timezone.label')}
+            </label>
+            <input
+              id="company_timezone"
+              type="text"
+              value={form.company_timezone}
+              onChange={(event) => setForm((current) => ({ ...current, company_timezone: event.target.value }))}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              placeholder={t('fields.timezone.placeholder')}
+              required
+            />
           </div>
 
-          <div className="flex flex-col gap-4 md:flex-row md:items-center">
-            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                checked={form.is_active}
-                onChange={(event) => setForm((current) => ({ ...current, is_active: event.target.checked }))}
-                className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-              />
-              {t('fields.active.label')}
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="company_locale">
+              {t('fields.locale.label')}
             </label>
-
-            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                checked={form.status}
-                onChange={(event) => setForm((current) => ({ ...current, status: event.target.checked }))}
-                className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
-              />
-              {t('fields.status.label')}
-            </label>
+            <input
+              id="company_locale"
+              type="text"
+              value={form.company_locale}
+              onChange={(event) => setForm((current) => ({ ...current, company_locale: event.target.value }))}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              placeholder={t('fields.locale.placeholder')}
+              required
+            />
           </div>
 
-          <div className="flex justify-end gap-2">
-            <button
-              type="submit"
-              disabled={!canSubmit || saving}
-              className="inline-flex items-center justify-center rounded-md bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 disabled:cursor-not-allowed disabled:bg-emerald-300"
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="currency">
+              {t('fields.currency.label')}
+            </label>
+            <input
+              id="currency"
+              type="text"
+              value={form.currency}
+              onChange={(event) => setForm((current) => ({ ...current, currency: event.target.value }))}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              placeholder={t('fields.currency.placeholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="branding_primary_color">
+              {t('fields.primaryColor.label')}
+            </label>
+            <input
+              id="branding_primary_color"
+              type="color"
+              value={form.branding_primary_color}
+              onChange={(event) => setForm((current) => ({ ...current, branding_primary_color: event.target.value }))}
+              className="h-12 w-full rounded-lg border border-slate-200 bg-white"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="date_format">
+              {t('fields.dateFormat.label')}
+            </label>
+            <input
+              id="date_format"
+              type="text"
+              value={form.date_format}
+              onChange={(event) => setForm((current) => ({ ...current, date_format: event.target.value }))}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="time_format">
+              {t('fields.timeFormat.label')}
+            </label>
+            <input
+              id="time_format"
+              type="text"
+              value={form.time_format}
+              onChange={(event) => setForm((current) => ({ ...current, time_format: event.target.value }))}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="logo_url">
+              {t('fields.logoUrl.label')}
+            </label>
+            <input
+              id="logo_url"
+              type="url"
+              value={form.logo_url}
+              onChange={(event) => setForm((current) => ({ ...current, logo_url: event.target.value }))}
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              placeholder={t('fields.logoUrl.placeholder')}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="first_day_of_week">
+              {t('fields.firstDay.label')}
+            </label>
+            <select
+              id="first_day_of_week"
+              value={form.first_day_of_week}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  first_day_of_week: event.target.value === '' ? '' : Number(event.target.value),
+                }))
+              }
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
             >
-              {saving ? t('actions.saving') : t('actions.save')}
-            </button>
+              {weekDays.map((day) => (
+                <option key={day.value} value={day.value}>
+                  {day.label}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {loading && <p className="text-sm text-slate-500">{t('states.loading')}</p>}
-        </form>
-      </div>
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-slate-700" htmlFor="number_decimals">
+              {t('fields.decimals.label')}
+            </label>
+            <input
+              id="number_decimals"
+              type="number"
+              min={0}
+              max={6}
+              value={form.number_decimals}
+              onChange={(event) =>
+                setForm((current) => ({
+                  ...current,
+                  number_decimals: event.target.value === '' ? '' : Number(event.target.value),
+                }))
+              }
+              className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
+            />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 text-sm text-slate-500">
+          {loading && <span>{t('states.loading')}</span>}
+          {form.updated && (
+            <span>{t('states.updatedAt', { value: form.updated })}</span>
+          )}
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            disabled={!canSubmit || saving}
+            className="inline-flex items-center justify-center rounded-lg bg-emerald-600 px-6 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-emerald-300"
+          >
+            {saving ? t('actions.saving') : t('actions.save')}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

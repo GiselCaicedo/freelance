@@ -9,7 +9,7 @@ interface SectionCardProps {
 
 export function SectionCard({ title, description, action, children }: SectionCardProps) {
   return (
-    <section className="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
+    <section className="rounded-3xl border border-gray-200 bg-white p-6">
       <header className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">{title}</h2>

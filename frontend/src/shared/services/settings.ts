@@ -2,7 +2,6 @@ import { api } from './conexion';
 
 export interface GeneralSetting {
   id: string;
-  client_id: string | null;
   company_timezone: string | null;
   company_locale: string | null;
   currency: string | null;
@@ -12,17 +11,14 @@ export interface GeneralSetting {
   time_format: string | null;
   branding_primary_color: string | null;
   logo_url: string | null;
-  is_active: boolean | null;
-  status: boolean | null;
   created?: string | null;
   updated?: string | null;
 }
 
-export type GeneralSettingPayload = Partial<Omit<GeneralSetting, 'id'>> & { id?: string; client_id?: string | null };
+export type GeneralSettingPayload = Partial<Omit<GeneralSetting, 'id'>> & { id?: string };
 
-export async function getGeneralSettingApi(clientId?: string | null): Promise<GeneralSetting | null> {
-  const params = clientId ? { clientId } : undefined;
-  const { data } = await api.get('/config/settings/general', { params });
+export async function getGeneralSettingApi(): Promise<GeneralSetting | null> {
+  const { data } = await api.get('/config/settings/general');
   if (data?.success) return (data.data ?? null) as GeneralSetting | null;
   return (data ?? null) as GeneralSetting | null;
 }
@@ -35,7 +31,6 @@ export async function saveGeneralSettingApi(payload: GeneralSettingPayload): Pro
 
 export interface SmtpConfig {
   id: string;
-  client_id: string | null;
   host: string | null;
   port: number | null;
   secure: boolean | null;
@@ -47,15 +42,12 @@ export interface SmtpConfig {
   rate_limit_per_minute: number | null;
   last_test_status: string | null;
   last_test_at: string | null;
-  is_active: boolean | null;
-  status: boolean | null;
 }
 
-export type SmtpConfigPayload = Partial<Omit<SmtpConfig, 'id'>> & { id?: string; client_id?: string | null };
+export type SmtpConfigPayload = Partial<Omit<SmtpConfig, 'id'>> & { id?: string };
 
-export async function getSmtpConfigApi(clientId?: string | null): Promise<SmtpConfig | null> {
-  const params = clientId ? { clientId } : undefined;
-  const { data } = await api.get('/config/settings/smtp', { params });
+export async function getSmtpConfigApi(): Promise<SmtpConfig | null> {
+  const { data } = await api.get('/config/settings/smtp');
   if (data?.success) return (data.data ?? null) as SmtpConfig | null;
   return (data ?? null) as SmtpConfig | null;
 }
@@ -68,7 +60,6 @@ export async function saveSmtpConfigApi(payload: SmtpConfigPayload): Promise<Smt
 
 export interface AlertRule {
   id: string;
-  client_id: string;
   name: string;
   type: string;
   conditions: Record<string, any> | null;
@@ -81,14 +72,13 @@ export interface AlertRule {
 
 export type AlertRulePayload = Partial<Omit<AlertRule, 'conditions'>> & {
   id?: string;
-  client_id: string;
   conditions?: Record<string, any> | string | null;
   channels?: string[] | null;
   remind_before_minutes?: (number | string)[] | null;
 };
 
-export async function listAlertRulesApi(clientId: string): Promise<AlertRule[]> {
-  const { data } = await api.get('/config/settings/alerts', { params: { clientId } });
+export async function listAlertRulesApi(): Promise<AlertRule[]> {
+  const { data } = await api.get('/config/settings/alerts');
   if (data?.success && Array.isArray(data.data)) return data.data as AlertRule[];
   if (Array.isArray(data)) return data as AlertRule[];
   return [];
@@ -107,108 +97,19 @@ export async function deleteAlertRuleApi(id: string): Promise<void> {
   }
 }
 
-export interface UserSetting {
-  id: string;
-  user_id: string;
-  locale: string | null;
-  timezone: string | null;
-  theme: string | null;
-  date_format: string | null;
-  time_format: string | null;
-  dashboard_config: Record<string, any> | null;
-  notify_email: boolean | null;
-  notify_push: boolean | null;
-  notify_whatsapp: boolean | null;
-  reminder_default_minutes: number | null;
-  digest_daily_hour: number | null;
-  twofa_enabled: boolean | null;
-  twofa_method: string | null;
-  session_timeout_minutes: number | null;
-  status: boolean | null;
-}
-
-export type UserSettingPayload = Partial<Omit<UserSetting, 'id' | 'user_id'>>;
-
-export async function getUserSettingsApi(userId: string): Promise<UserSetting | null> {
-  const { data } = await api.get(`/config/settings/user/${userId}/preferences`);
-  if (data?.success) return (data.data ?? null) as UserSetting | null;
-  return (data ?? null) as UserSetting | null;
-}
-
-export async function saveUserSettingsApi(userId: string, payload: UserSettingPayload): Promise<UserSetting> {
-  const { data } = await api.post(`/config/settings/user/${userId}/preferences`, payload);
-  if (data?.success && data?.data) return data.data as UserSetting;
-  throw new Error(data?.message ?? 'No fue posible guardar las preferencias del usuario');
-}
-
-export interface UserNotificationSetting {
-  id: string;
-  user_id: string;
-  channel_email: boolean | null;
-  channel_push: boolean | null;
-  channel_whatsapp: boolean | null;
-  quiet_hours_start: number | null;
-  quiet_hours_end: number | null;
-  digest_daily_hour: number | null;
-}
-
-export type UserNotificationSettingPayload = Partial<Omit<UserNotificationSetting, 'id' | 'user_id'>>;
-
-export async function getUserNotificationSettingsApi(userId: string): Promise<UserNotificationSetting | null> {
-  const { data } = await api.get(`/config/settings/user/${userId}/notifications`);
-  if (data?.success) return (data.data ?? null) as UserNotificationSetting | null;
-  return (data ?? null) as UserNotificationSetting | null;
-}
-
-export async function saveUserNotificationSettingsApi(
-  userId: string,
-  payload: UserNotificationSettingPayload,
-): Promise<UserNotificationSetting> {
-  const { data } = await api.post(`/config/settings/user/${userId}/notifications`, payload);
-  if (data?.success && data?.data) return data.data as UserNotificationSetting;
-  throw new Error(data?.message ?? 'No fue posible guardar las notificaciones del usuario');
-}
-
-export interface UserTwofaSetting {
-  id: string;
-  user_id: string;
-  type: string;
-  secret_encrypted: string | null;
-  backup_codes: Record<string, any> | null;
-  enabled: boolean | null;
-}
-
-export type UserTwofaPayload = Partial<Omit<UserTwofaSetting, 'id' | 'user_id'>>;
-
-export async function getUserTwofaApi(userId: string): Promise<UserTwofaSetting | null> {
-  const { data } = await api.get(`/config/settings/user/${userId}/twofa`);
-  if (data?.success) return (data.data ?? null) as UserTwofaSetting | null;
-  return (data ?? null) as UserTwofaSetting | null;
-}
-
-export async function saveUserTwofaApi(userId: string, payload: UserTwofaPayload): Promise<UserTwofaSetting> {
-  const { data } = await api.post(`/config/settings/user/${userId}/twofa`, payload);
-  if (data?.success && data?.data) return data.data as UserTwofaSetting;
-  throw new Error(data?.message ?? 'No fue posible guardar la configuración de 2FA');
-}
-
 export interface SecurityPolicy {
   id: string;
-  client_id: string | null;
   require_2fa_all: boolean | null;
   require_2fa_admin: boolean | null;
   allowed_2fa_methods: string[];
   allowed_ips: string[];
   max_concurrent_sessions: number | null;
-  is_active: boolean | null;
-  status: boolean | null;
 }
 
-export type SecurityPolicyPayload = Partial<Omit<SecurityPolicy, 'id'>> & { id?: string; client_id?: string | null };
+export type SecurityPolicyPayload = Partial<Omit<SecurityPolicy, 'id'>> & { id?: string };
 
-export async function getSecurityPolicyApi(clientId?: string | null): Promise<SecurityPolicy | null> {
-  const params = clientId ? { clientId } : undefined;
-  const { data } = await api.get('/config/settings/security/policy', { params });
+export async function getSecurityPolicyApi(): Promise<SecurityPolicy | null> {
+  const { data } = await api.get('/config/settings/security/policy');
   if (data?.success) return (data.data ?? null) as SecurityPolicy | null;
   return (data ?? null) as SecurityPolicy | null;
 }
@@ -221,22 +122,18 @@ export async function saveSecurityPolicyApi(payload: SecurityPolicyPayload): Pro
 
 export interface SessionPolicy {
   id: string;
-  client_id: string | null;
   idle_timeout_minutes: number | null;
   absolute_session_minutes: number | null;
   remember_me_days: number | null;
   lock_after_failed_attempts: number | null;
   lock_window_minutes: number | null;
   lock_duration_minutes: number | null;
-  is_active: boolean | null;
-  status: boolean | null;
 }
 
-export type SessionPolicyPayload = Partial<Omit<SessionPolicy, 'id'>> & { id?: string; client_id?: string | null };
+export type SessionPolicyPayload = Partial<Omit<SessionPolicy, 'id'>> & { id?: string };
 
-export async function getSessionPolicyApi(clientId?: string | null): Promise<SessionPolicy | null> {
-  const params = clientId ? { clientId } : undefined;
-  const { data } = await api.get('/config/settings/security/session', { params });
+export async function getSessionPolicyApi(): Promise<SessionPolicy | null> {
+  const { data } = await api.get('/config/settings/security/session');
   if (data?.success) return (data.data ?? null) as SessionPolicy | null;
   return (data ?? null) as SessionPolicy | null;
 }
@@ -249,7 +146,6 @@ export async function saveSessionPolicyApi(payload: SessionPolicyPayload): Promi
 
 export interface PasswordPolicy {
   id: string;
-  client_id: string | null;
   min_length: number | null;
   require_uppercase: boolean | null;
   require_lowercase: boolean | null;
@@ -258,15 +154,12 @@ export interface PasswordPolicy {
   disallow_common_passwords: boolean | null;
   expire_days: number | null;
   history_last_n: number | null;
-  is_active: boolean | null;
-  status: boolean | null;
 }
 
-export type PasswordPolicyPayload = Partial<Omit<PasswordPolicy, 'id'>> & { id?: string; client_id?: string | null };
+export type PasswordPolicyPayload = Partial<Omit<PasswordPolicy, 'id'>> & { id?: string };
 
-export async function getPasswordPolicyApi(clientId?: string | null): Promise<PasswordPolicy | null> {
-  const params = clientId ? { clientId } : undefined;
-  const { data } = await api.get('/config/settings/security/password', { params });
+export async function getPasswordPolicyApi(): Promise<PasswordPolicy | null> {
+  const { data } = await api.get('/config/settings/security/password');
   if (data?.success) return (data.data ?? null) as PasswordPolicy | null;
   return (data ?? null) as PasswordPolicy | null;
 }

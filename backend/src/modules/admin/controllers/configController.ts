@@ -12,12 +12,6 @@ import {
   listAlertRules,
   saveAlertRule,
   deleteAlertRule,
-  getUserSettingsSvc,
-  saveUserSettingsSvc,
-  getUserNotificationSettingsSvc,
-  saveUserNotificationSettingsSvc,
-  getUserTwofaSvc,
-  saveUserTwofaSvc,
   getSecurityPolicy,
   saveSecurityPolicy,
   getSessionPolicy,
@@ -181,8 +175,7 @@ export async function replaceRolePermissionsCtrl(req: Request, res: Response) {
 // =================== General settings ===================
 export async function getGeneralSettingsCtrl(req: Request, res: Response) {
   try {
-    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
-    const data = await getActiveGeneralSetting(clientId)
+    const data = await getActiveGeneralSetting(null)
     return res.json({ success: true, data })
   } catch (error) {
     console.error('Error al obtener configuración general:', error)
@@ -204,8 +197,7 @@ export async function saveGeneralSettingsCtrl(req: Request, res: Response) {
 // =================== SMTP ===================
 export async function getSmtpConfigCtrl(req: Request, res: Response) {
   try {
-    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
-    const data = await getActiveSmtpConfig(clientId)
+    const data = await getActiveSmtpConfig(null)
     return res.json({ success: true, data })
   } catch (error) {
     console.error('Error al obtener configuración SMTP:', error)
@@ -225,13 +217,9 @@ export async function saveSmtpConfigCtrl(req: Request, res: Response) {
 }
 
 // =================== Alert rules ===================
-export async function listAlertRulesCtrl(req: Request, res: Response) {
+export async function listAlertRulesCtrl(_req: Request, res: Response) {
   try {
-    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
-    if (!clientId) {
-      return res.status(400).json({ success: false, message: 'clientId es requerido' })
-    }
-    const data = await listAlertRules(clientId)
+    const data = await listAlertRules()
     return res.json({ success: true, data })
   } catch (error) {
     console.error('Error al listar alertas:', error)
@@ -261,81 +249,10 @@ export async function deleteAlertRuleCtrl(req: Request, res: Response) {
   }
 }
 
-// =================== User preferences ===================
-export async function getUserSettingsCtrl(req: Request, res: Response) {
-  try {
-    const { userId } = req.params
-    const data = await getUserSettingsSvc(userId)
-    return res.json({ success: true, data })
-  } catch (error) {
-    console.error('Error al obtener preferencias de usuario:', error)
-    return res.status(500).json({ success: false, message: 'Error al obtener las preferencias del usuario' })
-  }
-}
-
-export async function saveUserSettingsCtrl(req: Request, res: Response) {
-  try {
-    const { userId } = req.params
-    const payload = req.body as any
-    const data = await saveUserSettingsSvc(userId, payload)
-    return res.json({ success: true, data })
-  } catch (error: any) {
-    console.error('Error al guardar preferencias de usuario:', error)
-    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar las preferencias' })
-  }
-}
-
-export async function getUserNotificationSettingsCtrl(req: Request, res: Response) {
-  try {
-    const { userId } = req.params
-    const data = await getUserNotificationSettingsSvc(userId)
-    return res.json({ success: true, data })
-  } catch (error) {
-    console.error('Error al obtener notificaciones de usuario:', error)
-    return res.status(500).json({ success: false, message: 'Error al obtener las notificaciones del usuario' })
-  }
-}
-
-export async function saveUserNotificationSettingsCtrl(req: Request, res: Response) {
-  try {
-    const { userId } = req.params
-    const payload = req.body as any
-    const data = await saveUserNotificationSettingsSvc(userId, payload)
-    return res.json({ success: true, data })
-  } catch (error: any) {
-    console.error('Error al guardar notificaciones de usuario:', error)
-    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar las notificaciones' })
-  }
-}
-
-export async function getUserTwofaCtrl(req: Request, res: Response) {
-  try {
-    const { userId } = req.params
-    const data = await getUserTwofaSvc(userId)
-    return res.json({ success: true, data })
-  } catch (error) {
-    console.error('Error al obtener configuración 2FA:', error)
-    return res.status(500).json({ success: false, message: 'Error al obtener configuración de 2FA' })
-  }
-}
-
-export async function saveUserTwofaCtrl(req: Request, res: Response) {
-  try {
-    const { userId } = req.params
-    const payload = req.body as any
-    const data = await saveUserTwofaSvc(userId, payload)
-    return res.json({ success: true, data })
-  } catch (error: any) {
-    console.error('Error al guardar configuración 2FA:', error)
-    return res.status(400).json({ success: false, message: error?.message ?? 'Error al guardar configuración de 2FA' })
-  }
-}
-
 // =================== Security policy ===================
 export async function getSecurityPolicyCtrl(req: Request, res: Response) {
   try {
-    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
-    const data = await getSecurityPolicy(clientId)
+    const data = await getSecurityPolicy(null)
     return res.json({ success: true, data })
   } catch (error) {
     console.error('Error al obtener política de seguridad:', error)
@@ -357,8 +274,7 @@ export async function saveSecurityPolicyCtrl(req: Request, res: Response) {
 // =================== Session policy ===================
 export async function getSessionPolicyCtrl(req: Request, res: Response) {
   try {
-    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
-    const data = await getSessionPolicy(clientId)
+    const data = await getSessionPolicy(null)
     return res.json({ success: true, data })
   } catch (error) {
     console.error('Error al obtener política de sesión:', error)
@@ -380,8 +296,7 @@ export async function saveSessionPolicyCtrl(req: Request, res: Response) {
 // =================== Password policy ===================
 export async function getPasswordPolicyCtrl(req: Request, res: Response) {
   try {
-    const clientId = typeof req.query.clientId === 'string' ? req.query.clientId : null
-    const data = await getPasswordPolicy(clientId)
+    const data = await getPasswordPolicy(null)
     return res.json({ success: true, data })
   } catch (error) {
     console.error('Error al obtener política de contraseñas:', error)

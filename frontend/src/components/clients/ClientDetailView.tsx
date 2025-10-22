@@ -13,12 +13,16 @@ import type {
   ClientStatus,
   ClientReminderStatus,
   AssignServiceInput,
+  ClientService
 } from './types';
 import SidePanel from '@/shared/components/common/SidePanel';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { formatCurrency as formatCurrencyIntl } from '@/shared/utils/formatters';
 import { assignClientServiceApi, updateAdminClientApi, deleteAdminClientApi } from '@/shared/services/conexion';
 import { useAlerts } from '@/shared/components/common/AlertsProvider';
+import AgTable from '@/shared/components/datagrid/AgTable';
+import type { ColDef } from 'ag-grid-community';
+
 
 type ClientDetailViewProps = {
   client: ClientRecord;
@@ -164,6 +168,77 @@ export default function ClientDetailView({ client, parameters, serviceCatalog, l
 
   const formatCurrency = (value: number) => formatCurrencyIntl(value ?? 0, locale);
 
+
+  const serviceColumns = useMemo<ColDef<ClientService>[]>(
+    () => [
+      {
+        headerName: 'Servicio',
+        field: 'name',
+        flex: 1.4,
+        minWidth: 200,
+        cellRenderer: (params) => (
+          <div className="flex flex-col">
+            <span className="font-semibold text-gray-900">{params.data?.name ?? '—'}</span>
+            <span className="text-xs text-gray-500">{params.data?.serviceId ?? '—'}</span>
+          </div>
+        ),
+      },
+      {
+        headerName: 'Inicio',
+        field: 'started',
+        flex: 1,
+        minWidth: 140,
+        valueFormatter: (params) => formatDate(params.value as string | null | undefined, locale),
+        cellClass: 'text-gray-600',
+      },
+      {
+        headerName: 'Entrega',
+        field: 'delivery',
+        flex: 1,
+        minWidth: 140,
+        valueFormatter: (params) => formatDate(params.value as string | null | undefined, locale),
+        cellClass: 'text-gray-600',
+      },
+      {
+        headerName: 'Expira',
+        field: 'expiry',
+        flex: 1,
+        minWidth: 140,
+        valueFormatter: (params) => formatDate(params.value as string | null | undefined, locale),
+        cellClass: 'text-gray-600',
+      },
+      {
+        headerName: 'Frecuencia',
+        field: 'frequency',
+        flex: 1,
+        minWidth: 140,
+        valueFormatter: (params) => {
+          const row = params.data as ClientService | undefined;
+          if (!row?.frequency) return '—';
+          return `${row.frequency} ${row.unit ?? ''}`.trim();
+        },
+        cellClass: 'text-gray-600',
+      },
+      {
+        headerName: 'Integración',
+        field: 'urlApi',
+        flex: 1,
+        minWidth: 140,
+        sortable: false,
+        filter: false,
+        cellRenderer: (params) =>
+          params.data?.urlApi ? (
+            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+              <ShieldCheck className="h-3.5 w-3.5" /> API
+            </span>
+          ) : (
+            <span className="text-xs text-gray-400">—</span>
+          ),
+      },
+    ],
+    [locale],
+  );
+
   return (
     <div className="space-y-6" ref={containerRef}>
       <div className="flex flex-col gap-2">
@@ -270,47 +345,15 @@ export default function ClientDetailView({ client, parameters, serviceCatalog, l
           </div>
         ) : null}
 
-        <div className="mt-4 overflow-x-auto">
+        <div className="mt-4">
           {clientState.services.length > 0 ? (
-            <table className="min-w-full divide-y divide-gray-200 text-sm">
-              <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
-                <tr>
-                  <th scope="col" className="px-4 py-3 text-left">Servicio</th>
-                  <th scope="col" className="px-4 py-3 text-left">Inicio</th>
-                  <th scope="col" className="px-4 py-3 text-left">Entrega</th>
-                  <th scope="col" className="px-4 py-3 text-left">Expira</th>
-                  <th scope="col" className="px-4 py-3 text-left">Frecuencia</th>
-                  <th scope="col" className="px-4 py-3 text-left">Integración</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {clientState.services.map((service) => (
-                  <tr key={service.id} className="bg-white">
-                    <td className="px-4 py-3">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-gray-900">{service.name}</span>
-                        <span className="text-xs text-gray-500">{service.serviceId}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">{formatDate(service.started, locale)}</td>
-                    <td className="px-4 py-3 text-gray-600">{formatDate(service.delivery, locale)}</td>
-                    <td className="px-4 py-3 text-gray-600">{formatDate(service.expiry, locale)}</td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {service.frequency ? `${service.frequency} ${service.unit ?? ''}` : '—'}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">
-                      {service.urlApi ? (
-                        <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
-                          <ShieldCheck className="h-3.5 w-3.5" /> API
-                        </span>
-                      ) : (
-                        <span className="text-xs text-gray-400">—</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            <AgTable<ClientService>
+              rows={clientState.services}
+              columns={serviceColumns}
+              getRowId={(row) => row.id}
+              height={320}
+              pageSize={clientState.services.length > 10 ? 10 : clientState.services.length}
+            />
           ) : (
             <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-6 text-sm text-gray-500">
               Aún no hay servicios asociados. Usa el botón “Asignar servicio” para vincular uno nuevo.
