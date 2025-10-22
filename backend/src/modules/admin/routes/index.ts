@@ -5,6 +5,7 @@ import utilsRoutes from './utilsRoutes.js'
 import configRoutes from './configRoutes.js'
 import dashboardRoutes from './dashboardRoutes.js'
 import clientRoutes from './clientRoutes.js'
+import quoteRoutes from './quoteRoutes.js'
 import { authenticate } from '../../../middlewares/authenticate.js'
 
 const indexRoutes = express.Router()
@@ -20,6 +21,7 @@ indexRoutes.use('/utils', utilsRoutes)
 indexRoutes.use('/config', configRoutes)
 indexRoutes.use('/dashboard', dashboardRoutes)
 indexRoutes.use('/clients', clientRoutes)
+indexRoutes.use('/quotes', quoteRoutes)
 
 
 export default indexRoutes
