@@ -1,0 +1,25 @@
+import type { Metadata } from 'next';
+import { getTranslations } from 'next-intl/server';
+
+
+export async function generateMetadata(props: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await props.params;
+  const t = await getTranslations({
+    locale,
+    namespace: 'Pagos',
+  });
+
+  return {
+    title: t('meta_title'),
+  };
+}
+
+export default function Pagos() {
+  return (
+    <div className="flex py-5 [&_p]:my-6 justify-center">
+      Pagos
+    </div>
+  );
+}
