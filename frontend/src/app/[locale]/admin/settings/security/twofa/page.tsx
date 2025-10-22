@@ -113,8 +113,8 @@ export default function TwofaSettingsPage() {
 
       <form onSubmit={onSubmit} className="mt-8 space-y-8">
         <div className="grid gap-6 lg:grid-cols-2">
-          <div className="space-y-2">
-            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
+          <div className="space-y-2 ">
+            <label className="inline-flex items-center gap-2 text-sm text-slate-700 pr-3">
               <input
                 type="checkbox"
                 className="h-4 w-4 rounded border-slate-300 text-purple-600 focus:ring-purple-500"

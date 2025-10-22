@@ -97,8 +97,9 @@ export interface RegisterUserDto {
   status: boolean;
 }
 
-export async function getUsersApi(empresaId: string): Promise<BackendUser[]> {
-  const { data } = await api.get(`/config/get-users/${empresaId}`);
+export async function getUsersApi(empresaId?: string): Promise<BackendUser[]> {
+  const endpoint = empresaId ? `/config/get-users/${empresaId}` : '/config/get-users';
+  const { data } = await api.get(endpoint);
   if (!data?.success) throw new Error('No fue posible obtener usuarios');
   return data.data;
 }

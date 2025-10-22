@@ -17,7 +17,7 @@ import {
 const configRoutes = Router()
 
 // Usuarios
-configRoutes.get('/get-users/:empresaId', getUsers)
+configRoutes.get('/get-users/:empresaId?', getUsers)
 configRoutes.get('/get-roles', getRoles)
 configRoutes.get('/get-permisos/:id', getPermisos)
 configRoutes.get('/users/:id', getUser)

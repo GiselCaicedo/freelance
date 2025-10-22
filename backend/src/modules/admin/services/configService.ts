@@ -60,21 +60,6 @@ const normalizeJsonField = (value: unknown): Prisma.JsonValue | undefined => {
   return value as Prisma.JsonValue
 }
 
-// =================== Usuarios ===================
-export async function fetchUsers(empresaId: string) {
-  return prisma.user.findMany({
-    where: { client_id: empresaId },
-    select: {
-      id: true,
-      user: true,
-      name: true,
-      status: true,
-      updated: true,
-      role: { select: { name: true } },
-    },
-  })
-}
-
 export async function fetchRoles() {
   const roles = await prisma.role.findMany({
     select: {

@@ -1,9 +1,16 @@
 import bcrypt from 'bcrypt'
+import type { Prisma } from '@prisma/client'
 import { prisma } from '../../../config/db.ts'
 
-export async function fetchUsers(empresaId: string) {
+export async function fetchUsers(empresaId?: string) {
+  const where: Prisma.UserWhereInput = {}
+
+  if (empresaId) {
+    where.client_id = empresaId
+  }
+
   return prisma.user.findMany({
-    where: { client_id: empresaId },
+    where,
     select: {
       id: true,
       user: true,
@@ -12,6 +19,7 @@ export async function fetchUsers(empresaId: string) {
       updated: true,
       role: { select: { name: true } },
     },
+    orderBy: { updated: 'desc' },
   })
 }
 

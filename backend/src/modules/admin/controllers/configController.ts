@@ -24,7 +24,7 @@ import {
 
 export async function getUsers(req: Request, res: Response) {
   try {
-    const { empresaId } = req.params
+    const { empresaId } = req.params as { empresaId?: string }
     const users = await fetchUsers(empresaId)
     res.json({ success: true, data: users })
   } catch (error) {

@@ -143,6 +143,10 @@ export async function fetchBillingTotals(period: DashboardPeriod): Promise<Billi
   return { ...totals, total: totals.billed + totals.pendiente }
 }
 
+function isPendingStatus(status?: string | null): boolean {
+  return status?.trim().toLowerCase() === 'pendiente'
+}
+
 export async function fetchUpcomingInvoiceExpirations(
   referenceDate: Date,
   monthsAhead = 1,
@@ -179,9 +183,7 @@ export async function fetchUpcomingInvoiceExpirations(
     orderBy: { expiry: 'asc' },
   })
 
-  const pendienteInvoices = invoices.filter((invoice) =>
-    classifyPaymentStatus(invoice.status_pay, invoice.status) === 'pendiente',
-  )
+  const pendienteInvoices = invoices.filter((invoice) => isPendingStatus(invoice.status_pay))
 
   return pendienteInvoices.map((invoice) => {
     const expiryDate = invoice.expiry ?? null

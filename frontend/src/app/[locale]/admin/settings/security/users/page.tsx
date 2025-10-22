@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, usePathname } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ColDef, RowClassRules } from 'ag-grid-community';
 import { Plus, Search } from 'lucide-react';
@@ -16,6 +16,8 @@ import { useEnterprise } from '@/libs/acl/EnterpriseProvider';
 import CreateUserForm from '@/panels/admin/components/users/CreateUserForm';
 import EditUserForm from '@/panels/admin/components/users/EditUserForm';
 import { BackendUser, deleteUserApi, getUsersApi } from '@/shared/services/conexion';
+import { SettingsTabs } from '@/shared/components/settings/SettingsTabs';
+import { getSettingsBasePath } from '@/shared/settings/navigation';
 
 type UserRow = {
   id: string;
@@ -33,10 +35,13 @@ type ConfirmState = {
 
 export default function UsersPage() {
   const { locale } = useParams() as { locale: string };
+  const pathname = usePathname();
   const t = useTranslations('Settings.Users');
   const commonT = useTranslations('Common');
   const { empresaId } = useEnterprise();
   const { notify } = useAlerts();
+
+  const settingsBase = getSettingsBasePath(pathname ?? undefined);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -65,10 +70,9 @@ export default function UsersPage() {
     });
 
   const fetchUsers = useCallback(async () => {
-    if (!empresaId) return;
     try {
       setLoading(true);
-      const data = await getUsersApi(empresaId);
+      const data = await getUsersApi();
       setRows(normalizeUsers(data));
       setError(null);
     } catch (error: any) {
@@ -78,7 +82,7 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [empresaId, notify, t]);
+  }, [notify, t]);
 
   useEffect(() => {
     fetchUsers();
@@ -202,11 +206,10 @@ export default function UsersPage() {
   );
 
   return (
-    <div ref={containerRef} className="relative p-8 transition-[padding-right] duration-300">
+    <div ref={containerRef} className="relative py-8 px-4 transition-[padding-right] duration-300 sm:px-6 lg:px-12">
       <PageHeader
-        className="mb-6"
         breadcrumbs={[
-          { label: t('breadcrumbs.section'), href: `/${locale}/settings` },
+          { label: t('breadcrumbs.section'), href: settingsBase },
           { label: t('breadcrumbs.current') },
         ]}
         title={t('pageTitle')}
@@ -227,7 +230,9 @@ export default function UsersPage() {
         )}
       />
 
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <SettingsTabs className="mt-8" />
+
+      <div className="mt-6 mb-3 flex flex-wrap items-center gap-3">
         <div className="relative w-full max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
@@ -241,15 +246,17 @@ export default function UsersPage() {
         {error && <span className="text-xs text-red-600">{error}</span>}
       </div>
 
-      <AgTable<UserRow>
-        rows={rows}
-        columns={columns}
-        quickFilterText={quickFilter}
-        rowClassRules={rowClassRules}
-        getRowId={(row) => row.id}
-        height={440}
-        pageSize={10}
-      />
+      <div>
+        <AgTable<UserRow>
+          rows={rows}
+          columns={columns}
+          quickFilterText={quickFilter}
+          rowClassRules={rowClassRules}
+          getRowId={(row) => row.id}
+          height={440}
+          pageSize={10}
+        />
+      </div>
 
       <SidePanel
         title={t('panels.createTitle')}

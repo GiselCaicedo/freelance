@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { ColDef, RowClassRules } from 'ag-grid-community';
 import { Plus, Search } from 'lucide-react';
@@ -15,6 +15,8 @@ import { useAlerts } from '@/shared/components/common/AlertsProvider';
 import RoleFormModal from '@/panels/admin/components/roles/RoleFormModal';
 import { listRolesApi, deleteRoleApi, Role, RoleCategory } from '@/shared/services/conexion';
 import { normalizeRoleCategory } from '@/shared/utils/roles';
+import { SettingsTabs } from '@/shared/components/settings/SettingsTabs';
+import { buildSettingsHref, getSettingsBasePath } from '@/shared/settings/navigation';
 
 type RoleRow = {
   id: string
@@ -33,9 +35,12 @@ type ConfirmState = {
 export default function RolesPage() {
   const router = useRouter();
   const { locale } = useParams() as { locale: string };
+  const pathname = usePathname();
   const t = useTranslations('Settings.Roles');
   const commonT = useTranslations('Common');
   const { notify } = useAlerts();
+
+  const settingsBase = getSettingsBasePath(pathname ?? undefined);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -93,9 +98,10 @@ export default function RolesPage() {
 
   const handlePermissions = useCallback(
     (row: RoleRow) => {
-      router.push(`/${locale}/settings/security/roles/${row.id}/permissions`);
+      const target = buildSettingsHref(pathname, `security/roles/${row.id}/permissions`);
+      router.push(target);
     },
-    [router, locale],
+    [pathname, router],
   );
 
   const requestDelete = useCallback((row: RoleRow) => {
@@ -226,11 +232,10 @@ export default function RolesPage() {
   );
 
   return (
-    <div ref={containerRef} className="relative p-8 transition-[padding-right] duration-300">
+    <div ref={containerRef} className="relative py-8 px-4 transition-[padding-right] duration-300 sm:px-6 lg:px-12">
       <PageHeader
-        className="mb-6"
         breadcrumbs={[
-          { label: t('breadcrumbs.section'), href: `/${locale}/settings` },
+          { label: t('breadcrumbs.section'), href: settingsBase },
           { label: t('breadcrumbs.current') },
         ]}
         title={t('pageTitle')}
@@ -251,7 +256,9 @@ export default function RolesPage() {
         )}
       />
 
-      <div className="mb-3 flex items-center justify-between gap-3">
+      <SettingsTabs className="mt-8" />
+
+      <div className="mt-6 mb-3 flex flex-wrap items-center gap-3">
         <div className="relative w-full max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
@@ -265,15 +272,17 @@ export default function RolesPage() {
         {error && <span className="text-xs text-red-600">{error}</span>}
       </div>
 
-      <AgTable<RoleRow>
-        rows={rows}
-        columns={columns}
-        quickFilterText={quickFilter}
-        rowClassRules={rowClassRules}
-        getRowId={(row) => row.id}
-        height={440}
-        pageSize={10}
-      />
+      <div >
+        <AgTable<RoleRow>
+          rows={rows}
+          columns={columns}
+          quickFilterText={quickFilter}
+          rowClassRules={rowClassRules}
+          getRowId={(row) => row.id}
+          height={440}
+          pageSize={10}
+        />
+      </div>
 
       <SidePanel title={t('panels.createTitle')} open={openCreate} onClose={() => setOpenCreate(false)} reserveRef={containerRef}>
         <RoleFormModal

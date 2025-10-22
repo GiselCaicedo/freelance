@@ -285,7 +285,7 @@
   "Settings": {
     "Roles": {
       "breadcrumbs": {
-        "section": "Seguridad y accesos",
+        "section": "Configuración de acceso",
         "current": "Roles"
       },
       "pageTitle": "Roles",

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useMemo, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useParams, usePathname, useRouter } from 'next/navigation'
 import { Check, ChevronLeft, Save, Search, ToggleLeft, ToggleRight } from 'lucide-react'
 import PageHeader from '@/shared/components/common/PageHeader'
 import { useAlerts } from '@/shared/components/common/AlertsProvider'
@@ -12,13 +12,19 @@ import {
   saveRolePermissionsApi,
   Permission,
 } from '@/shared/services/conexion'
+import { SettingsTabs } from '@/shared/components/settings/SettingsTabs'
+import { buildSettingsHref, getSettingsBasePath } from '@/shared/settings/navigation'
 
 type Grouped = Record<string, Permission[]>
 
 export default function RolePermissionsPage() {
-  const { locale, id } = useParams() as { locale: string; id: string }
+  const { id } = useParams() as { id: string }
+  const pathname = usePathname()
   const router = useRouter()
   const { notify } = useAlerts()
+
+  const settingsBase = getSettingsBasePath(pathname ?? undefined)
+  const rolesListHref = buildSettingsHref(pathname, 'security/roles')
 
   const [roleName, setRoleName] = useState<string>('')
   const [groups, setGroups] = useState<Grouped>({})
@@ -117,12 +123,11 @@ export default function RolePermissionsPage() {
   }
 
   return (
-    <div className="p-8">
+    <div className="py-8 px-4 sm:px-6 lg:px-12">
       <PageHeader
-        className="mb-6"
         breadcrumbs={[
-          { label: 'Seguridad y Accesos', href: `/${locale}/settings/security` },
-          { label: 'Roles', href: `/${locale}/settings/security/roles` },
+          { label: 'Seguridad y Accesos', href: settingsBase },
+          { label: 'Roles', href: rolesListHref },
           { label: 'Permisos' },
         ]}
         title={`Permisos del rol: ${roleName || '—'}`}
@@ -131,7 +136,7 @@ export default function RolePermissionsPage() {
           <>
             <button
               type="button"
-              onClick={() => router.push(`/${locale}/settings/security/roles`)}
+              onClick={() => router.push(rolesListHref)}
               className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm hover:bg-gray-50"
             >
               <ChevronLeft className="h-4 w-4" /> Volver
@@ -149,8 +154,10 @@ export default function RolePermissionsPage() {
         )}
       />
 
+      <SettingsTabs className="mt-8" />
+
       {/* Barra de herramientas */}
-      <div className="mt-4 mb-6 flex flex-wrap items-center gap-3">
+      <div className="mt-6 mb-6 flex flex-wrap items-center gap-3">
         <div className="relative w-full max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
           <input
