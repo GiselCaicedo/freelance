@@ -5,8 +5,9 @@ import arcjet from '@/libs/Arcjet';
 import createMiddleware from 'next-intl/middleware';
 import { routing } from './libs/I18nRouting';
 import { jwtVerify } from 'jose';
+import { normalizeRoleCategory } from '@/shared/utils/roles';
 
-const devMode = process.env.NEXT_DEV_MODE;
+const devMode = process.env.NEXT_DEV_MODE === 'true';
 
 // i18n
 const handleI18nRouting = createMiddleware(routing);
@@ -19,17 +20,16 @@ const aj = arcjet.withRule(
   }),
 );
 
-// --- Rutas protegidas (ahora bajo /admin y /client) ---
+// --- Rutas protegidas ---
 const PROTECTED_ROUTES = [
-  /^\/$/,                            // raíz
-  /^\/admin(?:\/.*)?$/,              // /admin...
-  /^\/client(?:\/.*)?$/,             // /client...
-  /^\/[a-z]{2}\/$/,                  // /es o /en
-  /^\/[a-z]{2}\/admin(?:\/.*)?$/,    // /es/admin...
-  /^\/[a-z]{2}\/client(?:\/.*)?$/,   // /es/client...
+  /^\/$/,
+  /^\/admin(?:\/.*)?$/,
+  /^\/client(?:\/.*)?$/,
+  /^\/[a-z]{2}\/$/,
+  /^\/[a-z]{2}\/admin(?:\/.*)?$/,
+  /^\/[a-z]{2}\/client(?:\/.*)?$/,
 ];
 
-// Subconjuntos para validar panel por permisos
 const ADMIN_ROUTES = [
   /^\/admin(?:\/.*)?$/,
   /^\/[a-z]{2}\/admin(?:\/.*)?$/,
@@ -40,7 +40,6 @@ const CLIENT_ROUTES = [
   /^\/[a-z]{2}\/client(?:\/.*)?$/,
 ];
 
-// Páginas de autenticación (grupos de rutas no afectan la URL)
 const AUTH_PAGES = [
   /^\/sign-in(.*)/,
   /^\/[a-z]{2}\/sign-in(.*)/,
@@ -48,16 +47,13 @@ const AUTH_PAGES = [
   /^\/[a-z]{2}\/sign-up(.*)/,
 ];
 
-// Mapa de slugs "públicos" -> canonical interno (para /cotizaciones, /pagos, etc.)
 type Canonical = 'dashboard' | 'quotes' | 'payments' | 'services' | 'settings';
 const PUBLIC_SLUG_MAP: Record<string, Canonical> = {
-  // ES
   cotizaciones: 'quotes',
   pagos: 'payments',
   servicios: 'services',
   ajustes: 'settings',
   dashboard: 'dashboard',
-  // EN / canonicals
   quotes: 'quotes',
   payments: 'payments',
   services: 'services',
@@ -65,11 +61,18 @@ const PUBLIC_SLUG_MAP: Record<string, Canonical> = {
 };
 
 // JWT
-async function verifyJWT(token: string): Promise<{ permissions?: string[] } | null> {
+type JwtPayload = {
+  permissions?: unknown;
+  roleCategory?: unknown;
+  role_category?: unknown;
+  panel?: unknown;
+};
+
+async function verifyJWT(token: string): Promise<JwtPayload | null> {
   try {
     const secret = new TextEncoder().encode(process.env.JWT_SECRET);
     const { payload } = await jwtVerify(token, secret);
-    return payload as { permissions?: string[] };
+    return payload as JwtPayload;
   } catch {
     return null;
   }
@@ -79,10 +82,9 @@ export default async function middleware(request: NextRequest, _event: NextFetch
   const { pathname } = request.nextUrl;
   console.log('🛡️ Middleware:', pathname);
 
-  // --- Arcjet ---
+  // Arcjet
   if (process.env.ARCJET_KEY) {
     const decision = await aj.protect(request);
-    console.log('Arcjet:', decision);
     if (decision.isDenied()) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -97,89 +99,97 @@ export default async function middleware(request: NextRequest, _event: NextFetch
   const detectedLocale = localeMatch ? localeMatch[1] : 'es';
 
   // Normalizar permisos
-  const permissions = (payload?.permissions ?? [])
+  const permissionList = Array.isArray(payload?.permissions) ? payload.permissions : [];
+  const permissions = permissionList
     .map((p) => (typeof p === 'string' ? p.trim().toLowerCase() : ''))
     .filter(Boolean);
 
-  const hasAdminPanel = permissions.includes('admin');
-  const hasClientPanel = permissions.includes('client') || permissions.includes('cliente');
+  const roleCategoryRaw =
+    typeof payload?.roleCategory === 'string'
+      ? payload.roleCategory
+      : typeof payload?.role_category === 'string'
+      ? payload.role_category
+      : typeof payload?.panel === 'string'
+      ? payload.panel
+      : null;
 
-  // --- Normalizar slugs públicos al nuevo esquema /admin ---
-  // Soporta: /cotizaciones -> /es/admin/quotes (si admin) o /es/client/dashboard (si client)
+  const normalizedRoleCategory =
+    normalizeRoleCategory(roleCategoryRaw)?.toLowerCase?.() || '';
+
+  const hasAdminPanel =
+    normalizedRoleCategory === 'admin' || permissions.includes('admin');
+  const hasClientPanel =
+    normalizedRoleCategory === 'client' ||
+    permissions.includes('client') ||
+    permissions.includes('cliente');
+
+  // --- Logs de diagnóstico ---
+  console.log('[MW]', {
+    path: pathname,
+    hasCookie: Boolean(token),
+    hasPayload: Boolean(payload),
+    roleCat: roleCategoryRaw,
+    normRoleCat: normalizedRoleCategory,
+  });
+
+  // --- Redirecciones de raíz y alias públicos ---
   const segments = pathname.replace(/^\//, '').split('/');
   const hasLocalePrefix = /^[a-z]{2}$/.test(segments[0] || '');
-  const head = hasLocalePrefix ? (segments[1] || '') : (segments[0] || '');
+  const head = hasLocalePrefix ? segments[1] || '' : segments[0] || '';
   const tail = hasLocalePrefix ? segments.slice(2) : segments.slice(1);
   const publicCanonical = PUBLIC_SLUG_MAP[(head || '').toLowerCase()] || null;
 
   let effectivePathname = pathname;
   let rewriteTarget: string | null = null;
 
-  // Redirección amigable: /admin -> /admin/dashboard (respetando locale)
   const isAdminRoot = /^\/(?:[a-z]{2}\/)?admin\/?$/.test(pathname);
   if (isAdminRoot) {
-    const locale = detectedLocale;
-    const target = `/${locale}/admin/dashboard`;
+    const target = `/${detectedLocale}/admin/dashboard`;
     return NextResponse.redirect(new URL(target, request.url));
   }
 
-  // Redirección amigable: /client -> /client/dashboard (opcional; ajusta si tu dashboard cliente vive ahí)
   const isClientRoot = /^\/(?:[a-z]{2}\/)?client\/?$/.test(pathname);
   if (isClientRoot) {
-    const locale = detectedLocale;
-    const target = `/${locale}/client/dashboard`;
+    const target = `/${detectedLocale}/client/dashboard`;
     return NextResponse.redirect(new URL(target, request.url));
   }
 
-  // Redirección desde raíz a panel según permisos
   const isRoot = pathname === '/' || /^\/[a-z]{2}\/?$/.test(pathname);
   if (isRoot) {
-    const locale = detectedLocale;
     const target = hasAdminPanel
-      ? `/${locale}/admin/dashboard`
+      ? `/${detectedLocale}/admin/dashboard`
       : hasClientPanel
-      ? `/${locale}/client/dashboard`
-      : `/${locale}/sign-in`;
+      ? `/${detectedLocale}/client/dashboard`
+      : `/${detectedLocale}/sign-in`;
     return NextResponse.redirect(new URL(target, request.url));
   }
 
-  // Reescritura de slugs públicos (mantiene URL pública)
   if (publicCanonical) {
-    const locale = detectedLocale;
     const suffix = tail.length ? `/${tail.join('/')}` : '';
-
     if (publicCanonical === 'dashboard') {
-      if (hasAdminPanel) {
-        rewriteTarget = `/${locale}/admin/dashboard${suffix}`;
-      } else if (hasClientPanel) {
-        rewriteTarget = `/${locale}/client/dashboard${suffix}`;
-      } else {
-        rewriteTarget = `/${locale}/sign-in`;
-      }
+      rewriteTarget = hasAdminPanel
+        ? `/${detectedLocale}/admin/dashboard${suffix}`
+        : hasClientPanel
+        ? `/${detectedLocale}/client/dashboard${suffix}`
+        : `/${detectedLocale}/sign-in`;
     } else {
-      // quotes | payments | services | settings
-      if (hasAdminPanel) {
-        rewriteTarget = `/${locale}/admin/${publicCanonical}${suffix}`;
-      } else if (hasClientPanel) {
-        // No hay sección equivalente en cliente -> enviar a dashboard cliente
-        rewriteTarget = `/${locale}/client/dashboard`;
-      } else {
-        rewriteTarget = `/${locale}/sign-in`;
-      }
+      rewriteTarget = hasAdminPanel
+        ? `/${detectedLocale}/admin/${publicCanonical}${suffix}`
+        : hasClientPanel
+        ? `/${detectedLocale}/client/dashboard`
+        : `/${detectedLocale}/sign-in`;
     }
-
     if (rewriteTarget) {
       const url = new URL(rewriteTarget, request.url);
-      effectivePathname = url.pathname; // usar para las validaciones de abajo
+      effectivePathname = url.pathname;
     }
   }
 
-  // ¿Está protegida la ruta efectiva?
+  // ¿Ruta protegida?
   const isProtected = PROTECTED_ROUTES.some((r) => r.test(effectivePathname));
-  console.log('Ruta protegida:', isProtected, '->', effectivePathname);
 
-  // --- Verificación JWT (salta en devMode) ---
-  if (isProtected && devMode !== 'true') {
+  // Verificación JWT
+  if (isProtected && !devMode) {
     if (!token || !payload) {
       const signInUrl = new URL(`/${detectedLocale}/sign-in`, request.url);
       console.log(`🔁 Redirect a ${signInUrl.href}`);
@@ -187,36 +197,39 @@ export default async function middleware(request: NextRequest, _event: NextFetch
     }
   }
 
-  // Validación de panel según permisos
+  // Validar panel según permisos
   const matchesAdminRoute = ADMIN_ROUTES.some((r) => r.test(effectivePathname));
   const matchesClientRoute = CLIENT_ROUTES.some((r) => r.test(effectivePathname));
 
   if (matchesAdminRoute && !hasAdminPanel) {
-    const fallback = hasClientPanel ? `/${detectedLocale}/client/dashboard` : `/${detectedLocale}/sign-in`;
+    const fallback = hasClientPanel
+      ? `/${detectedLocale}/client/dashboard`
+      : `/${detectedLocale}/sign-in`;
     return NextResponse.redirect(new URL(fallback, request.url));
   }
 
   if (matchesClientRoute && !hasClientPanel) {
-    const fallback = hasAdminPanel ? `/${detectedLocale}/admin/dashboard` : `/${detectedLocale}/sign-in`;
+    const fallback = hasAdminPanel
+      ? `/${detectedLocale}/admin/dashboard`
+      : `/${detectedLocale}/sign-in`;
     return NextResponse.redirect(new URL(fallback, request.url));
   }
 
-  // Aplicar reescritura (si hubo slug público)
+  // Reescritura
   if (rewriteTarget) {
     return NextResponse.rewrite(new URL(rewriteTarget, request.url));
   }
 
-  // --- Evitar bucle: no aplicar i18n en auth pages ---
+  // Evitar bucle i18n
   if (isAuthPage) {
     if (!/^\/[a-z]{2}\//.test(pathname)) {
-      const defaultLocale = 'es';
-      const localeUrl = new URL(`/${defaultLocale}${pathname}`, request.url);
+      const localeUrl = new URL(`/es${pathname}`, request.url);
       return NextResponse.redirect(localeUrl);
     }
     return NextResponse.next();
   }
 
-  // Flujo normal con i18n
+  // Normal
   return handleI18nRouting(request);
 }
 

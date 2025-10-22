@@ -1,8 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifyToken } from '@/libs/Auth';
-import ClientLayout from './client/layout';
-import ClientDashboard from '@/panels/client/pages/Dashboard';
 
 const normalizePermission = (value: unknown) =>
   typeof value === 'string' ? value.trim().toLowerCase() : '';
@@ -19,18 +17,23 @@ export default async function LocalePanelRedirect({
     redirect(`/${locale}/sign-in`);
   }
 
-  const payload = await verifyToken<{ permissions?: string[] }>(token);
-  const permissions = payload?.permissions ?? [];
-  const normalized = permissions
-    .map(normalizePermission)
-    .filter((permission) => permission.length > 0);
+  const payload = await verifyToken<{ permissions?: string[]; roleCategory?: string }>(token);
+  const permissions = (payload?.permissions ?? []).map(normalizePermission);
 
-  if (normalized.includes('admin')) {
+  const panelRaw =
+    (payload as any)?.roleCategory ??
+    (payload as any)?.role_category ??
+    (payload as any)?.panel ??
+    '';
+
+  const panel = typeof panelRaw === 'string' ? panelRaw.trim().toLowerCase() : '';
+
+  if (permissions.includes('admin') || panel === 'admin') {
     redirect(`/${locale}/admin/dashboard`);
   }
 
-  if (normalized.includes('client')) {
-   redirect(`/${locale}/client/dashboard`);
+  if (permissions.includes('client') || permissions.includes('cliente') || panel === 'client') {
+    redirect(`/${locale}/client/dashboard`);
   }
 
   redirect(`/${locale}/sign-in`);

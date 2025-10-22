@@ -33,7 +33,9 @@ export default async function RootLayout(props: {
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  const token = cookies().get('auth_token')?.value || '';
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value || '';
+
 
   const messages = await getMessages({ locale });
 
@@ -51,13 +53,13 @@ export default async function RootLayout(props: {
     <html lang={locale}>
       <body>
         <NextIntlClientProvider locale={locale} messages={messages} timeZone="UTC">
-            <AlertsProvider>
-              <EnterpriseProvider empresaId={empresaId} empresaName={empresaName}>
-                <PermissionProvider permissions={permissions}>
-                  {props.children}
-                </PermissionProvider>
-              </EnterpriseProvider>
-            </AlertsProvider>
+          <AlertsProvider>
+            <EnterpriseProvider empresaId={empresaId} empresaName={empresaName}>
+              <PermissionProvider permissions={permissions}>
+                {props.children}
+              </PermissionProvider>
+            </EnterpriseProvider>
+          </AlertsProvider>
         </NextIntlClientProvider>
       </body>
     </html>

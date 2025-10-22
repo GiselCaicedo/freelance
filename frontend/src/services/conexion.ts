@@ -233,21 +233,22 @@ export async function login(credentials: {
   password: string;
 }): Promise<{ success: boolean; data?: any; message?: string }> {
   try {
-    const response = await api.post('/auth/login', credentials);
-    const token: string | undefined = response?.data?.token;
+    const response = await api.post('/auth/login', credentials, {
+      withCredentials: true,
+    });
 
-    if (token && typeof window !== 'undefined') {
-      window.sessionStorage.setItem(TOKEN_STORAGE_KEY, token);
-      window.localStorage.setItem(TOKEN_STORAGE_KEY, token);
-      api.defaults.headers.common.Authorization = `Bearer ${token}`;
-      setAuthCookie(token);
-    }
     return { success: true, data: response.data };
   } catch (error: any) {
     console.error('Login error:', error);
-    return { success: false, message: error?.response?.data?.message || 'Error al iniciar sesión' };
+    return {
+      success: false,
+      message:
+        error?.response?.data?.message || 'Error al iniciar sesión',
+    };
   }
 }
+
+
 
 export async function logout(): Promise<{ success: boolean; message?: string }> {
   try {

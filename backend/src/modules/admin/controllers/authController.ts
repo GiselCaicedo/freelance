@@ -3,6 +3,7 @@ import type { Request, Response } from 'express'
 import * as authService from '../services/authService.js'
 
 export const login = async (req: Request, res: Response) => {
+  console.log('Iniciando sesión del usuario', req.body)
   try {
     const { identifier, password } = req.body
     if (!identifier || !password)
@@ -14,6 +15,7 @@ export const login = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
+      path: '/', 
       maxAge: 24 * 60 * 60 * 1000,
     })
 
