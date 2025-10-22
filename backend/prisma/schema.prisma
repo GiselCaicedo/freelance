@@ -1,0 +1,465 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/**
+ * ================================
+ * CLIENTES Y SERVICIOS
+ * ================================
+ */
+
+model client {
+  id      String    @id @default(uuid())
+  name    String?   @db.VarChar
+  created DateTime? @db.Timestamptz(6)
+  updated DateTime? @db.Timestamptz(6)
+  status  Boolean?
+
+  client_details client_details[]
+  client_service client_service[]
+  invoice        invoice[]
+  log            log[]
+  payment        payment[]
+  quote          quote[]
+  service_usage  service_usage[]
+  user           user[]
+}
+
+model client_details {
+  id               String            @id @db.Uuid
+  client_id        String?           @db.Uuid
+  c_parameter_id   String?           @db.Uuid
+  value            String?           @db.VarChar
+  client_parameter client_parameter? @relation(fields: [c_parameter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  client           client?           @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model client_parameter {
+  id             String           @id @db.Uuid
+  name           String?          @db.VarChar
+  client_details client_details[]
+}
+
+model client_service {
+  id         String    @id @db.Uuid
+  client_id  String?   @db.Uuid
+  service_id String?   @db.Uuid
+  created    DateTime? @db.Timestamptz(6)
+  updated    DateTime? @db.Timestamptz(6)
+  started    DateTime? @db.Timestamptz(6)
+  delivery   DateTime? @db.Timestamptz(6)
+  expiry     DateTime? @db.Timestamptz(6)
+  frequency  String?   @db.VarChar
+  unit       String?   @db.VarChar
+  url_api    String?   @db.VarChar
+  token_api  String?   @db.VarChar
+  client     client?   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service    service?  @relation(fields: [service_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model invoice {
+  id                 String               @id @db.Uuid
+  client_id          String?              @db.Uuid
+  description        String?              @db.VarChar
+  value              String?              @db.VarChar
+  url                String?              @db.VarChar
+  created            DateTime?            @db.Timestamptz(6)
+  updated            DateTime?            @db.Timestamptz(6)
+  status             Boolean?
+  expiry             DateTime?            @db.Timestamptz(6)
+  client             client?              @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoice_detail     invoice_detail[]
+  payment_attachment payment_attachment[]
+  quote_attachment   quote_attachment[]
+}
+
+model invoice_detail {
+  id          String    @id @db.Uuid
+  invoice_id  String?   @db.Uuid
+  service_id  String?   @db.Uuid
+  item        Int?
+  quantity    Int?
+  total_value Float?
+  created     DateTime? @db.Timestamptz(6)
+  updated     DateTime? @db.Timestamptz(6)
+  status      Boolean?
+  invoice     invoice?  @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service     service?  @relation(fields: [service_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model log {
+  id        String    @id @db.Uuid
+  user_id   String?   @db.Uuid
+  role_id   String?   @db.Uuid
+  client_id String?   @db.Uuid
+  user_name String?   @db.VarChar
+  ip        String?   @db.VarChar
+  type      String?   @db.VarChar
+  detail    String?   @db.VarChar
+  created   DateTime? @db.Timestamptz(6)
+  client    client?   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role      role?     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user      user?     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payment {
+  id                String          @id @db.Uuid
+  client_id         String?         @db.Uuid
+  code              String?         @db.VarChar
+  value             String?         @db.VarChar
+  status_pay        String?         @db.VarChar
+  method            String?         @db.VarChar
+  payment_method_id String?         @db.Uuid
+  type              String?         @db.VarChar
+  url               String?         @db.VarChar
+  created           DateTime?       @db.Timestamptz(6)
+  updated           DateTime?       @db.Timestamptz(6)
+  status            Boolean?
+  client            client?         @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment_method    payment_method? @relation(fields: [payment_method_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  attachments       payment_attachment[]
+}
+
+model payment_attachment {
+  id         String   @id @db.Uuid
+  payment_id String?  @db.Uuid
+  invoice_id String?  @db.Uuid
+  url        String?  @db.VarChar
+  created    DateTime? @db.Timestamptz(6)
+  updated    DateTime? @db.Timestamptz(6)
+  payment    payment? @relation(fields: [payment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  invoice    invoice? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model payment_method {
+  id      String    @id @db.Uuid
+  name    String?   @unique @db.VarChar
+  payment payment[]
+}
+
+/**
+ * ================================
+ * COTIZACIONES Y SERVICIOS
+ * ================================
+ */
+
+model permission {
+  id              String            @id @db.Uuid
+  name            String?           @db.VarChar
+  section         String?           @db.VarChar
+  role_permission role_permission[]
+}
+
+model quote {
+  id               String             @id @db.Uuid
+  client_id        String?            @db.Uuid
+  description      String?            @db.VarChar
+  value            String?            @db.VarChar
+  url              String?            @db.VarChar
+  created          DateTime?          @db.Timestamptz(6)
+  updated          DateTime?          @db.Timestamptz(6)
+  status           Boolean?
+  client           client?            @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quote_attachment quote_attachment[]
+  quote_detail     quote_detail[]
+}
+
+model quote_attachment {
+  id         String   @id @db.Uuid
+  quote_id   String?  @db.Uuid
+  invoice_id String?  @db.Uuid
+  invoice    invoice? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quote      quote?   @relation(fields: [quote_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model quote_detail {
+  id          String    @id @db.Uuid
+  quote_id    String?   @db.Uuid
+  service_id  String?   @db.Uuid
+  item        Int?
+  quantity    Int?
+  total_value Float?
+  created     DateTime? @db.Timestamptz(6)
+  updated     DateTime? @db.Timestamptz(6)
+  status      Boolean?
+  quote       quote?    @relation(fields: [quote_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service     service?  @relation(fields: [service_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/**
+ * ================================
+ * ROLES Y USUARIOS
+ * ================================
+ */
+
+model role {
+  id          String       @id @default(uuid())
+  name        String
+  description String?
+  panel       RoleCategory @default(CLIENT)
+  created     DateTime?    @db.Timestamptz(6)
+  updated     DateTime?    @db.Timestamptz(6)
+  status      Boolean?
+
+  role_permission    role_permission[]
+  log                log[]
+  user               user[]
+  user_module_policy user_module_policy[]
+}
+
+enum RoleCategory {
+  ADMIN
+  CLIENT
+}
+
+model role_permission {
+  id            String      @id @default(uuid())
+  role_id       String?     @db.Uuid
+  permission_id String?     @db.Uuid
+  permission    permission? @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role          role?       @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user {
+  id        String    @id @default(uuid())
+  role_id   String?   @db.Uuid
+  client_id String?   @db.Uuid
+  user      String?   @db.VarChar
+  pass      String?   @db.VarChar
+  name      String?   @db.VarChar
+  created   DateTime? @db.Timestamptz(6)
+  updated   DateTime? @db.Timestamptz(6)
+  status    Boolean?
+
+  log    log[]
+  client client? @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role   role?   @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  user_setting              user_setting?
+  user_twofa                user_twofa?
+  user_notification_setting user_notification_setting?
+  password_history          password_history[]
+}
+
+/**
+ * ================================
+ * CONFIGURACIÓN GLOBAL DEL SISTEMA
+ * ================================
+ */
+
+model general_setting {
+  id                     String    @id @default(uuid())
+  company_timezone       String?   @db.VarChar
+  company_locale         String?   @db.VarChar
+  currency               String?   @db.VarChar
+  first_day_of_week      Int?
+  number_decimals        Int?
+  date_format            String?   @db.VarChar
+  time_format            String?   @db.VarChar
+  branding_primary_color String?   @db.VarChar
+  logo_url               String?
+  is_active              Boolean?  @default(true)
+  created                DateTime? @db.Timestamptz(6)
+  updated                DateTime? @db.Timestamptz(6)
+  status                 Boolean?  @default(true)
+}
+
+model smtp_config {
+  id                    String    @id @default(uuid())
+  host                  String?   @db.VarChar
+  port                  Int?
+  secure                Boolean?
+  username              String?   @db.VarChar
+  password_encrypted    String?
+  from_name             String?   @db.VarChar
+  from_email            String?   @db.VarChar
+  reply_to_email        String?   @db.VarChar
+  rate_limit_per_minute Int?
+  last_test_status      String?   @db.VarChar
+  last_test_at          DateTime? @db.Timestamptz(6)
+  is_active             Boolean?  @default(true)
+  created               DateTime? @db.Timestamptz(6)
+  updated               DateTime? @db.Timestamptz(6)
+  status                Boolean?  @default(true)
+}
+
+model alert_rule {
+  id                    String    @id @default(uuid())
+  name                  String    @db.VarChar
+  type                  String    @db.VarChar
+  conditions            Json?
+  channels              String[]
+  remind_before_minutes Int[]
+  is_active             Boolean?  @default(true)
+  created               DateTime? @db.Timestamptz(6)
+  updated               DateTime? @db.Timestamptz(6)
+}
+
+model security_policy {
+  id                      String    @id @default(uuid())
+  require_2fa_all         Boolean?  @default(false)
+  require_2fa_admin       Boolean?  @default(true)
+  allowed_2fa_methods     String[]
+  allowed_ips             String[]
+  max_concurrent_sessions Int?
+  is_active               Boolean?  @default(true)
+  created                 DateTime? @db.Timestamptz(6)
+  updated                 DateTime? @db.Timestamptz(6)
+  status                  Boolean?  @default(true)
+}
+
+model session_policy {
+  id                         String    @id @default(uuid())
+  idle_timeout_minutes       Int?
+  absolute_session_minutes   Int?
+  remember_me_days           Int?
+  lock_after_failed_attempts Int?
+  lock_window_minutes        Int?
+  lock_duration_minutes      Int?
+  is_active                  Boolean?  @default(true)
+  created                    DateTime? @db.Timestamptz(6)
+  updated                    DateTime? @db.Timestamptz(6)
+  status                     Boolean?  @default(true)
+}
+
+model password_policy {
+  id                        String    @id @default(uuid())
+  min_length                Int?      @default(10)
+  require_uppercase         Boolean?  @default(true)
+  require_lowercase         Boolean?  @default(true)
+  require_number            Boolean?  @default(true)
+  require_special           Boolean?  @default(true)
+  disallow_common_passwords Boolean?  @default(true)
+  expire_days               Int?
+  history_last_n            Int?      @default(5)
+  is_active                 Boolean?  @default(true)
+  created                   DateTime? @db.Timestamptz(6)
+  updated                   DateTime? @db.Timestamptz(6)
+  status                    Boolean?  @default(true)
+}
+
+model user_module_policy {
+  id                  String    @id @default(uuid())
+  allow_self_register Boolean?  @default(false)
+  default_role_id     String?   @db.Uuid
+  invite_expire_hours Int?      @default(48)
+  is_active           Boolean?  @default(true)
+  created             DateTime? @db.Timestamptz(6)
+  updated             DateTime? @db.Timestamptz(6)
+  status              Boolean?  @default(true)
+
+  role role? @relation(fields: [default_role_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+}
+
+/**
+ * ================================
+ * CONFIGURACIÓN POR USUARIO
+ * ================================
+ */
+
+model user_setting {
+  id                       String    @id @default(uuid())
+  user_id                  String    @unique @db.Uuid
+  locale                   String?
+  timezone                 String?
+  theme                    String?
+  date_format              String?
+  time_format              String?
+  dashboard_config         Json?     @default("{}")
+  notify_email             Boolean?  @default(true)
+  notify_push              Boolean?  @default(true)
+  notify_whatsapp          Boolean?  @default(false)
+  reminder_default_minutes Int?
+  digest_daily_hour        Int?
+  twofa_enabled            Boolean?  @default(false)
+  twofa_method             String?
+  session_timeout_minutes  Int?
+  created                  DateTime? @default(now()) @db.Timestamptz(6)
+  updated                  DateTime? @default(now()) @db.Timestamptz(6)
+  status                   Boolean?  @default(true)
+
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model user_twofa {
+  id               String    @id @default(uuid())
+  user_id          String    @unique @db.Uuid
+  type             String
+  secret_encrypted String?
+  backup_codes     Json?
+  enabled          Boolean?  @default(false)
+  created          DateTime? @default(now()) @db.Timestamptz(6)
+  updated          DateTime? @default(now()) @db.Timestamptz(6)
+
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model user_notification_setting {
+  id                String    @id @default(uuid())
+  user_id           String    @unique @db.Uuid
+  channel_email     Boolean?  @default(true)
+  channel_push      Boolean?  @default(true)
+  channel_whatsapp  Boolean?  @default(false)
+  quiet_hours_start Int?
+  quiet_hours_end   Int?
+  digest_daily_hour Int?
+  created           DateTime? @default(now()) @db.Timestamptz(6)
+  updated           DateTime? @default(now()) @db.Timestamptz(6)
+
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model password_history {
+  id            String    @id @default(uuid())
+  user_id       String    @db.Uuid
+  password_hash String
+  changed_at    DateTime? @default(now()) @db.Timestamptz(6)
+
+  user user @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+/**
+ * ================================
+ * SERVICIOS
+ * ================================
+ */
+
+model service {
+  id                  String            @id @db.Uuid
+  service_category_id String?           @db.Uuid
+  name                String?           @db.VarChar
+  unit                String?           @db.VarChar
+  description         String?
+  created             DateTime?         @db.Timestamptz(6)
+  updated             DateTime?         @db.Timestamptz(6)
+  status              Boolean?
+  client_service      client_service[]
+  invoice_detail      invoice_detail[]
+  quote_detail        quote_detail[]
+  service_category    service_category? @relation(fields: [service_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service_usage       service_usage[]
+}
+
+model service_category {
+  id      String    @id @db.Uuid
+  name    String?   @db.VarChar
+  service service[]
+}
+
+model service_usage {
+  id         String    @id @db.Uuid
+  client_id  String?   @db.Uuid
+  service_id String?   @db.Uuid
+  start_date DateTime? @db.Timestamptz(6)
+  end_date   DateTime? @db.Timestamptz(6)
+  usage      String?   @db.VarChar
+  created    DateTime? @db.Timestamptz(6)
+  status     String?   @db.VarChar
+  client     client?   @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service    service?  @relation(fields: [service_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
