@@ -96,6 +96,22 @@ export async function fetchClientParameters() {
   }))
 }
 
+const mapClientServiceEntry = (service: any, fallbackClientId: string) => ({
+  id: service.id,
+  clientId: service.client_id ?? fallbackClientId,
+  serviceId: service.service_id ?? '',
+  name: normalizeText(service.service?.name ?? null, 'Servicio sin nombre'),
+  createdAt: toIso(service.created),
+  updatedAt: toIso(service.updated),
+  started: toIso(service.started),
+  delivery: toIso(service.delivery),
+  expiry: toIso(service.expiry),
+  frequency: service.frequency ?? null,
+  unit: service.unit ?? service.service?.unit ?? null,
+  urlApi: service.url_api ?? null,
+  tokenApi: service.token_api ?? null,
+})
+
 const mapClientRecord = (
   client: any,
   parameterNames: Map<string, string>,
@@ -118,21 +134,7 @@ const mapClientRecord = (
       value: detail.value ?? '',
     }))
 
-  const services = serviceEntries.map((service) => ({
-    id: service.id,
-    clientId: service.client_id ?? client.id,
-    serviceId: service.service_id ?? '',
-    name: normalizeText(service.service?.name ?? null, 'Servicio sin nombre'),
-    createdAt: toIso(service.created),
-    updatedAt: toIso(service.updated),
-    started: toIso(service.started),
-    delivery: toIso(service.delivery),
-    expiry: toIso(service.expiry),
-    frequency: service.frequency ?? null,
-    unit: service.unit ?? service.service?.unit ?? null,
-    urlApi: service.url_api ?? null,
-    tokenApi: service.token_api ?? null,
-  }))
+  const services = serviceEntries.map((service) => mapClientServiceEntry(service, client.id))
 
   const quotes = quoteEntries.map((quote) => ({
     id: quote.id,
@@ -276,6 +278,82 @@ export async function fetchClientById(id: string) {
     parameters,
     serviceCatalog,
   }
+}
+
+export type AssignServicePayload = {
+  serviceId: string
+  started?: string | null
+  delivery?: string | null
+  expiry?: string | null
+  frequency?: string | null
+  unit?: string | null
+  urlApi?: string | null
+  tokenApi?: string | null
+}
+
+const parseDate = (value: string | null | undefined): Date | null => {
+  if (!value) return null
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return null
+  return date
+}
+
+const sanitizeOptionalText = (value: string | null | undefined) => {
+  const trimmed = value?.trim()
+  return trimmed && trimmed.length > 0 ? trimmed : null
+}
+
+export async function assignServiceToClient(clientId: string, payload: AssignServicePayload) {
+  const [client, service] = await Promise.all([
+    prisma.client.findUnique({ where: { id: clientId } }),
+    prisma.service.findUnique({ where: { id: payload.serviceId } }),
+  ])
+
+  if (!client) {
+    throw new Error('Cliente no encontrado')
+  }
+
+  if (!service) {
+    throw new Error('Servicio no encontrado')
+  }
+
+  const now = new Date()
+  const started = parseDate(payload.started) ?? now
+  const delivery = parseDate(payload.delivery)
+  const expiry = parseDate(payload.expiry)
+  const frequency = sanitizeOptionalText(payload.frequency)
+  const unit = sanitizeOptionalText(payload.unit) ?? sanitizeOptionalText(service.unit)
+  const urlApi = sanitizeOptionalText(payload.urlApi)
+  const tokenApi = sanitizeOptionalText(payload.tokenApi)
+
+  const created = await prisma.$transaction(async (tx) => {
+    const createdService = await tx.client_service.create({
+      data: {
+        id: randomUUID(),
+        client_id: clientId,
+        service_id: service.id,
+        created: now,
+        updated: now,
+        started,
+        delivery,
+        expiry,
+        frequency,
+        unit,
+        url_api: urlApi,
+        token_api: tokenApi,
+      },
+      include: { service: true },
+    })
+
+    await tx.client.update({
+      where: { id: clientId },
+      data: { updated: now },
+    })
+
+    return createdService
+  })
+
+  return mapClientServiceEntry(created, clientId)
 }
 
 export async function createClient(payload: PersistClientPayload) {

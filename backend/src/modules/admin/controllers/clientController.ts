@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import {
+  assignServiceToClient,
   createClient,
   deleteClient,
   fetchClientById,
@@ -7,6 +8,7 @@ import {
   updateClient,
   type ClientStatus,
   type ClientType,
+  type AssignServicePayload,
 } from '../services/clientService.js'
 
 const CLIENT_STATUSES: ClientStatus[] = ['active', 'inactive', 'onboarding']
@@ -43,6 +45,32 @@ const buildPayload = (body: any) => {
   }
 
   return { data: { name, status, type, details } }
+}
+
+const buildServiceAssignmentPayload = (body: any) => {
+  const serviceId = typeof body?.serviceId === 'string' ? body.serviceId.trim() : ''
+  if (!serviceId) {
+    return { error: 'El servicio es obligatorio' }
+  }
+
+  const normalize = (value: any) => (typeof value === 'string' ? value.trim() : '')
+  const nullable = (value: any) => {
+    const normalized = normalize(value)
+    return normalized.length > 0 ? normalized : null
+  }
+
+  const payload: AssignServicePayload = {
+    serviceId,
+    started: nullable(body?.started),
+    delivery: nullable(body?.delivery),
+    expiry: nullable(body?.expiry),
+    frequency: nullable(body?.frequency),
+    unit: nullable(body?.unit),
+    urlApi: nullable(body?.urlApi),
+    tokenApi: nullable(body?.tokenApi),
+  }
+
+  return { data: payload }
 }
 
 export async function listClientsCtrl(_req: Request, res: Response) {
@@ -114,5 +142,29 @@ export async function deleteClientCtrl(req: Request, res: Response) {
   } catch (error) {
     console.error('deleteClientCtrl error', error)
     return res.status(500).json({ success: false, message: 'No fue posible eliminar el cliente' })
+  }
+}
+
+export async function assignClientServiceCtrl(req: Request, res: Response) {
+  const { id } = req.params
+  if (!id) {
+    return res.status(400).json({ success: false, message: 'Falta el identificador del cliente' })
+  }
+
+  const parsed = buildServiceAssignmentPayload(req.body)
+  if ('error' in parsed) {
+    return res.status(400).json({ success: false, message: parsed.error })
+  }
+
+  try {
+    const service = await assignServiceToClient(id, parsed.data)
+    return res.status(201).json({ success: true, data: { service } })
+  } catch (error: any) {
+    console.error('assignClientServiceCtrl error', error)
+    const message = typeof error?.message === 'string' ? error.message : 'No fue posible asignar el servicio'
+    if (message === 'Cliente no encontrado' || message === 'Servicio no encontrado') {
+      return res.status(404).json({ success: false, message })
+    }
+    return res.status(500).json({ success: false, message: 'No fue posible asignar el servicio' })
   }
 }

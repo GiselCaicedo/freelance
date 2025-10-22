@@ -29,6 +29,17 @@ export type ClientService = {
   tokenApi?: string | null;
 };
 
+export type AssignServiceInput = {
+  serviceId: string;
+  started?: string | null;
+  delivery?: string | null;
+  expiry?: string | null;
+  frequency?: string | null;
+  unit?: string | null;
+  urlApi?: string | null;
+  tokenApi?: string | null;
+};
+
 export type ClientQuoteStatus = 'aprobada' | 'pendiente' | 'rechazada';
 
 export type ClientQuote = {

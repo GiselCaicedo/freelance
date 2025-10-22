@@ -4,6 +4,8 @@ import type {
   ClientParameter,
   ClientRecord,
   ServiceCatalogEntry,
+  AssignServiceInput,
+  ClientService,
 } from '@/components/clients/types';
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -83,18 +85,18 @@ export interface Role {
   description?: string | null
   status?: boolean
   updated?: string | null
-  role_category?: RoleCategory | null
+  panel?: RoleCategory | null
 }
 
-const ROLE_CATEGORY_ALIASES: Record<RoleCategory, string[]> = {
-  admin: ['admin', 'panel_admin'],
-  client: ['client', 'cliente', 'panel_client'],
+const panel_ALIASES: Record<RoleCategory, string[]> = {
+  admin: ['ADMIN', 'panel_admin'],
+  client: ['CLIENT', 'cliente', 'panel_client'],
 }
 
 const normalizeRoleCategoryValue = (value: unknown): RoleCategory | null => {
   if (typeof value !== 'string') return null
   const normalized = value.trim().toLowerCase()
-  for (const [category, aliases] of Object.entries(ROLE_CATEGORY_ALIASES)) {
+  for (const [category, aliases] of Object.entries(panel_ALIASES)) {
     if (aliases.some((alias) => alias.toLowerCase() === normalized)) {
       return category as RoleCategory
     }
@@ -104,7 +106,7 @@ const normalizeRoleCategoryValue = (value: unknown): RoleCategory | null => {
 
 const withNormalizedRole = <T extends Role>(role: T): T => ({
   ...role,
-  role_category: normalizeRoleCategoryValue(role.role_category ?? null),
+  panel: normalizeRoleCategoryValue(role.P ?? null),
 })
 
 export interface Permission {
@@ -229,7 +231,7 @@ export async function getRoleApi(id: string): Promise<Role> {
 
 // Crear rol
 export async function createRoleApi(payload: {
-  name: string; description?: string | null; status?: boolean; role_category: RoleCategory;
+  name: string; description?: string | null; status?: boolean; panel: RoleCategory;
 }): Promise<Role> {
   const { data } = await api.post('/config/roles', payload);
   return withNormalizedRole(data as Role);
@@ -237,7 +239,7 @@ export async function createRoleApi(payload: {
 
 // Actualizar rol
 export async function updateRoleApi(id: string, payload: {
-  name?: string; description?: string | null; status?: boolean; role_category?: RoleCategory;
+  name?: string; description?: string | null; status?: boolean; panel?: RoleCategory;
 }): Promise<Role> {
   const { data } = await api.put(`/config/roles/${id}`, payload);
   return withNormalizedRole(data as Role);
@@ -420,6 +422,40 @@ export async function deleteAdminClientApi(id: string, token?: string): Promise<
     console.error('deleteAdminClientApi error:', error);
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.message ?? 'No fue posible eliminar el cliente');
+    }
+    throw error;
+  }
+}
+
+export async function assignClientServiceApi(
+  clientId: string,
+  payload: AssignServiceInput,
+  token?: string,
+): Promise<ClientService> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = {
+      serviceId: payload.serviceId,
+      started: payload.started ?? null,
+      delivery: payload.delivery ?? null,
+      expiry: payload.expiry ?? null,
+      frequency: payload.frequency ?? null,
+      unit: payload.unit ?? null,
+      urlApi: payload.urlApi ?? null,
+      tokenApi: payload.tokenApi ?? null,
+    };
+    const { data } = await api.post(`/clients/${clientId}/services`, body, config);
+    if (data?.success === true && data?.data?.service) {
+      return data.data.service as ClientService;
+    }
+    if (data?.service) {
+      return data.service as ClientService;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al asignar el servicio');
+  } catch (error: any) {
+    console.error('assignClientServiceApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible asignar el servicio');
     }
     throw error;
   }

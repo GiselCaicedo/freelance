@@ -42,14 +42,27 @@ export default function SignInPage() {
         const hasAdminPanel = normalized.includes('admin');
         const hasClientPanel = normalized.includes('cliente') || normalized.includes('client');
 
-        const target = `/${locale}`;
+        if (!hasAdminPanel && !hasClientPanel) {
+          const message = t('errors.noPanelAccess');
+          setFormError(message);
+          notify({
+            type: 'error',
+            title: t('alerts.error.title'),
+            description: message,
+          });
+          return;
+        }
+
+        const target = hasAdminPanel
+          ? `/${locale}/admin/dashboard`
+          : `/${locale}/client/dashboard`;
 
         notify({
           type: 'success',
           title: t('alerts.success.title'),
           description: t('alerts.success.description'),
         });
-        router.push(target);
+        router.replace(target);
         router.refresh();
         return;
       }

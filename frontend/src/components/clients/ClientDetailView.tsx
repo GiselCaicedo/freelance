@@ -9,15 +9,16 @@ import AssignServicePanel from './AssignServicePanel';
 import type {
   ClientParameter,
   ClientRecord,
-  ClientService,
   ServiceCatalogEntry,
   ClientStatus,
   ClientReminderStatus,
+  AssignServiceInput,
 } from './types';
 import SidePanel from '@/shared/components/common/SidePanel';
 import Breadcrumbs from '@/components/ui/Breadcrumbs';
 import { formatCurrency as formatCurrencyIntl } from '@/shared/utils/formatters';
-import { updateAdminClientApi, deleteAdminClientApi } from '@/shared/services/conexion';
+import { assignClientServiceApi, updateAdminClientApi, deleteAdminClientApi } from '@/shared/services/conexion';
+import { useAlerts } from '@/shared/components/common/AlertsProvider';
 
 type ClientDetailViewProps = {
   client: ClientRecord;
@@ -64,11 +65,13 @@ const cloneClientRecord = (client: ClientRecord): ClientRecord => ({
 
 export default function ClientDetailView({ client, parameters, serviceCatalog, locale }: ClientDetailViewProps) {
   const router = useRouter();
+  const { notify } = useAlerts();
   const [clientState, setClientState] = useState<ClientRecord>(() => cloneClientRecord(client));
   const [parametersState] = useState<ClientParameter[]>(() => parameters.map((parameter) => ({ ...parameter })));
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isAssignServiceOpen, setIsAssignServiceOpen] = useState(false);
+  const [serviceError, setServiceError] = useState<string | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -96,12 +99,33 @@ export default function ClientDetailView({ client, parameters, serviceCatalog, l
 
   // Fase 1: sin creación de nuevos parámetros desde esta vista
 
-  const handleAssignService = (service: ClientService) => {
-    setClientState((prev) => ({
-      ...prev,
-      services: [...prev.services, service],
-      updatedAt: new Date().toISOString(),
-    }));
+  const handleAssignService = async (payload: AssignServiceInput) => {
+    try {
+      const service = await assignClientServiceApi(clientState.id, payload);
+      setClientState((prev) => {
+        const nextServices = prev.services.filter((item) => item.id !== service.id);
+        return {
+          ...prev,
+          services: [...nextServices, service],
+          updatedAt: service.updatedAt ?? new Date().toISOString(),
+        };
+      });
+      setServiceError(null);
+      notify({
+        type: 'success',
+        title: 'Servicio asignado',
+        description: 'El servicio fue vinculado correctamente al cliente.',
+      });
+    } catch (error: any) {
+      const message = error instanceof Error ? error.message : 'No fue posible asignar el servicio.';
+      setServiceError(message);
+      notify({
+        type: 'error',
+        title: 'No fue posible asignar el servicio',
+        description: message,
+      });
+      throw error instanceof Error ? error : new Error(message);
+    }
   };
 
   const handleDelete = async (_authCode: string) => {
@@ -239,6 +263,12 @@ export default function ClientDetailView({ client, parameters, serviceCatalog, l
             <Zap className="h-3.5 w-3.5" /> Asignar nuevo servicio
           </button>
         </div>
+
+        {serviceError ? (
+          <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {serviceError}
+          </div>
+        ) : null}
 
         <div className="mt-4 overflow-x-auto">
           {clientState.services.length > 0 ? (
@@ -417,7 +447,6 @@ export default function ClientDetailView({ client, parameters, serviceCatalog, l
           onClose={() => setIsAssignServiceOpen(false)}
           onSubmit={handleAssignService}
           servicesCatalog={serviceCatalog}
-          clientId={clientState.id}
         />
       </SidePanel>
 

@@ -35,10 +35,13 @@ export const loginUser = async (identifier: string, password: string) => {
 
   const permissions = user.role?.role_permission.map((rp) => rp.permission.name) ?? [];
 
-  // Normaliza la categoría (evita el error "non-enum-compatible null")
   const roleCategory =
-    (user.role?.panelcategory as 'ADMIN' | 'CLIENT' | 'GENERAL' | null) ??
+    (user.role?.panel as 'ADMIN' | 'CLIENT' ) ??
     inferCategoryFromPermissions(permissions);
+
+
+
+  console.log(roleCategory)
 
   const token = jwt.sign(
     {
@@ -66,7 +69,7 @@ export const loginUser = async (identifier: string, password: string) => {
       user: user.user,
       name: user.name,
       role: user.role?.name ?? null,
-      roleCategory, // <-- también en la respuesta
+      roleCategory, 
       client_id: user.client_id,
       client_name: user.client?.name ?? null,
       permissions,

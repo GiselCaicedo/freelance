@@ -114,7 +114,8 @@
       },
       "errors": {
         "invalidCredentials": "Usuario o contraseña incorrectos.",
-        "unexpected": "Ocurrió un error inesperado. Inténtalo más tarde."
+        "unexpected": "Ocurrió un error inesperado. Inténtalo más tarde.",
+        "noPanelAccess": "Tu usuario no tiene un panel asignado. Contacta al administrador."
       },
       "hero": {
         "badge": "Plataforma administrativa",

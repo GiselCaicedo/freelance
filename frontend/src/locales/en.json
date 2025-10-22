@@ -114,7 +114,8 @@
       },
       "errors": {
         "invalidCredentials": "Incorrect username or password.",
-        "unexpected": "Something went wrong. Please try again later."
+        "unexpected": "Something went wrong. Please try again later.",
+        "noPanelAccess": "Your account does not have an assigned panel. Contact an administrator."
       },
       "hero": {
         "badge": "Admin platform",
