@@ -5,6 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { LogIn, Lock, User } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { login } from '@/shared/services/conexion';
+import { normalizeRoleCategory } from '@/shared/utils/roles';
 import { useAlerts } from '@/shared/components/common/AlertsProvider';
 
 type FormState = {
@@ -35,12 +36,25 @@ export default function SignInPage() {
       const response = await login(form);
       if (response.success) {
         const permissions: unknown = response.data?.user?.permissions;
+        const roleCategoryRaw =
+          typeof response.data?.user?.roleCategory === 'string'
+            ? response.data.user.roleCategory
+            : typeof response.data?.user?.role_category === 'string'
+            ? response.data.user.role_category
+            : typeof response.data?.user?.panel === 'string'
+            ? response.data.user.panel
+            : null;
+        const normalizedRoleCategory = normalizeRoleCategory(roleCategoryRaw) ?? '';
         const list = Array.isArray(permissions) ? permissions : [];
         const normalized = list
           .map((permission) => (typeof permission === 'string' ? permission.trim().toLowerCase() : ''))
           .filter(Boolean);
-        const hasAdminPanel = normalized.includes('admin');
-        const hasClientPanel = normalized.includes('cliente') || normalized.includes('client');
+        const hasAdminPanel =
+          normalizedRoleCategory === 'admin' || normalized.includes('admin');
+        const hasClientPanel =
+          normalizedRoleCategory === 'client' ||
+          normalized.includes('cliente') ||
+          normalized.includes('client');
 
         if (!hasAdminPanel && !hasClientPanel) {
           const message = t('errors.noPanelAccess');

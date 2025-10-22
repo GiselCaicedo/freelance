@@ -9,6 +9,7 @@ import { EnterpriseProvider } from '@/libs/acl/EnterpriseProvider';
 import PermissionProvider from '@/libs/acl/PermissionProvider';
 import { routing } from '@/libs/I18nRouting';
 import { verifyToken } from '@/libs/Auth';
+import { normalizeRoleCategory } from '@/shared/utils/roles';
 import '@/styles/global.css';
 
 export const metadata: Metadata = {
@@ -39,13 +40,43 @@ export default async function RootLayout(props: {
 
   const messages = await getMessages({ locale });
 
-  const payload = token ? await verifyToken<{
-    permissions?: string[];
-    empresaid?: string;
-    empresa?: string;
-  }>(token) : null;
+  const payload = token
+    ? await verifyToken<{
+        permissions?: unknown;
+        roleCategory?: unknown;
+        role_category?: unknown;
+        panel?: unknown;
+        empresaid?: string;
+        empresa?: string;
+      }>(token)
+    : null;
 
-  const permissions = payload?.permissions ?? [];
+  const permissionsRaw = Array.isArray(payload?.permissions) ? payload?.permissions : [];
+  const permissionsList = permissionsRaw.filter((permission): permission is string => typeof permission === 'string');
+
+  const roleCategoryRaw =
+    typeof payload?.roleCategory === 'string'
+      ? payload.roleCategory
+      : typeof payload?.role_category === 'string'
+      ? payload.role_category
+      : typeof payload?.panel === 'string'
+      ? payload.panel
+      : null;
+
+  const normalizedRoleCategory = normalizeRoleCategory(roleCategoryRaw);
+
+  const augmentedPermissions = new Set(permissionsList.map((permission) => permission.trim().toLowerCase()));
+
+  if (normalizedRoleCategory === 'admin') {
+    augmentedPermissions.add('admin');
+  }
+
+  if (normalizedRoleCategory === 'client') {
+    augmentedPermissions.add('client');
+    augmentedPermissions.add('cliente');
+  }
+
+  const permissions = Array.from(augmentedPermissions);
   const empresaId = payload?.empresaid ?? null;
   const empresaName = payload?.empresa ?? null;
 

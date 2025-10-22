@@ -84,7 +84,8 @@ export async function getAdminDashboardSummary({
   from?: string;
   to?: string;
 }): Promise<AdminDashboardSummary> {
-  const token = cookies().get('auth_token')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value;
 
   if (!token) {
     throw new Error('No auth token found');

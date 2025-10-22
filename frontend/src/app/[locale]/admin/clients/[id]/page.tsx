@@ -5,7 +5,8 @@ import { getAdminClientDetailApi } from '@/shared/services/conexion';
 
 export default async function ClientDetailPage(props: { params: Promise<{ locale: string; id: string }> }) {
   const { locale, id } = await props.params;
-  const token = cookies().get('auth_token')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value;
 
   if (!token) {
     notFound();

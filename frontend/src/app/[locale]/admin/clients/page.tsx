@@ -6,7 +6,8 @@ import type { ClientParameter, ClientRecord } from '@/components/clients/types';
 export default async function ClientsPage(props: { params: Promise<{ locale: string }> }) {
   const { locale } = await props.params;
   void locale;
-  const token = cookies().get('auth_token')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value;
 
   let clients: ClientRecord[] = [];
   let parameters: ClientParameter[] = [];

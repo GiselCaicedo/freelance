@@ -11,7 +11,8 @@ export default async function LocalePanelRedirect({
   params: { locale: string };
 }) {
   const locale = params.locale ?? 'es';
-  const token = cookies().get('auth_token')?.value ?? '';
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value ?? '';
 
   if (!token) {
     redirect(`/${locale}/sign-in`);

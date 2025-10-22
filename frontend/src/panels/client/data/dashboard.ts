@@ -22,7 +22,8 @@ type ClientSummaryResponse =
   | { success: false; message?: string };
 
 export async function getClientDashboardSummary(locale: string): Promise<ClientDashboardSummary> {
-  const token = cookies().get('auth_token')?.value;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('auth_token')?.value;
   if (!token) {
     throw new Error('Missing auth token');
   }
