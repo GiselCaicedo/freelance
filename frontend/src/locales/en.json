@@ -785,5 +785,14 @@
     "meta_description": "Manage clients, related services and custom fields in one place.",
     "detail_meta_suffix": "Clients",
     "detail_meta_description": "Full client profile with services, billing history and reminders."
+  },
+  "Pagos": {
+    "meta_title": "Payments",
+    "meta_description": "Keep track of incoming payments and their supporting documents.",
+    "list": {
+      "title": "Payments management",
+      "empty": "No payments have been recorded yet.",
+      "error": "We couldn't load the payments list."
+    }
   }
 }

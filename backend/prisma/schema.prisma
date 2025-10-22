@@ -122,11 +122,17 @@ model payment {
   status            Boolean?
   client            client?         @relation(fields: [client_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   payment_method    payment_method? @relation(fields: [payment_method_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  attachments       payment_attachment[]
 }
 
 model payment_attachment {
   id         String   @id @db.Uuid
+  payment_id String?  @db.Uuid
   invoice_id String?  @db.Uuid
+  url        String?  @db.VarChar
+  created    DateTime? @db.Timestamptz(6)
+  updated    DateTime? @db.Timestamptz(6)
+  payment    payment? @relation(fields: [payment_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   invoice    invoice? @relation(fields: [invoice_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
