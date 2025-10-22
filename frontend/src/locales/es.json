@@ -9,7 +9,8 @@
       "collapse": "Contraer menú",
       "expand": "Expandir menú",
       "redirecting": "Redirigiendo…",
-      "clients": "Clientes"
+      "clients": "Clientes",
+      "invoices": "Facturas"
     },
     "enterprise": {
       "switcherLabel": "Seleccionar empresa",

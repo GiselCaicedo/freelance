@@ -81,6 +81,7 @@ export default function ModuleLayout({ variant, children }: ModuleLayoutProps) {
       { slug: 'dashboard', label: t('nav.dashboard'), icon: Home, permission: null },
       // Mostrar Clientes en el panel admin sin requerir permiso específico distinto a 'admin'
       { slug: 'clients', label: t('nav.clients'), icon: Users, permission: 'admin' },
+      { slug: 'invoices', label: t('nav.invoices'), icon: FileText, permission: 'admin' },
       // { slug: 'services', label: t('nav.services'), icon: Zap, permission: 'service' },
       // { slug: 'payments', label: t('nav.payments'), icon: CreditCard, permission: 'pay' },
       // { slug: 'quotes', label: t('nav.quotes'), icon: FileText, permission: 'invoice' },

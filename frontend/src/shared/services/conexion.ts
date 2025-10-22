@@ -7,6 +7,12 @@ import type {
   AssignServiceInput,
   ClientService,
 } from '@/components/clients/types';
+import type {
+  AdminInvoiceCatalog,
+  AdminInvoiceListItem,
+  AdminInvoiceRecord,
+  PersistAdminInvoiceInput,
+} from '@/panels/admin/data/invoices';
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 const TOKEN_STORAGE_KEY = 'auth_token';
@@ -457,6 +463,216 @@ export async function assignClientServiceApi(
     console.error('assignClientServiceApi error:', error);
     if (axios.isAxiosError(error)) {
       throw new Error(error.response?.data?.message ?? 'No fue posible asignar el servicio');
+    }
+    throw error;
+  }
+}
+
+export async function getAdminInvoicesApi(
+  token?: string,
+): Promise<{ invoices: AdminInvoiceListItem[] }> {
+  try {
+    const config = buildAuthConfig(token);
+    const { data } = await api.get('/invoices', config);
+    if (data?.success === true && Array.isArray(data?.data?.invoices)) {
+      return { invoices: data.data.invoices as AdminInvoiceListItem[] };
+    }
+    if (Array.isArray(data?.invoices)) {
+      return { invoices: data.invoices as AdminInvoiceListItem[] };
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al obtener facturas');
+  } catch (error: any) {
+    console.error('getAdminInvoicesApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'Error al obtener facturas');
+    }
+    throw error;
+  }
+}
+
+export async function getAdminInvoiceByIdApi(
+  id: string,
+  token?: string,
+): Promise<AdminInvoiceRecord | null> {
+  try {
+    const config = buildAuthConfig(token);
+    const { data } = await api.get(`/invoices/${id}`, config);
+    if (data?.success === true && data?.data?.invoice) {
+      return data.data.invoice as AdminInvoiceRecord;
+    }
+    if (data?.invoice) {
+      return data.invoice as AdminInvoiceRecord;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al obtener la factura');
+  } catch (error: any) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return null;
+    }
+    console.error('getAdminInvoiceByIdApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'Error al obtener la factura');
+    }
+    throw error;
+  }
+}
+
+export async function getAdminInvoiceCatalogApi(
+  token?: string,
+): Promise<AdminInvoiceCatalog> {
+  try {
+    const config = buildAuthConfig(token);
+    const { data } = await api.get('/invoices/catalog', config);
+    if (data?.success === true && data?.data) {
+      return data.data as AdminInvoiceCatalog;
+    }
+    if (Array.isArray(data?.clients) && Array.isArray(data?.services)) {
+      return data as AdminInvoiceCatalog;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al obtener el catálogo de facturas');
+  } catch (error: any) {
+    console.error('getAdminInvoiceCatalogApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible obtener el catálogo de facturas');
+    }
+    throw error;
+  }
+}
+
+const normalizeInvoiceDetailsPayload = (payload: PersistAdminInvoiceInput['details']) =>
+  (Array.isArray(payload) ? payload : []).map((detail, index) => ({
+    serviceId: detail.serviceId,
+    quantity: detail.quantity,
+    total: detail.total,
+    item: detail.item ?? index + 1,
+  }));
+
+export async function createAdminInvoiceApi(
+  payload: PersistAdminInvoiceInput,
+  token?: string,
+): Promise<AdminInvoiceRecord> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = {
+      clientId: payload.clientId,
+      number: payload.number,
+      amount: payload.amount,
+      status: payload.status,
+      issuedAt: payload.issuedAt ?? null,
+      dueAt: payload.dueAt ?? null,
+      url: payload.url ?? null,
+      details: normalizeInvoiceDetailsPayload(payload.details),
+    };
+    const { data } = await api.post('/invoices', body, config);
+    if (data?.success === true && data?.data?.invoice) {
+      return data.data.invoice as AdminInvoiceRecord;
+    }
+    if (data?.invoice) {
+      return data.invoice as AdminInvoiceRecord;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al crear la factura');
+  } catch (error: any) {
+    console.error('createAdminInvoiceApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible crear la factura');
+    }
+    throw error;
+  }
+}
+
+export async function updateAdminInvoiceApi(
+  id: string,
+  payload: PersistAdminInvoiceInput,
+  token?: string,
+): Promise<AdminInvoiceRecord> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = {
+      clientId: payload.clientId,
+      number: payload.number,
+      amount: payload.amount,
+      status: payload.status,
+      issuedAt: payload.issuedAt ?? null,
+      dueAt: payload.dueAt ?? null,
+      url: payload.url ?? null,
+      details: normalizeInvoiceDetailsPayload(payload.details),
+    };
+    const { data } = await api.put(`/invoices/${id}`, body, config);
+    if (data?.success === true && data?.data?.invoice) {
+      return data.data.invoice as AdminInvoiceRecord;
+    }
+    if (data?.invoice) {
+      return data.invoice as AdminInvoiceRecord;
+    }
+    throw new Error(data?.message ?? 'Respuesta inesperada al actualizar la factura');
+  } catch (error: any) {
+    console.error('updateAdminInvoiceApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible actualizar la factura');
+    }
+    throw error;
+  }
+}
+
+export async function deleteAdminInvoiceApi(id: string, token?: string): Promise<void> {
+  try {
+    const config = buildAuthConfig(token);
+    await api.delete(`/invoices/${id}`, config);
+  } catch (error: any) {
+    console.error('deleteAdminInvoiceApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible eliminar la factura');
+    }
+    throw error;
+  }
+}
+
+export async function sendAdminInvoiceEmailApi(
+  id: string,
+  recipient: string,
+  token?: string,
+): Promise<string> {
+  try {
+    const config = buildAuthConfig(token);
+    const body = { recipient };
+    const { data } = await api.post(`/invoices/${id}/send-email`, body, config);
+    if (data?.success === true && typeof data?.data?.message === 'string') {
+      return data.data.message as string;
+    }
+    if (typeof data?.message === 'string') {
+      return data.message as string;
+    }
+    if (typeof data?.data === 'string') {
+      return data.data as string;
+    }
+    return 'Correo enviado';
+  } catch (error: any) {
+    console.error('sendAdminInvoiceEmailApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible enviar la factura');
+    }
+    throw error;
+  }
+}
+
+export type AdminInvoiceDownloadFormat = 'pdf' | 'xml' | 'zip';
+
+export async function downloadAdminInvoiceArtifactApi(
+  id: string,
+  format: AdminInvoiceDownloadFormat,
+  token?: string,
+): Promise<Blob> {
+  try {
+    const authConfig = buildAuthConfig(token);
+    const config = {
+      ...(authConfig ?? {}),
+      responseType: 'blob' as const,
+    };
+    const { data } = await api.get(`/invoices/${id}/download/${format}`, config);
+    return data as Blob;
+  } catch (error: any) {
+    console.error('downloadAdminInvoiceArtifactApi error:', error);
+    if (axios.isAxiosError(error)) {
+      throw new Error(error.response?.data?.message ?? 'No fue posible descargar la factura');
     }
     throw error;
   }
