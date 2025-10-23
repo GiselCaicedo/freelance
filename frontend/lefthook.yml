@@ -1,0 +1,21 @@
+# Validate commit messages
+commit-msg:
+  commands:
+    commitlint:
+      run: npx --no -- commitlint --edit {1}
+
+# Validate content before committing
+pre-commit:
+  parallel: false
+  commands:
+    typecheck:
+      run: npm run check:types
+      priority: 1
+    lint:
+      glob: '*.{js,jsx,ts,tsx}'
+      run: npx --no -- eslint --max-warnings=0 {staged_files}
+      priority: 2
+    exports:
+      glob: '*.{ts,tsx}'
+      run: npx --no -- eslint --max-warnings=0 --rule "perfectionist/sort-exports: error" {staged_files}
+      priority: 3
