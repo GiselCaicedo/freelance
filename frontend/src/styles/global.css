@@ -1,0 +1,167 @@
+@layer theme, base, clerk, components, utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-heading:
+    'Montserrat', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+  --color-primary-50: #e8f6f0;
+  --color-primary-100: #c5ead9;
+  --color-primary-200: #9cddc1;
+  --color-primary-300: #72d0a9;
+  --color-primary-400: #48c391;
+  --color-primary-500: #17a76c;
+  --color-primary-600: #12885a;
+  --color-primary-700: #0c6a47;
+  --color-primary-800: #084c34;
+  --color-primary-900: #052f22;
+
+  --color-secondary-50: #eef0ff;
+  --color-secondary-100: #dbdeff;
+  --color-secondary-200: #b7beff;
+  --color-secondary-300: #929dff;
+  --color-secondary-400: #6e7dff;
+  --color-secondary-500: #1a20cc;
+  --color-secondary-600: #151aa3;
+  --color-secondary-700: #10137b;
+  --color-secondary-800: #090c52;
+  --color-secondary-900: #050629;
+
+  --color-gray-50: #f7f9fc;
+  --color-gray-100: #edf2f7;
+  --color-gray-200: #e0e7f1;
+  --color-gray-300: #cdd5e1;
+  --color-gray-400: #a3aec2;
+  --color-gray-500: #6e768a;
+  --color-gray-600: #4c5567;
+  --color-gray-700: #2f3644;
+  --color-gray-800: #1e232f;
+  --color-gray-900: #111722;
+
+  --color-emerald-50: #e8f6f0;
+  --color-emerald-100: #c5ead9;
+  --color-emerald-200: #9cddc1;
+  --color-emerald-300: #72d0a9;
+  --color-emerald-400: #48c391;
+  --color-emerald-500: #17a76c;
+  --color-emerald-600: #12885a;
+  --color-emerald-700: #0c6a47;
+  --color-emerald-800: #084c34;
+  --color-emerald-900: #052f22;
+
+  --color-green-50: #ecfdf3;
+  --color-green-100: #d1fadf;
+  --color-green-200: #a6f4c5;
+  --color-green-300: #72e9a6;
+  --color-green-400: #42dd87;
+  --color-green-500: #22c55e;
+  --color-green-600: #16a34a;
+  --color-green-700: #15803d;
+  --color-green-800: #166534;
+  --color-green-900: #14532d;
+
+  --color-amber-50: #fffbeb;
+  --color-amber-100: #fef3c7;
+  --color-amber-200: #fde68a;
+  --color-amber-300: #fbdd4f;
+  --color-amber-400: #fbd335;
+  --color-amber-500: #facc15;
+  --color-amber-600: #c49a0a;
+  --color-amber-700: #a47e07;
+  --color-amber-800: #866205;
+  --color-amber-900: #644803;
+
+  --color-red-50: #ffecec;
+  --color-red-100: #ffd5d5;
+  --color-red-200: #ffb3b3;
+  --color-red-300: #ff8a8a;
+  --color-red-400: #ff6464;
+  --color-red-500: #f75555;
+  --color-red-600: #dc3b3b;
+  --color-red-700: #b62e2e;
+  --color-red-800: #8f2222;
+  --color-red-900: #6a1717;
+
+  --color-blue-50: #eef4ff;
+  --color-blue-100: #d9e4ff;
+  --color-blue-200: #b4caff;
+  --color-blue-300: #8daeff;
+  --color-blue-400: #6792ff;
+  --color-blue-500: #0d62ff;
+  --color-blue-600: #0a4fd6;
+  --color-blue-700: #083cac;
+  --color-blue-800: #052a82;
+  --color-blue-900: #031a59;
+
+  --color-purple-50: #f1e9ff;
+  --color-purple-100: #e1d1ff;
+  --color-purple-200: #c3a8ff;
+  --color-purple-300: #a57fff;
+  --color-purple-400: #8757ff;
+  --color-purple-500: #8c52ff;
+  --color-purple-600: #6f3dcc;
+  --color-purple-700: #522c99;
+  --color-purple-800: #361c66;
+  --color-purple-900: #1c0d33;
+
+  --color-orange-50: #fff4ec;
+  --color-orange-100: #ffe1d0;
+  --color-orange-200: #ffc2a1;
+  --color-orange-300: #ffa173;
+  --color-orange-400: #ff834d;
+  --color-orange-500: #ff6a3d;
+  --color-orange-600: #e4572d;
+  --color-orange-700: #bd4423;
+  --color-orange-800: #96341b;
+  --color-orange-900: #6f2412;
+
+  --color-white: #ffffff;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+  }
+}
+
+/* Tema base para todas las tablas */
+.ag-theme-cifra {
+  --ag-font-size: 13px;
+  --ag-font-family:
+    'Inter', 'Montserrat', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial,
+    'Noto Sans';
+  --ag-header-background-color: #f9fafb;
+  --ag-header-foreground-color: #0f172a;
+  --ag-border-color: #e5e7eb;
+  --ag-row-hover-color: #f3f4f6;
+  --ag-odd-row-background-color: #ffffff;
+  --ag-even-row-background-color: #fafafa;
+  --ag-selected-row-background-color: #e0f2fe;
+}
+.ag-theme-cifra .ag-root-wrapper {
+  border: none;
+}
+.ag-theme-cifra .ag-header {
+  border-bottom: 1px solid #e5e7eb;
+}
+.ag-theme-cifra .ag-cell {
+  display: flex;
+  align-items: center;
+  padding: 4px 8px;
+}
+.ag-theme-cifra .ag-paging-panel {
+  justify-content: center;
+  gap: 16px;
+  padding: 8px 12px;
+}
+.ag-theme-cifra .ag-paging-page-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.ag-theme-cifra .ag-paging-page-size > span:first-child {
+  display: none;
+}
