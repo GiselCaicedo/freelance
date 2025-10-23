@@ -1,0 +1,1032 @@
+{
+  "Layout": {
+    "nav": {
+      "dashboard": "Home",
+      "services": "Services",
+      "payments": "Payments",
+      "quotes": "Quotes",
+      "settings": "Settings",
+      "collapse": "Collapse menu",
+      "expand": "Expand menu",
+      "redirecting": "Redirecting…",
+      "clients": "Clients",
+      "invoices": "Invoices"
+    },
+    "enterprise": {
+      "switcherLabel": "Select organisation",
+      "placeholder": "Organisation"
+    }
+  },
+  "Client": {
+    "Layout": {
+      "badge": "Client panel",
+      "title": "Cifra Pay",
+      "adminCta": "Go to the admin panel",
+      "redirecting": "Redirecting to your available panel…"
+    },
+    "Dashboard": {
+      "hero": {
+        "badge": "Welcome",
+        "heading": "Client overview",
+        "description": "This view highlights the key information for your account. Keep track of active services, review supporting documents and monitor payments without switching to the admin panel."
+      },
+      "status": {
+        "heading": "Connection with the service",
+        "description": "This summary confirms the client dashboard works independently from the admin panel.",
+        "messageLabel": "Latest update",
+        "timestamp": "Updated on {value}",
+        "noticesHeading": "Helpful notices",
+        "empty": "There are no notices to show right now.",
+        "error": "We couldn't fetch the client dashboard summary."
+      }
+    }
+  },
+  "Dashboard": {
+    "meta_title": "Dashboard",
+    "meta_description": "Activity overview",
+    "heading": "Welcome back!",
+    "subheading": "Check the status of your operations and jump into the most important sections of the platform.",
+    "metrics": {
+      "totalBilling": "Total billing",
+      "totalBilled": "Total collected",
+      "pendingCollection": "Pending collection",
+      "pendingHint": "Amounts still pending within the selected period.",
+      "period": "Period: {from} – {to}"
+    },
+    "filters": {
+      "title": "Filter period",
+      "hint": "Choose a date range up to 12 months long.",
+      "from": "From",
+      "to": "To",
+      "apply": "Apply",
+      "applying": "Applying…",
+      "reset": "Reset",
+      "error": {
+        "required": "Select both dates.",
+        "range": "The start date must be before or equal to the end date."
+      }
+    },
+    "billing": {
+      "title": "Monthly billing comparison",
+      "description": "Compare billed versus pending amounts month over month.",
+      "billed": "Billed",
+      "pending": "Pending",
+      "empty": "No billing data is available for this period."
+    },
+    "topServices": {
+      "title": "Top selling services",
+      "description": "Services with the highest number of sales in the selected period.",
+      "empty": "No services were sold in this period.",
+      "fallback": "Service #{position}",
+      "soldLabel": "Times sold"
+    },
+    "expirations": {
+      "title": "Upcoming invoices",
+      "description": "Monitor invoices approaching their due date.",
+      "empty": "No invoices are due within the selected range.",
+      "dueToday": "Due today",
+      "dueTomorrow": "Due tomorrow",
+      "dueIn": "Due in {count, plural, one {# day} other {# days}}",
+      "clientFallback": "Unassigned client",
+      "invoiceFallback": "Invoice without reference"
+    },
+    "clientStatus": {
+      "title": "Client status",
+      "description": "Distribution of active, inactive and clients without a defined status.",
+      "active": "Active",
+      "inactive": "Inactive",
+      "unknown": "Unknown",
+      "total": "{count, plural, one {# client in total} other {# clients in total}}"
+    },
+    "errors": {
+      "load": "We couldn't load the dashboard information."
+    }
+  },
+  "Auth": {
+    "SignIn": {
+      "alerts": {
+        "success": {
+          "title": "Signed in successfully",
+          "description": "Welcome, loading your dashboard."
+        },
+        "error": {
+          "title": "We couldn't sign you in"
+        }
+      },
+      "errors": {
+        "invalidCredentials": "Incorrect username or password.",
+        "unexpected": "Something went wrong. Please try again later.",
+        "noPanelAccess": "Your account does not have an assigned panel. Contact an administrator."
+      },
+      "hero": {
+        "badge": "Admin platform",
+        "heading": "Manage your payments from a single place",
+        "description": "...",
+        "tipTitle": "Did you know?",
+        "tipDescription": "You can enable or disable team access at any time from the security panel."
+      },
+      "form": {
+        "heading": "Welcome back",
+        "subheading": "Enter your credentials to continue.",
+        "usernameLabel": "Username",
+        "usernamePlaceholder": "your.username",
+        "passwordLabel": "Password",
+        "passwordPlaceholder": "••••••••",
+        "submit": "Sign in",
+        "submitLoading": "Signing in…",
+        "footerNotice": "Forgot your password? Contact your company administrator to reset it."
+      }
+    },
+    "Logout": {
+      "successTitle": "Signed out",
+      "successDescription": "See you soon.",
+      "errorTitle": "Sign-out failed",
+      "errorDescription": "Please try again in a moment.",
+      "loading": "Signing out…",
+      "buttonLabel": "Sign out"
+    }
+  },
+  "Roles": {
+    "Form": {
+      "nameLabel": "Role name",
+      "namePlaceholder": "e.g. Administrator",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Short description (optional)",
+      "panel": {
+        "label": "Assigned panel",
+        "placeholder": "Select a panel",
+        "options": {
+          "admin": "Admin panel",
+          "client": "Client panel"
+        }
+      },
+      "status": {
+        "active": "Role enabled",
+        "inactive": "Role disabled"
+      },
+      "alerts": {
+        "saveError": {
+          "title": "Could not save the role",
+          "description": "Please try again."
+        }
+      },
+      "actions": {
+        "create": "Create role",
+        "update": "Save changes",
+        "saving": "Saving…",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "Users": {
+    "EditForm": {
+      "errors": {
+        "load": "We couldn't load the user information.",
+        "unexpected": "Something went wrong."
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Error loading user"
+        },
+        "updateError": {
+          "title": "User update failed",
+          "description": "Please try again."
+        },
+        "success": {
+          "title": "User updated",
+          "description": "Changes saved successfully."
+        }
+      },
+      "states": {
+        "loading": "Loading…"
+      },
+      "status": {
+        "active": "User active",
+        "inactive": "User inactive"
+      },
+      "fields": {
+        "username": {
+          "label": "Username"
+        },
+        "name": {
+          "label": "Name",
+          "placeholder": "Full name"
+        },
+        "role": {
+          "label": "Role",
+          "placeholder": "Select a role…"
+        },
+        "password": {
+          "label": "New password (optional)",
+          "placeholder": "Leave blank to keep it"
+        }
+      },
+      "actions": {
+        "save": "Save changes",
+        "saving": "Saving…",
+        "cancel": "Cancel"
+      }
+    },
+    "CreateForm": {
+      "errors": {
+        "loadLists": "We couldn't load the required lists.",
+        "unexpected": "Something went wrong."
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Error loading data"
+        },
+        "invalid": {
+          "title": "Incomplete form",
+          "description": "Complete all required fields. The password must be at least 8 characters long."
+        },
+        "success": {
+          "title": "User created",
+          "description": "The user was created successfully."
+        },
+        "createError": {
+          "title": "We couldn't create the user"
+        }
+      },
+      "states": {
+        "loadingLists": "Loading lists…"
+      },
+      "fields": {
+        "username": {
+          "label": "Username",
+          "placeholder": "Username"
+        },
+        "name": {
+          "label": "Full name",
+          "placeholder": "e.g. Jane Doe"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "••••••••",
+          "help": "At least 8 characters."
+        },
+        "role": {
+          "label": "Role",
+          "searchPlaceholder": "Search role…",
+          "empty": "No roles found"
+        },
+        "client": {
+          "label": "Client",
+          "searchPlaceholder": "Search client…",
+          "empty": "No clients found"
+        }
+      },
+      "actions": {
+        "create": "Create user",
+        "creating": "Creating…",
+        "cancel": "Cancel"
+      }
+    }
+  },
+  "Settings": {
+    "Roles": {
+      "breadcrumbs": {
+        "section": "Security & access",
+        "current": "Roles"
+      },
+      "pageTitle": "Roles",
+      "pageDescription": "Manage system roles and permissions",
+      "actions": {
+        "newRole": "New role"
+      },
+      "table": {
+        "columns": {
+          "role": "Role",
+          "description": "Notes",
+          "panel": "Panel",
+          "status": "Status",
+          "updatedAt": "Last update",
+          "actions": "Actions"
+        },
+        "searchPlaceholder": "Search by role or description…"
+      },
+      "panelBadges": {
+        "admin": "Administration",
+        "client": "Clients"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "states": {
+        "loading": "Loading roles…"
+      },
+      "panels": {
+        "createTitle": "Create role",
+        "editTitle": "Edit role"
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Unable to load roles",
+          "description": "Please try again."
+        },
+        "deleteSuccess": {
+          "title": "Role deleted",
+          "description": "{{role}} was deleted successfully."
+        },
+        "deleteError": {
+          "title": "Unable to delete role",
+          "description": "Something went wrong."
+        }
+      },
+      "confirm": {
+        "deleteTitle": "Delete role {{role}}",
+        "deleteDescription": "This action cannot be undone."
+      }
+    },
+    "Users": {
+      "breadcrumbs": {
+        "section": "Security & access",
+        "current": "Users"
+      },
+      "pageTitle": "Users",
+      "pageDescription": "Manage system users",
+      "actions": {
+        "newUser": "New user"
+      },
+      "table": {
+        "columns": {
+          "username": "Username",
+          "name": "Name",
+          "role": "Role",
+          "status": "Status",
+          "updatedAt": "Last update",
+          "actions": "Actions"
+        },
+        "searchPlaceholder": "Search by username, name or role…"
+      },
+      "status": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "states": {
+        "loading": "Loading users…"
+      },
+      "panels": {
+        "createTitle": "Create user",
+        "editTitle": "Edit user"
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Unable to load users",
+          "description": "Please try again."
+        },
+        "deleteSuccess": {
+          "title": "User deleted",
+          "description": "{{user}} was deleted successfully."
+        },
+        "deleteError": {
+          "title": "Unable to delete user",
+          "description": "Something went wrong."
+        }
+      },
+      "confirm": {
+        "deleteTitle": "Delete user {{user}}",
+        "deleteDescription": "This action cannot be undone."
+      }
+    },
+    "General": {
+      "pageTitle": "General settings",
+      "pageDescription": "Manage default preferences for your company.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "General"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load settings",
+        "loadError": "We couldn't retrieve the current configuration.",
+        "invalidTitle": "Review the information",
+        "invalidDescription": "Complete the required fields before saving.",
+        "successTitle": "Settings saved",
+        "successDescription": "Changes were applied successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while saving the configuration."
+      },
+      "actions": {
+        "save": "Save changes",
+        "saving": "Saving…"
+      },
+      "states": {
+        "loading": "Loading configuration…"
+      },
+      "fields": {
+        "timezone": {
+          "label": "Time zone",
+          "placeholder": "America/Bogota"
+        },
+        "locale": {
+          "label": "Locale",
+          "placeholder": "en-US"
+        },
+        "currency": {
+          "label": "Default currency",
+          "placeholder": "USD"
+        },
+        "primaryColor": {
+          "label": "Primary color"
+        },
+        "dateFormat": {
+          "label": "Date format"
+        },
+        "timeFormat": {
+          "label": "Time format"
+        },
+        "logoUrl": {
+          "label": "Logo URL",
+          "placeholder": "https://…"
+        },
+        "firstDay": {
+          "label": "First day of week"
+        },
+        "decimals": {
+          "label": "Number decimals"
+        },
+        "active": {
+          "label": "Active configuration"
+        },
+        "status": {
+          "label": "Record enabled"
+        }
+      }
+    },
+    "Company": {
+      "pageTitle": "Company data",
+      "pageDescription": "Update the main details of your organization.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "Company data"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to fetch company",
+        "loadErrorDescription": "We couldn't retrieve the information.",
+        "noCompanyTitle": "No company selected",
+        "noCompanyDescription": "Select a company to edit its details.",
+        "invalidTitle": "Review the information",
+        "invalidDescription": "Provide a valid company name.",
+        "successTitle": "Company updated",
+        "successDescription": "Changes were saved successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while updating the company."
+      },
+      "states": {
+        "noCompany": "Select a company to continue.",
+        "loading": "Loading company data…",
+        "updatedAt": "Last updated: {value}"
+      },
+      "fields": {
+        "name": {
+          "label": "Business name",
+          "placeholder": "Company name"
+        },
+        "status": {
+          "label": "Status",
+          "help": "Control whether the company is active.",
+          "active": "Active",
+          "inactive": "Inactive"
+        }
+      },
+      "actions": {
+        "save": "Save changes",
+        "saving": "Saving…"
+      }
+    },
+    "Alerts": {
+      "pageTitle": "Alerts & reminders",
+      "pageDescription": "Automate notifications for your team.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "Alerts & reminders"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load alerts",
+        "loadErrorDescription": "Try again in a few minutes.",
+        "noCompanyTitle": "No company selected",
+        "noCompanyDescription": "Select a company to manage alerts.",
+        "invalidTitle": "Review the information",
+        "invalidDescription": "Complete all required fields.",
+        "channelWarning": "Select at least one delivery channel.",
+        "successTitle": "Alert saved",
+        "successDescription": "Changes were stored successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while saving the alert.",
+        "deleteSuccessTitle": "Alert deleted",
+        "deleteSuccessDescription": "The alert was removed successfully.",
+        "deleteErrorTitle": "Unable to delete",
+        "deleteErrorDescription": "Something went wrong while deleting the alert."
+      },
+      "table": {
+        "title": "Configured alerts",
+        "new": "New alert",
+        "columns": {
+          "name": "Name",
+          "type": "Type",
+          "channels": "Channels",
+          "remind": "Reminders",
+          "status": "Status",
+          "actions": "Actions"
+        },
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "remind": {
+          "none": "No reminders"
+        },
+        "actions": {
+          "edit": "Edit",
+          "delete": "Delete"
+        },
+        "empty": "No alerts configured yet.",
+        "loading": "Loading alerts…"
+      },
+      "form": {
+        "fields": {
+          "name": {
+            "label": "Alert name",
+            "placeholder": "e.g. Invoice due"
+          },
+          "type": {
+            "label": "Type",
+            "placeholder": "invoice_due"
+          },
+          "channels": {
+            "label": "Channels"
+          },
+          "remind": {
+            "label": "Remind before (minutes)",
+            "placeholder": "60, 30, 10",
+            "help": "Separate values with commas."
+          },
+          "conditions": {
+            "label": "Conditions (JSON)",
+            "placeholder": "{\"threshold\":1000}"
+          },
+          "active": {
+            "label": "Active alert"
+          }
+        },
+        "actions": {
+          "reset": "Clear",
+          "create": "Create alert",
+          "update": "Update alert",
+          "saving": "Saving…"
+        }
+      },
+      "states": {
+        "loading": "Loading alerts…"
+      },
+      "confirm": {
+        "delete": "Delete alert {name}?"
+      }
+    },
+    "Smtp": {
+      "pageTitle": "SMTP mail",
+      "pageDescription": "Configure the outbound mail server for notifications.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "SMTP mail"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load SMTP",
+        "loadErrorDescription": "Review the configuration and try again.",
+        "invalidTitle": "Review the information",
+        "invalidDescription": "Complete the required fields to continue.",
+        "successTitle": "SMTP updated",
+        "successDescription": "Changes were saved successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while updating the SMTP settings."
+      },
+      "actions": {
+        "save": "Save configuration",
+        "saving": "Saving…"
+      },
+      "states": {
+        "loading": "Loading SMTP configuration…"
+      },
+      "fields": {
+        "host": {
+          "label": "Server",
+          "placeholder": "smtp.mailprovider.com"
+        },
+        "port": {
+          "label": "Port"
+        },
+        "username": {
+          "label": "Username",
+          "placeholder": "user@company.com"
+        },
+        "password": {
+          "label": "Password / token",
+          "placeholder": "••••••••",
+          "help": "Leave blank to keep the current value."
+        },
+        "fromName": {
+          "label": "Sender name",
+          "placeholder": "Billing team"
+        },
+        "fromEmail": {
+          "label": "Sender email"
+        },
+        "replyTo": {
+          "label": "Reply to"
+        },
+        "rateLimit": {
+          "label": "Rate limit per minute",
+          "help": "Optional. Controls how many emails per minute are sent."
+        },
+        "secure": {
+          "label": "Require secure connection (SSL/TLS)"
+        },
+        "active": {
+          "label": "Active configuration"
+        },
+        "status": {
+          "label": "Record enabled"
+        }
+      }
+    },
+    "Profile": {
+      "pageTitle": "User preferences",
+      "pageDescription": "Adjust personal settings and notifications for the team.",
+      "breadcrumbs": {
+        "section": "Settings",
+        "current": "User profile"
+      },
+      "alerts": {
+        "loadUsersTitle": "Unable to load users",
+        "loadUsersDescription": "Check the selected company.",
+        "loadSettingsTitle": "Unable to load preferences",
+        "loadSettingsDescription": "Something went wrong while fetching data.",
+        "invalidTitle": "Select a user",
+        "invalidDescription": "Choose a user before saving.",
+        "successTitle": "Preferences saved",
+        "successDescription": "Changes were stored successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Please review the information and try again."
+      },
+      "states": {
+        "loading": "Loading preferences…"
+      },
+      "fields": {
+        "user": {
+          "label": "User",
+          "loading": "Loading users…",
+          "placeholder": "Select a user"
+        },
+        "locale": {
+          "label": "Locale"
+        },
+        "timezone": {
+          "label": "Time zone"
+        },
+        "theme": {
+          "label": "Theme",
+          "options": {
+            "system": "Automatic",
+            "light": "Light",
+            "dark": "Dark"
+          }
+        },
+        "dateFormat": {
+          "label": "Date format"
+        },
+        "timeFormat": {
+          "label": "Time format"
+        },
+        "reminder": {
+          "label": "Default reminders (min)"
+        },
+        "digest": {
+          "label": "Daily digest hour"
+        },
+        "sessionTimeout": {
+          "label": "Session timeout (min)"
+        },
+        "notify": {
+          "email": "Email",
+          "push": "Push",
+          "whatsapp": "WhatsApp"
+        }
+      },
+      "notifications": {
+        "title": "Notifications",
+        "quietStart": "Quiet hours start",
+        "quietEnd": "Quiet hours end",
+        "digestHour": "Digest hour",
+        "channelsTitle": "Enabled channels"
+      },
+      "actions": {
+        "save": "Save preferences",
+        "saving": "Saving…"
+      }
+    },
+    "SecurityPolicy": {
+      "pageTitle": "Security policy",
+      "pageDescription": "Manage access requirements and two-factor authentication.",
+      "breadcrumbs": {
+        "section": "Security",
+        "current": "Security policy"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load policy",
+        "loadErrorDescription": "Try again in a few minutes.",
+        "successTitle": "Policy saved",
+        "successDescription": "Changes were applied successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while updating the policy."
+      },
+      "fields": {
+        "requireAll": "Require 2FA for all users",
+        "requireAdmin": "Require 2FA for administrators",
+        "methods": {
+          "label": "Allowed methods",
+          "options": {
+            "totp": "Authenticator app",
+            "email": "Email code",
+            "sms": "SMS code"
+          },
+          "help": "Select the methods available to users."
+        },
+        "allowedIps": {
+          "label": "Allowed IPs or ranges",
+          "help": "One IP or CIDR range per line. Leave blank to allow any origin."
+        },
+        "maxSessions": {
+          "label": "Max concurrent sessions"
+        },
+        "policyNote": "These limits apply to every user across the platform."
+      },
+      "actions": {
+        "save": "Save",
+        "saving": "Saving…"
+      },
+      "states": {
+        "loading": "Loading policy…"
+      }
+    },
+    "Twofa": {
+      "pageTitle": "Two-factor authentication",
+      "pageDescription": "Define the global rules for second-factor verification across the platform.",
+      "breadcrumbs": {
+        "section": "Security",
+        "current": "2FA"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load policy",
+        "loadErrorDescription": "Try again in a few minutes.",
+        "successTitle": "Policy saved",
+        "successDescription": "Changes were applied successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while updating the policy."
+      },
+      "fields": {
+        "requireAll": "Require 2FA for all users",
+        "requireAdmin": "Always require 2FA for administrators",
+        "methods": {
+          "label": "Allowed methods",
+          "options": {
+            "totp": "Authenticator app",
+            "email": "Email code",
+            "sms": "SMS code"
+          },
+          "help": "Select the second-factor methods that your users can enable."
+        },
+        "policyNote": "These requirements will apply the next time users sign in."
+      },
+      "actions": {
+        "save": "Save",
+        "saving": "Saving…"
+      },
+      "states": {
+        "loading": "Loading policy…"
+      }
+    },
+    "PasswordPolicy": {
+      "pageTitle": "Password policy",
+      "pageDescription": "Define complexity requirements for user passwords.",
+      "breadcrumbs": {
+        "section": "Security",
+        "current": "Password policy"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load policy",
+        "loadErrorDescription": "Try again later.",
+        "invalidTitle": "Invalid values",
+        "invalidDescription": "Minimum length must be at least 6 characters.",
+        "successTitle": "Policy updated",
+        "successDescription": "Changes were saved successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Something went wrong while updating the policy."
+      },
+      "fields": {
+        "minLength": {
+          "label": "Minimum length"
+        },
+        "history": {
+          "label": "History to keep"
+        },
+        "expire": {
+          "label": "Expiration (days)",
+          "help": "Defines how often passwords must be rotated. Leave blank to disable."
+        },
+        "require": {
+          "uppercase": "Require uppercase letters",
+          "lowercase": "Require lowercase letters",
+          "number": "Require numbers",
+          "special": "Require special characters",
+          "common": "Block common passwords"
+        }
+      },
+      "actions": {
+        "save": "Save",
+        "saving": "Saving…"
+      },
+      "states": {
+        "loading": "Loading policy…"
+      }
+    },
+    "SessionPolicy": {
+      "pageTitle": "Session policy",
+      "pageDescription": "Control session duration and lock rules.",
+      "breadcrumbs": {
+        "section": "Security",
+        "current": "Session policy"
+      },
+      "alerts": {
+        "loadErrorTitle": "Unable to load policy",
+        "loadErrorDescription": "Something went wrong while fetching data.",
+        "successTitle": "Policy saved",
+        "successDescription": "Changes were applied successfully.",
+        "saveErrorTitle": "Unable to save",
+        "saveErrorDescription": "Try again in a few minutes."
+      },
+      "fields": {
+        "idle": {
+          "label": "Idle timeout (min)"
+        },
+        "absolute": {
+          "label": "Absolute session duration (min)"
+        },
+        "remember": {
+          "label": "Remember session for (days)"
+        },
+        "lockAttempts": {
+          "label": "Failed attempts before lock"
+        },
+        "lockWindow": {
+          "label": "Lock window (min)"
+        },
+        "lockDuration": {
+          "label": "Lock duration (min)"
+        }
+      },
+      "actions": {
+        "save": "Save",
+        "saving": "Saving…"
+      },
+      "states": {
+        "loading": "Loading policy…"
+      }
+    }
+  },
+  "Common": {
+    "Actions": {
+      "edit": "Edit",
+      "permissions": "Permissions",
+      "delete": "Delete"
+    },
+    "confirm": {
+      "confirm": "Confirm",
+      "cancel": "Cancel"
+    }
+  },
+  "Clientes": {
+    "meta_title": "Clients",
+    "meta_description": "Manage clients, related services and custom fields in one place.",
+    "detail_meta_suffix": "Clients",
+    "detail_meta_description": "Full client profile with services, billing history and reminders."
+  },
+  "Pagos": {
+    "meta_title": "Payments",
+    "meta_description": "Keep track of incoming payments and their supporting documents.",
+    "list": {
+      "title": "Payments management",
+      "empty": "No payments have been recorded yet.",
+      "error": "We couldn't load the payments list."
+    }
+  },
+  "Servicios": {
+    "meta_title": "Services",
+    "meta_description": "Manage the catalog of services available to your clients.",
+    "List": {
+      "title": "Services",
+      "description": "Manage the catalog of services available to your clients.",
+      "searchPlaceholder": "Search services…",
+      "createButton": "New service",
+      "breadcrumbs": {
+        "home": "Admin panel",
+        "section": "Services"
+      },
+      "table": {
+        "name": "Name",
+        "category": "Category",
+        "unit": "Unit",
+        "price": "Price",
+        "subtotal": "Subtotal",
+        "taxOne": "Tax 1",
+        "taxTwo": "Tax 2",
+        "noTax": "No tax",
+        "status": "Status",
+        "clients": "Clients",
+        "created": "Created",
+        "updated": "Updated",
+        "actions": "Actions",
+        "edit": "Edit",
+        "delete": "Delete",
+        "uncategorized": "No category",
+        "status": {
+          "active": "Active",
+          "inactive": "Inactive"
+        }
+      }
+    },
+    "Form": {
+      "createTitle": "Create service",
+      "editTitle": "Edit service",
+      "nameLabel": "Name",
+      "namePlaceholder": "Service name",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "Describe the service",
+      "unitLabel": "Unit",
+      "unitPlaceholder": "e.g. unit, hour, license…",
+      "priceLabel": "Price",
+      "pricePlaceholder": "Enter the base price",
+      "subtotalLabel": "Subtotal",
+      "subtotalPlaceholder": "Enter the subtotal",
+      "subtotalHelper": "Leave it empty to reuse the price.",
+      "frequencyLabel": "Frequency",
+      "frequencyPlaceholder": "e.g. monthly, yearly…",
+      "startDateLabel": "Start date",
+      "endDateLabel": "End date",
+      "taxOneLabel": "Primary tax",
+      "taxTwoLabel": "Secondary tax",
+      "noTaxOption": "No tax",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "No category",
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "errors": {
+        "priceRequired": "Enter a valid price."
+      },
+      "actions": {
+        "create": "Create",
+        "update": "Save changes",
+        "saving": "Saving…",
+        "cancel": "Cancel",
+        "delete": "Delete service",
+        "deleting": "Deleting…"
+      }
+    },
+    "Alerts": {
+      "created": {
+        "title": "Service created",
+        "description": "The service was created successfully."
+      },
+      "updated": {
+        "title": "Service updated",
+        "description": "The service was updated successfully."
+      },
+      "deleted": {
+        "title": "Service deleted",
+        "description": "The service was deleted successfully."
+      },
+      "loadError": {
+        "title": "Unable to load",
+        "description": "We could not fetch the services."
+      },
+      "saveError": {
+        "title": "Unable to save",
+        "description": "We could not save the service."
+      },
+      "deleteError": {
+        "title": "Unable to delete",
+        "description": "We could not delete the service."
+      },
+      "assignedError": {
+        "title": "Cannot delete",
+        "description": "The service is assigned to clients."
+      }
+    },
+    "ConfirmDelete": {
+      "title": "Delete service",
+      "description": "This action cannot be undone. Do you want to delete this service?",
+      "confirm": "Delete",
+      "cancel": "Cancel"
+    }
+  }
+}

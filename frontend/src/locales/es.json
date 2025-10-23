@@ -1,0 +1,1032 @@
+{
+  "Layout": {
+    "nav": {
+      "dashboard": "Inicio",
+      "services": "Servicios",
+      "payments": "Pagos",
+      "quotes": "Cotizaciones",
+      "settings": "Configuración",
+      "collapse": "Contraer menú",
+      "expand": "Expandir menú",
+      "redirecting": "Redirigiendo…",
+      "clients": "Clientes",
+      "invoices": "Facturas"
+    },
+    "enterprise": {
+      "switcherLabel": "Seleccionar empresa",
+      "placeholder": "Empresa"
+    }
+  },
+  "Client": {
+    "Layout": {
+      "badge": "Panel de clientes",
+      "title": "Cifra Pay",
+      "adminCta": "Ir al panel de administración",
+      "redirecting": "Redirigiendo al panel disponible…"
+    },
+    "Dashboard": {
+      "hero": {
+        "badge": "Bienvenido",
+        "heading": "Resumen general del cliente",
+        "description": "Esta vista concentra la información clave de tu cuenta. Desde aquí puedes seguir tus servicios activos, revisar documentos asociados y monitorear tus pagos sin acceder al panel administrativo."
+      },
+      "status": {
+        "heading": "Conexión con el servicio",
+        "description": "Este resumen confirma que el panel de cliente funciona de manera independiente al panel administrativo.",
+        "messageLabel": "Última actualización",
+        "timestamp": "Actualizado el {value}",
+        "noticesHeading": "Avisos útiles",
+        "empty": "No hay avisos para mostrar por ahora.",
+        "error": "No pudimos obtener el resumen del panel de cliente."
+      }
+    }
+  },
+  "Dashboard": {
+    "meta_title": "Panel",
+    "meta_description": "Resumen de actividad",
+    "heading": "¡Bienvenido al panel administrador!",
+    "subheading": "[Descripcion pendiente]",
+    "metrics": {
+      "totalBilling": "Facturación total",
+      "totalBilled": "Total facturado",
+      "pendingCollection": "Pendiente de cobro",
+      "pendingHint": "Cobros aún por recaudar en el periodo seleccionado.",
+      "period": "Periodo: {from} – {to}"
+    },
+    "filters": {
+      "title": "Filtrar periodo",
+      "hint": "Selecciona un rango de fechas de hasta 12 meses.",
+      "from": "Desde",
+      "to": "Hasta",
+      "apply": "Aplicar",
+      "applying": "Aplicando…",
+      "reset": "Restablecer",
+      "error": {
+        "required": "Debes seleccionar ambas fechas.",
+        "range": "La fecha inicial debe ser anterior o igual a la fecha final."
+      }
+    },
+    "billing": {
+      "title": "Comparativa de facturación",
+      "description": "[Descripcion pendiente]",
+      "billed": "Cobrado",
+      "pending": "Pendiente",
+      "empty": "No hay datos de facturación disponibles para este periodo."
+    },
+    "topServices": {
+      "title": "Servicios más vendidos",
+      "description": "[Descripcion pendiente]",
+      "empty": "No se registraron ventas en este periodo.",
+      "fallback": "Servicio #{position}",
+      "soldLabel": "Veces vendido"
+    },
+    "expirations": {
+      "title": "Facturas por vencer",
+      "description": "Próximos compromisos de facturación según su fecha de vencimiento.",
+      "empty": "No hay facturas próximas a vencer en el rango seleccionado.",
+      "dueToday": "Vence hoy",
+      "dueTomorrow": "Vence mañana",
+      "dueIn": "Vence en {count, plural, one {# día} other {# días}}",
+      "clientFallback": "...",
+      "invoiceFallback": "Factura sin referencia"
+    },
+    "clientStatus": {
+      "title": "Estado de clientes",
+      "description": "[Descripcion pendiente]",
+      "active": "Activos",
+      "inactive": "Inactivos",
+      "unknown": "Sin estado",
+      "total": "{count, plural, one {# cliente en total} other {# clientes en total}}"
+    },
+    "errors": {
+      "load": "No pudimos cargar la información del dashboard."
+    }
+  },
+  "Auth": {
+    "SignIn": {
+      "alerts": {
+        "success": {
+          "title": "Inicio de sesión correcto",
+          "description": "Bienvenido, estamos preparando tu panel."
+        },
+        "error": {
+          "title": "No fue posible iniciar sesión"
+        }
+      },
+      "errors": {
+        "invalidCredentials": "Usuario o contraseña incorrectos.",
+        "unexpected": "Ocurrió un error inesperado. Inténtalo más tarde.",
+        "noPanelAccess": "Tu usuario no tiene un panel asignado. Contacta al administrador."
+      },
+      "hero": {
+        "badge": "Plataforma administrativa",
+        "heading": "Gestiona tus cobros desde un solo lugar",
+        "description": "Descripción pendiente",
+        "tipTitle": "¿Sabías que…?",
+        "tipDescription": "Puedes habilitar o desactivar accesos de tu equipo en cualquier momento desde el panel de seguridad."
+      },
+      "form": {
+        "heading": "Bienvenido de nuevo",
+        "subheading": "Ingresa tus credenciales para continuar.",
+        "usernameLabel": "Usuario",
+        "usernamePlaceholder": "tu.usuario",
+        "passwordLabel": "Contraseña",
+        "passwordPlaceholder": "••••••••",
+        "submit": "Iniciar sesión",
+        "submitLoading": "Ingresando…",
+        "footerNotice": "¿Olvidaste tu contraseña? Contacta al administrador de tu empresa para restablecerla."
+      }
+    },
+    "Logout": {
+      "successTitle": "Sesión cerrada",
+      "successDescription": "Vuelve pronto.",
+      "errorTitle": "No se pudo cerrar sesión",
+      "errorDescription": "Inténtalo de nuevo en unos segundos.",
+      "loading": "Cerrando…",
+      "buttonLabel": "Cerrar sesión"
+    }
+  },
+  "Roles": {
+    "Form": {
+      "nameLabel": "Nombre del rol",
+      "namePlaceholder": "Ej. Administrador",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Descripción breve (opcional)",
+      "panel": {
+        "label": "Panel asignado",
+        "placeholder": "Selecciona un panel",
+        "options": {
+          "admin": "Panel de administración",
+          "client": "Panel de clientes"
+        }
+      },
+      "status": {
+        "active": "Rol activo",
+        "inactive": "Rol inactivo"
+      },
+      "alerts": {
+        "saveError": {
+          "title": "No se pudo guardar el rol",
+          "description": "Inténtalo nuevamente."
+        }
+      },
+      "actions": {
+        "create": "Crear rol",
+        "update": "Guardar cambios",
+        "saving": "Guardando…",
+        "cancel": "Cancelar"
+      }
+    }
+  },
+  "Users": {
+    "EditForm": {
+      "errors": {
+        "load": "No se pudo cargar la información del usuario.",
+        "unexpected": "Ocurrió un error inesperado."
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Error al cargar el usuario"
+        },
+        "updateError": {
+          "title": "No se pudo actualizar el usuario",
+          "description": "Inténtalo nuevamente."
+        },
+        "success": {
+          "title": "Usuario actualizado",
+          "description": "Los cambios se guardaron correctamente."
+        }
+      },
+      "states": {
+        "loading": "Cargando…"
+      },
+      "status": {
+        "active": "Usuario activo",
+        "inactive": "Usuario inactivo"
+      },
+      "fields": {
+        "username": {
+          "label": "Usuario"
+        },
+        "name": {
+          "label": "Nombre",
+          "placeholder": "Nombre completo"
+        },
+        "role": {
+          "label": "Rol",
+          "placeholder": "Selecciona un rol…"
+        },
+        "password": {
+          "label": "Nuevo password (opcional)",
+          "placeholder": "Dejar vacío para mantener"
+        }
+      },
+      "actions": {
+        "save": "Guardar cambios",
+        "saving": "Guardando…",
+        "cancel": "Cancelar"
+      }
+    },
+    "CreateForm": {
+      "errors": {
+        "loadLists": "No fue posible cargar las listas requeridas.",
+        "unexpected": "Ocurrió un error inesperado."
+      },
+      "alerts": {
+        "loadError": {
+          "title": "Error al cargar datos"
+        },
+        "invalid": {
+          "title": "Formulario incompleto",
+          "description": "Completa los campos obligatorios. La contraseña debe tener al menos 8 caracteres."
+        },
+        "success": {
+          "title": "Usuario creado",
+          "description": "El usuario se registró correctamente."
+        },
+        "createError": {
+          "title": "No se pudo crear el usuario"
+        }
+      },
+      "states": {
+        "loadingLists": "Cargando listas…"
+      },
+      "fields": {
+        "username": {
+          "label": "Usuario",
+          "placeholder": "Nombre de usuario"
+        },
+        "name": {
+          "label": "Nombre completo",
+          "placeholder": "Ej: Juan Pérez"
+        },
+        "password": {
+          "label": "Contraseña",
+          "placeholder": "••••••••",
+          "help": "Mínimo 8 caracteres."
+        },
+        "role": {
+          "label": "Rol",
+          "searchPlaceholder": "Buscar rol…",
+          "empty": "No se encontraron roles"
+        },
+        "client": {
+          "label": "Cliente",
+          "searchPlaceholder": "Buscar cliente…",
+          "empty": "No se encontraron clientes"
+        }
+      },
+      "actions": {
+        "create": "Crear usuario",
+        "creating": "Creando…",
+        "cancel": "Cancelar"
+      }
+    }
+  },
+  "Settings": {
+    "Roles": {
+      "breadcrumbs": {
+        "section": "Configuración de acceso",
+        "current": "Roles"
+      },
+      "pageTitle": "Roles",
+      "pageDescription": "Gestiona los roles y permisos del sistema",
+      "actions": {
+        "newRole": "Nuevo rol"
+      },
+      "table": {
+        "columns": {
+          "role": "Rol",
+          "description": "Comentario",
+          "panel": "Panel",
+          "status": "Estado",
+          "updatedAt": "Últ. actualización",
+          "actions": "Acciones"
+        },
+        "searchPlaceholder": "Buscar por rol o comentario…"
+      },
+      "panelBadges": {
+        "admin": "Administración",
+        "client": "Clientes"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "states": {
+        "loading": "Cargando roles…"
+      },
+      "panels": {
+        "createTitle": "Crear nuevo rol",
+        "editTitle": "Editar rol"
+      },
+      "alerts": {
+        "loadError": {
+          "title": "No se pudieron cargar los roles",
+          "description": "Inténtalo nuevamente."
+        },
+        "deleteSuccess": {
+          "title": "Rol eliminado",
+          "description": "{{role}} se eliminó correctamente."
+        },
+        "deleteError": {
+          "title": "No se pudo eliminar el rol",
+          "description": "Ocurrió un error inesperado."
+        }
+      },
+      "confirm": {
+        "deleteTitle": "Eliminar rol {{role}}",
+        "deleteDescription": "Esta acción no se puede deshacer."
+      }
+    },
+    "Users": {
+      "breadcrumbs": {
+        "section": "Seguridad y accesos",
+        "current": "Usuarios"
+      },
+      "pageTitle": "Usuarios",
+      "pageDescription": "Gestiona los usuarios del sistema",
+      "actions": {
+        "newUser": "Nuevo usuario"
+      },
+      "table": {
+        "columns": {
+          "username": "Usuario",
+          "name": "Nombre",
+          "role": "Perfil",
+          "status": "Estado",
+          "updatedAt": "Últ. actualización",
+          "actions": "Acciones"
+        },
+        "searchPlaceholder": "Buscar por usuario, nombre o perfil…"
+      },
+      "status": {
+        "active": "Activo",
+        "inactive": "Inactivo"
+      },
+      "states": {
+        "loading": "Cargando usuarios…"
+      },
+      "panels": {
+        "createTitle": "Crear nuevo usuario",
+        "editTitle": "Editar usuario"
+      },
+      "alerts": {
+        "loadError": {
+          "title": "No se pudieron cargar los usuarios",
+          "description": "Inténtalo nuevamente."
+        },
+        "deleteSuccess": {
+          "title": "Usuario eliminado",
+          "description": "{{user}} fue eliminado correctamente."
+        },
+        "deleteError": {
+          "title": "No se pudo eliminar el usuario",
+          "description": "Ocurrió un error inesperado."
+        }
+      },
+      "confirm": {
+        "deleteTitle": "Eliminar usuario {{user}}",
+        "deleteDescription": "Esta acción no se puede deshacer."
+      }
+    },
+    "General": {
+      "pageTitle": "Configuración general",
+      "pageDescription": "Define los parámetros base de la empresa.",
+      "breadcrumbs": {
+        "section": "Configuración",
+        "current": "Generales"
+      },
+      "alerts": {
+        "loadErrorTitle": "No se pudo cargar la configuración",
+        "loadError": "No fue posible obtener la configuración actual.",
+        "invalidTitle": "Revisa la información",
+        "invalidDescription": "Completa los campos obligatorios antes de guardar.",
+        "successTitle": "Configuración guardada",
+        "successDescription": "Los cambios se aplicaron correctamente.",
+        "saveErrorTitle": "No se pudo guardar",
+        "saveErrorDescription": "Ocurrió un error al intentar guardar la configuración."
+      },
+      "actions": {
+        "save": "Guardar cambios",
+        "saving": "Guardando…"
+      },
+      "states": {
+        "loading": "Cargando configuración…"
+      },
+      "fields": {
+        "timezone": {
+          "label": "Zona horaria",
+          "placeholder": "America/Bogota"
+        },
+        "locale": {
+          "label": "Idioma",
+          "placeholder": "es-CO"
+        },
+        "currency": {
+          "label": "Moneda predeterminada",
+          "placeholder": "COP"
+        },
+        "primaryColor": {
+          "label": "Color principal"
+        },
+        "dateFormat": {
+          "label": "Formato de fecha"
+        },
+        "timeFormat": {
+          "label": "Formato de hora"
+        },
+        "logoUrl": {
+          "label": "URL del logo",
+          "placeholder": "https://…"
+        },
+        "firstDay": {
+          "label": "Primer día de la semana"
+        },
+        "decimals": {
+          "label": "Decimales numéricos"
+        },
+        "active": {
+          "label": "Configuración activa"
+        },
+        "status": {
+          "label": "Registro habilitado"
+        }
+      }
+    },
+    "Company": {
+      "pageTitle": "Datos de la empresa",
+      "pageDescription": "Actualiza la información básica de la organización.",
+      "breadcrumbs": {
+        "section": "Configuración",
+        "current": "Datos de la empresa"
+      },
+      "alerts": {
+        "loadErrorTitle": "No se pudo obtener la empresa",
+        "loadErrorDescription": "Ocurrió un error al consultar la información.",
+        "noCompanyTitle": "Sin empresa seleccionada",
+        "noCompanyDescription": "Debes seleccionar una empresa para modificar sus datos.",
+        "invalidTitle": "Revisa la información",
+        "invalidDescription": "Indica un nombre válido para la empresa.",
+        "successTitle": "Datos actualizados",
+        "successDescription": "Los cambios se guardaron correctamente.",
+        "saveErrorTitle": "No se pudo guardar",
+        "saveErrorDescription": "Ocurrió un error al actualizar la empresa."
+      },
+      "states": {
+        "noCompany": "Selecciona una empresa para continuar.",
+        "loading": "Cargando datos…",
+        "updatedAt": "Última actualización: {value}"
+      },
+      "fields": {
+        "name": {
+          "label": "Nombre comercial",
+          "placeholder": "Nombre de la empresa"
+        },
+        "status": {
+          "label": "Estado",
+          "help": "Controla si la empresa se encuentra activa.",
+          "active": "Activa",
+          "inactive": "Inactiva"
+        }
+      },
+      "actions": {
+        "save": "Guardar cambios",
+        "saving": "Guardando…"
+      }
+    },
+    "Alerts": {
+      "pageTitle": "Alertas y recordatorios",
+      "pageDescription": "Configura notificaciones automáticas para tu equipo.",
+      "breadcrumbs": {
+        "section": "Configuración",
+        "current": "Alertas y recordatorios"
+      },
+      "alerts": {
+        "loadErrorTitle": "No se pudieron cargar las alertas",
+        "loadErrorDescription": "Inténtalo de nuevo en unos minutos.",
+        "noCompanyTitle": "Sin empresa",
+        "noCompanyDescription": "Selecciona una empresa para administrar las alertas.",
+        "invalidTitle": "Revisa la información",
+        "invalidDescription": "Completa los campos obligatorios.",
+        "channelWarning": "Selecciona al menos un canal de notificación.",
+        "successTitle": "Alerta guardada",
+        "successDescription": "Los cambios se registraron correctamente.",
+        "saveErrorTitle": "No se pudo guardar",
+        "saveErrorDescription": "Ocurrió un problema al guardar la alerta.",
+        "deleteSuccessTitle": "Alerta eliminada",
+        "deleteSuccessDescription": "La alerta se eliminó exitosamente.",
+        "deleteErrorTitle": "No se pudo eliminar",
+        "deleteErrorDescription": "Ocurrió un error al eliminar la alerta."
+      },
+      "table": {
+        "title": "Alertas configuradas",
+        "new": "Nueva alerta",
+        "columns": {
+          "name": "Nombre",
+          "type": "Tipo",
+          "channels": "Canales",
+          "remind": "Recordatorios",
+          "status": "Estado",
+          "actions": "Acciones"
+        },
+        "status": {
+          "active": "Activa",
+          "inactive": "Inactiva"
+        },
+        "remind": {
+          "none": "Sin recordatorios"
+        },
+        "actions": {
+          "edit": "Editar",
+          "delete": "Eliminar"
+        },
+        "empty": "No hay alertas configuradas.",
+        "loading": "Cargando alertas…"
+      },
+      "form": {
+        "fields": {
+          "name": {
+            "label": "Nombre de la alerta",
+            "placeholder": "Ej. Factura por vencer"
+          },
+          "type": {
+            "label": "Tipo",
+            "placeholder": "invoice_due"
+          },
+          "channels": {
+            "label": "Canales"
+          },
+          "remind": {
+            "label": "Recordar antes (minutos)",
+            "placeholder": "60, 30, 10",
+            "help": "Separa por comas los minutos antes del evento."
+          },
+          "conditions": {
+            "label": "Condiciones (JSON)",
+            "placeholder": "{\"threshold\":1000}"
+          },
+          "active": {
+            "label": "Alerta activa"
+          }
+        },
+        "actions": {
+          "reset": "Limpiar",
+          "create": "Crear alerta",
+          "update": "Actualizar alerta",
+          "saving": "Guardando…"
+        }
+      },
+      "states": {
+        "loading": "Cargando alertas…"
+      },
+      "confirm": {
+        "delete": "¿Eliminar la alerta {name}?"
+      }
+    },
+    "Smtp": {
+      "pageTitle": "Correo SMTP",
+      "pageDescription": "Configura el servidor de correo saliente para tus notificaciones.",
+      "breadcrumbs": {
+        "section": "Configuración",
+        "current": "Correo SMTP"
+      },
+      "alerts": {
+        "loadErrorTitle": "No se pudo cargar el SMTP",
+        "loadErrorDescription": "Revisa la configuración e inténtalo nuevamente.",
+        "invalidTitle": "Revisa la información",
+        "invalidDescription": "Completa los campos obligatorios para continuar.",
+        "successTitle": "SMTP actualizado",
+        "successDescription": "Los cambios se guardaron correctamente.",
+        "saveErrorTitle": "No se pudo guardar",
+        "saveErrorDescription": "Ocurrió un error al actualizar el SMTP."
+      },
+      "actions": {
+        "save": "Guardar configuración",
+        "saving": "Guardando…"
+      },
+      "states": {
+        "loading": "Cargando configuración SMTP…"
+      },
+      "fields": {
+        "host": {
+          "label": "Servidor",
+          "placeholder": "smtp.mailprovider.com"
+        },
+        "port": {
+          "label": "Puerto"
+        },
+        "username": {
+          "label": "Usuario",
+          "placeholder": "usuario@empresa.com"
+        },
+        "password": {
+          "label": "Contraseña / token",
+          "placeholder": "••••••••",
+          "help": "Se almacenará de forma segura. Déjalo vacío para mantener el valor actual."
+        },
+        "fromName": {
+          "label": "Nombre remitente",
+          "placeholder": "Equipo de Cobranza"
+        },
+        "fromEmail": {
+          "label": "Correo remitente"
+        },
+        "replyTo": {
+          "label": "Responder a"
+        },
+        "rateLimit": {
+          "label": "Límite por minuto",
+          "help": "Cantidad máxima de correos por minuto (opcional)."
+        },
+        "secure": {
+          "label": "Requerir conexión segura (SSL/TLS)"
+        },
+        "active": {
+          "label": "Configuración activa"
+        },
+        "status": {
+          "label": "Registro habilitado"
+        }
+      }
+    },
+    "Profile": {
+      "pageTitle": "Preferencias de usuario",
+      "pageDescription": "Administra ajustes personales y notificaciones del equipo.",
+      "breadcrumbs": {
+        "section": "Configuración",
+        "current": "Perfil de usuario"
+      },
+      "alerts": {
+        "loadUsersTitle": "No se pudieron cargar los usuarios",
+        "loadUsersDescription": "Verifica la empresa seleccionada.",
+        "loadSettingsTitle": "No se pudieron cargar las preferencias",
+        "loadSettingsDescription": "Ocurrió un error al consultar los datos.",
+        "invalidTitle": "Selecciona un usuario",
+        "invalidDescription": "Debes elegir un usuario para guardar.",
+        "successTitle": "Preferencias actualizadas",
+        "successDescription": "Los cambios se guardaron correctamente.",
+        "saveErrorTitle": "No se pudo guardar",
+        "saveErrorDescription": "Revisa la información e inténtalo nuevamente."
+      },
+      "states": {
+        "loading": "Cargando preferencias…"
+      },
+      "fields": {
+        "user": {
+          "label": "Usuario",
+          "loading": "Cargando usuarios…",
+          "placeholder": "Selecciona un usuario"
+        },
+        "locale": {
+          "label": "Idioma"
+        },
+        "timezone": {
+          "label": "Zona horaria"
+        },
+        "theme": {
+          "label": "Tema",
+          "options": {
+            "system": "Automático",
+            "light": "Claro",
+            "dark": "Oscuro"
+          }
+        },
+        "dateFormat": {
+          "label": "Formato de fecha"
+        },
+        "timeFormat": {
+          "label": "Formato de hora"
+        },
+        "reminder": {
+          "label": "Recordatorios predeterminados (min)"
+        },
+        "digest": {
+          "label": "Hora del resumen diario"
+        },
+        "sessionTimeout": {
+          "label": "Cierre de sesión por inactividad (min)"
+        },
+        "notify": {
+          "email": "Correo",
+          "push": "Push",
+          "whatsapp": "WhatsApp"
+        }
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "quietStart": "Inicio de horario silencioso",
+        "quietEnd": "Fin de horario silencioso",
+        "digestHour": "Hora del resumen",
+        "channelsTitle": "Canales habilitados"
+      },
+      "actions": {
+        "save": "Guardar preferencias",
+        "saving": "Guardando…"
+      }
+    },
+    "SecurityPolicy": {
+      "pageTitle": "Política de seguridad",
+      "pageDescription": "Configura los requisitos de acceso y doble autenticación.",
+      "breadcrumbs": {
+        "section": "Seguridad",
+        "current": "Política de seguridad"
+      },
+      "alerts": {
+        "loadErrorTitle": "No se pudo cargar la política",
+        "loadErrorDescription": "Inténtalo nuevamente más tarde.",
+        "successTitle": "Política guardada",
+        "successDescription": "Los cambios se aplicaron correctamente.",
+        "saveErrorTitle": "No se pudo guardar",
+        "saveErrorDescription": "Ocurrió un error al actualizar la política."
+      },
+      "fields": {
+        "requireAll": "Exigir 2FA a todos los usuarios",
+        "requireAdmin": "Exigir 2FA a administradores",
+        "methods": {
+          "label": "Métodos permitidos",
+          "options": {
+            "totp": "Aplicación de autenticación",
+            "email": "Código por correo",
+            "sms": "Código por SMS"
+          },
+          "help": "Selecciona los métodos disponibles para los usuarios."
+        },
+        "allowedIps": {
+          "label": "IPs o rangos permitidos",
+          "help": "Una IP o rango CIDR por línea. Deja vacío para permitir cualquier origen."
+        },
+        "maxSessions": {
+          "label": "Sesiones concurrentes máximas"
+        },
+        "policyNote": "Estos límites se aplican a todos los usuarios del sistema."
+      },
+      "actions": {
+        "save": "Guardar",
+        "saving": "Guardando…"
+      },
+      "states": {
+        "loading": "Cargando política…"
+      }
+    },
+    "Twofa": {
+      "pageTitle": "Política de autenticación 2FA",
+      "pageDescription": "Define los requisitos de segundo factor para todo el sistema.",
+      "breadcrumbs": {
+        "section": "Seguridad",
+        "current": "2FA"
+      },
+      "alerts": {
+        "loadErrorTitle": "No se pudo cargar la configuración",
+        "loadErrorDescription": "Ocurrió un error al consultar los datos.",
+        "successTitle": "Política actualizada",
+        "successDescription": "Los cambios se guardaron correctamente.",
+        "saveErrorTitle": "No se pudo guardar",
+        "saveErrorDescription": "Inténtalo nuevamente."
+      },
+      "fields": {
+        "requireAll": "Exigir 2FA a todos los usuarios",
+        "requireAdmin": "Exigir 2FA a administradores",
+        "methods": {
+          "label": "Métodos disponibles",
+          "options": {
+            "totp": "Aplicación de autenticación",
+            "email": "Código por correo",
+            "sms": "Código por SMS"
+          },
+          "help": "Selecciona los métodos que los usuarios podrán activar."
+        },
+        "policyNote": "Los cambios aplican inmediatamente a los próximos inicios de sesión."
+      },
+      "actions": {
+        "save": "Guardar",
+        "saving": "Guardando…"
+      },
+      "states": {
+        "loading": "Cargando política…"
+      }
+    },
+    "PasswordPolicy": {
+      "pageTitle": "Política de contraseñas",
+      "pageDescription": "Define los requisitos de complejidad para las contraseñas.",
+      "breadcrumbs": {
+        "section": "Seguridad",
+        "current": "Política de contraseñas"
+      },
+      "alerts": {
+        "loadErrorTitle": "No se pudo cargar la política",
+        "loadErrorDescription": "Inténtalo nuevamente más tarde.",
+        "invalidTitle": "Valores inválidos",
+        "invalidDescription": "El mínimo debe ser mayor o igual a 6 caracteres.",
+        "successTitle": "Política actualizada",
+        "successDescription": "Los cambios se guardaron correctamente.",
+        "saveErrorTitle": "No se pudo guardar",
+        "saveErrorDescription": "Ocurrió un error al actualizar la política."
+      },
+      "fields": {
+        "minLength": {
+          "label": "Longitud mínima"
+        },
+        "history": {
+          "label": "Historial a conservar"
+        },
+        "expire": {
+          "label": "Expiración (días)",
+          "help": "Define cada cuántos días expira la contraseña. Deja en blanco para desactivar."
+        },
+        "require": {
+          "uppercase": "Requerir mayúsculas",
+          "lowercase": "Requerir minúsculas",
+          "number": "Requerir números",
+          "special": "Requerir caracteres especiales",
+          "common": "Bloquear contraseñas comunes"
+        }
+      },
+      "actions": {
+        "save": "Guardar",
+        "saving": "Guardando…"
+      },
+      "states": {
+        "loading": "Cargando política…"
+      }
+    },
+    "SessionPolicy": {
+      "pageTitle": "Política de inactividad",
+      "pageDescription": "Controla el tiempo de sesión y bloqueos por intentos fallidos.",
+      "breadcrumbs": {
+        "section": "Seguridad",
+        "current": "Inactividad"
+      },
+      "alerts": {
+        "loadErrorTitle": "No se pudo cargar la política",
+        "loadErrorDescription": "Ocurrió un error al consultar los datos.",
+        "successTitle": "Política guardada",
+        "successDescription": "Los cambios se aplicaron correctamente.",
+        "saveErrorTitle": "No se pudo guardar",
+        "saveErrorDescription": "Inténtalo de nuevo en unos minutos."
+      },
+      "fields": {
+        "idle": {
+          "label": "Tiempo de inactividad (min)"
+        },
+        "absolute": {
+          "label": "Duración máxima de sesión (min)"
+        },
+        "remember": {
+          "label": "Recuerda sesión por (días)"
+        },
+        "lockAttempts": {
+          "label": "Intentos fallidos antes de bloquear"
+        },
+        "lockWindow": {
+          "label": "Ventana de conteo (min)"
+        },
+        "lockDuration": {
+          "label": "Duración del bloqueo (min)"
+        }
+      },
+      "actions": {
+        "save": "Guardar",
+        "saving": "Guardando…"
+      },
+      "states": {
+        "loading": "Cargando política…"
+      }
+    }
+  },
+  "Common": {
+    "Actions": {
+      "edit": "Editar",
+      "permissions": "Permisos",
+      "delete": "Eliminar"
+    },
+    "confirm": {
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
+    }
+  },
+  "Clientes": {
+    "meta_title": "Clientes",
+    "meta_description": "Administra clientes, servicios y campos personalizados en un solo módulo.",
+    "detail_meta_suffix": "Clientes",
+    "detail_meta_description": "Detalle completo del cliente, servicios asociados y flujos comerciales."
+  },
+  "Pagos": {
+    "meta_title": "Pagos",
+    "meta_description": "Gestiona los registros de pagos y sus comprobantes.",
+    "list": {
+      "title": "Gestión de pagos",
+      "empty": "No hay pagos registrados por ahora.",
+      "error": "No fue posible cargar los pagos."
+    }
+  },
+  "Servicios": {
+    "meta_title": "Servicios",
+    "meta_description": "Gestiona el catálogo de servicios disponibles para tus clientes.",
+    "List": {
+      "title": "Servicios",
+      "description": "Gestiona el catálogo de servicios disponibles para tus clientes.",
+      "searchPlaceholder": "Buscar servicios…",
+      "createButton": "Nuevo servicio",
+      "breadcrumbs": {
+        "home": "Panel admin",
+        "section": "Servicios"
+      },
+      "table": {
+        "name": "Nombre",
+        "category": "Categoría",
+        "unit": "Unidad",
+        "price": "Precio",
+        "subtotal": "Subtotal",
+        "taxOne": "Impuesto 1",
+        "taxTwo": "Impuesto 2",
+        "noTax": "Sin impuesto",
+        "status": "Estado",
+        "clients": "Clientes",
+        "created": "Creado",
+        "updated": "Actualizado",
+        "actions": "Acciones",
+        "edit": "Editar",
+        "delete": "Eliminar",
+        "uncategorized": "Sin categoría",
+        "status": {
+          "active": "Activo",
+          "inactive": "Inactivo"
+        }
+      }
+    },
+    "Form": {
+      "createTitle": "Crear servicio",
+      "editTitle": "Editar servicio",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Nombre del servicio",
+      "descriptionLabel": "Descripción",
+      "descriptionPlaceholder": "Describe el servicio",
+      "unitLabel": "Unidad",
+      "unitPlaceholder": "Ej. unidad, hora, licencia…",
+      "priceLabel": "Precio",
+      "pricePlaceholder": "Ingresa el precio base",
+      "subtotalLabel": "Subtotal",
+      "subtotalPlaceholder": "Ingresa el subtotal",
+      "subtotalHelper": "Si lo dejas vacío se usará el precio.",
+      "frequencyLabel": "Frecuencia",
+      "frequencyPlaceholder": "Ej. mensual, anual…",
+      "startDateLabel": "Fecha de inicio",
+      "endDateLabel": "Fecha de finalización",
+      "taxOneLabel": "Impuesto principal",
+      "taxTwoLabel": "Impuesto adicional",
+      "noTaxOption": "Sin impuesto",
+      "categoryLabel": "Categoría",
+      "categoryPlaceholder": "Sin categoría",
+      "statusActive": "Activo",
+      "statusInactive": "Inactivo",
+      "errors": {
+        "priceRequired": "Ingresa un precio válido."
+      },
+      "actions": {
+        "create": "Crear",
+        "update": "Guardar cambios",
+        "saving": "Guardando…",
+        "cancel": "Cancelar",
+        "delete": "Eliminar servicio",
+        "deleting": "Eliminando…"
+      }
+    },
+    "Alerts": {
+      "created": {
+        "title": "Servicio creado",
+        "description": "El servicio se creó correctamente."
+      },
+      "updated": {
+        "title": "Servicio actualizado",
+        "description": "El servicio se actualizó correctamente."
+      },
+      "deleted": {
+        "title": "Servicio eliminado",
+        "description": "El servicio se eliminó correctamente."
+      },
+      "loadError": {
+        "title": "Error al cargar",
+        "description": "No fue posible obtener los servicios."
+      },
+      "saveError": {
+        "title": "Error al guardar",
+        "description": "No fue posible guardar el servicio."
+      },
+      "deleteError": {
+        "title": "Error al eliminar",
+        "description": "No fue posible eliminar el servicio."
+      },
+      "assignedError": {
+        "title": "No se puede eliminar",
+        "description": "El servicio tiene clientes asignados."
+      }
+    },
+    "ConfirmDelete": {
+      "title": "Eliminar servicio",
+      "description": "Esta acción no se puede deshacer. ¿Deseas eliminar este servicio?",
+      "confirm": "Eliminar",
+      "cancel": "Cancelar"
+    }
+  }
+}
