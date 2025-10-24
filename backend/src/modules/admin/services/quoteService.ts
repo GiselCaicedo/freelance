@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 type QuoteStatusLabel = 'pendiente' | 'aprobada' | 'rechazada'
 

@@ -12,8 +12,8 @@ export const validate = (schema: ZodSchema): RequestHandler => {
           campo: e.path.join('.'),
           tipo: e.code,
           detalle: e.message,
-          esperado: e.expected ?? null,
-          recibido: e.received ?? null
+          esperado: 'expected' in e ? (e as { expected?: unknown }).expected ?? null : null,
+          recibido: 'received' in e ? (e as { received?: unknown }).received ?? null : null
         }))
 
         console.error('Error de validación:', formattedErrors)

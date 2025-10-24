@@ -1,4 +1,4 @@
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 export async function fetchAllPermissions() {
   return prisma.permission.findMany({
@@ -17,6 +17,7 @@ export async function fetchPermissionsGrouped() {
   for (const r of rows) {
     const key = r.section ?? 'General'
     if (!grouped[key]) grouped[key] = []
+    if (typeof r.name !== 'string') continue
     grouped[key].push({ id: r.id, name: r.name })
   }
   return grouped

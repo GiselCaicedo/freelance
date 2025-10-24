@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 export type TaxRecord = {
   id: string

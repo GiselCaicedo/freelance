@@ -1,7 +1,7 @@
-import { listUsers } from '../../../modules/client/controllers/clientController'
+import { listUsers } from '../../../modules/client/controllers/clientController.js'
 
 // Mock de servicio compartido de usuarios
-jest.mock('../../../modules/shared/services/user.service', () => ({
+jest.mock('../../../modules/shared/services/user.service.js', () => ({
   fetchUsers: jest.fn(async (_empresaId: string) => [{ id: 'u1', name: 'User 1' }]),
 }))
 

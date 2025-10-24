@@ -1,4 +1,4 @@
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 export const listActiveClients = async (minimal = true) => {
   const select = minimal ? { id: true, name: true } : undefined

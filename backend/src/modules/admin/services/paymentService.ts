@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 const PAID_KEYWORDS = ['paid', 'pag', 'aprob', 'complet', 'success', 'cobrad']
 const PENDING_KEYWORDS = ['pend', 'proces', 'waiting', 'hold', 'due', 'unpaid', 'por cobrar']
@@ -73,7 +73,7 @@ export interface PersistPaymentPayload {
 const PAYMENT_INCLUDE = {
   client: { select: { id: true, name: true } },
   payment_method: { select: { id: true, name: true } },
-} satisfies Parameters<typeof prisma.payment.findMany>[0]['include']
+} satisfies NonNullable<Parameters<typeof prisma.payment.findMany>[0]>['include']
 
 const toIso = (value: Date | null | undefined): string | null => (value ? value.toISOString() : null)
 

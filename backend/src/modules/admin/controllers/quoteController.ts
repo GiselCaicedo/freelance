@@ -46,9 +46,10 @@ export async function generateQuotePdfCtrl(req: Request, res: Response) {
 }
 
 const parseSendQuotePayload = (body: any): SendQuoteEmailPayload | { error: string } => {
-  const recipients = Array.isArray(body?.recipients) ? body.recipients : []
+  const recipients: unknown[] = Array.isArray(body?.recipients) ? body.recipients : []
   const normalized = recipients
-    .map((recipient) => (typeof recipient === 'string' ? recipient.trim() : ''))
+    .filter((recipient): recipient is string => typeof recipient === 'string')
+    .map((recipient) => recipient.trim())
     .filter((recipient) => recipient.length > 0)
 
   if (normalized.length === 0) {

@@ -1,8 +1,25 @@
-import type { Prisma } from '@prisma/client'
-import { prisma } from '../../../config/db.ts'
+import type { Prisma, RoleCategory } from '@prisma/client'
+import { prisma } from '../../../config/db.js'
 import { normalizeRoleCategory, safeNormalizeRoleCategory } from './panel.utils.js'
 
-// Mantiene nombres compatibles con configService existente
+const mapRoleRecord = (role: {
+  id: string
+  name: string
+  description: string | null
+  status: boolean | null
+  updated: Date | null
+  panel: RoleCategory | null
+}) => ({
+  id: role.id,
+  name: role.name,
+  description: role.description,
+  status: role.status,
+  updated: role.updated,
+  role_category: safeNormalizeRoleCategory(role.panel),
+})
+
+const toPrismaCategory = (category: string): RoleCategory =>
+  category.toLowerCase() === 'admin' ? 'ADMIN' : 'CLIENT'
 
 export async function fetchRoles() {
   const roles = await prisma.role.findMany({
@@ -12,21 +29,12 @@ export async function fetchRoles() {
       description: true,
       status: true,
       updated: true,
-       panel: true,
+      panel: true,
     },
     orderBy: { name: 'asc' },
   })
 
-  return roles.map((role) => {
-    return {
-      id: role.id,
-      name: role.name,
-      description: role.description,
-      status: role.status,
-      updated: role.updated,
-       panel: safeNormalizeRoleCategory(role. panel),
-    }
-  })
+  return roles.map(mapRoleRecord)
 }
 
 export async function fetchRoleByIdSvc(id: string) {
@@ -38,30 +46,26 @@ export async function fetchRoleByIdSvc(id: string) {
       description: true,
       status: true,
       updated: true,
-       panel: true,
+      panel: true,
     },
   })
 
   if (!role) return null
 
-  return {
-    id: role.id,
-    name: role.name,
-    description: role.description,
-    status: role.status,
-    updated: role.updated,
-     panel: safeNormalizeRoleCategory(role. panel),
-  }
+  return mapRoleRecord(role)
 }
 
 export async function createRoleSvc(data: {
   name: string
   description?: string | null
   status?: boolean
-   panel?: string | null // "client" o "admin"
+  role_category?: string | null
 }) {
   return prisma.$transaction(async (tx) => {
-    const category = normalizeRoleCategory(data. panel)
+    const normalized = data.role_category
+      ? normalizeRoleCategory(data.role_category)
+      : 'client'
+    const category = toPrismaCategory(normalized)
 
     const role = await tx.role.create({
       data: {
@@ -69,37 +73,52 @@ export async function createRoleSvc(data: {
         description: data.description ?? null,
         status: typeof data.status === 'boolean' ? data.status : true,
         updated: new Date(),
-         panel: category,
+        panel: category,
       },
-      select: { id: true, name: true, description: true, status: true, updated: true,  panel: true },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        status: true,
+        updated: true,
+        panel: true,
+      },
     })
 
-    return role
+    return mapRoleRecord(role)
   })
 }
 
 export async function updateRoleSvc(
   id: string,
-  payload: { name?: string; description?: string | null; status?: boolean;  panel?: string | null },
+  payload: { name?: string; description?: string | null; status?: boolean; role_category?: string | null },
 ) {
   return prisma.$transaction(async (tx) => {
-    const data: Prisma.RoleUpdateInput = { updated: new Date() }
+    const data: Prisma.roleUpdateInput = { updated: new Date() }
 
     if (typeof payload.name !== 'undefined') data.name = payload.name
     if (typeof payload.description !== 'undefined') data.description = payload.description
     if (typeof payload.status !== 'undefined') data.status = payload.status
 
-    if (typeof payload. panel !== 'undefined') {
-      data. panel = normalizeRoleCategory(payload. panel)
+    if (typeof payload.role_category !== 'undefined') {
+      const normalized = normalizeRoleCategory(payload.role_category)
+      data.panel = toPrismaCategory(normalized)
     }
 
     const updated = await tx.role.update({
       where: { id },
       data,
-      select: { id: true, name: true, description: true, status: true, updated: true,  panel: true },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        status: true,
+        updated: true,
+        panel: true,
+      },
     })
 
-    return updated
+    return mapRoleRecord(updated)
   })
 }
 
@@ -110,8 +129,6 @@ export async function deleteRoleSvc(id: string) {
   })
 }
 
-// Variante minimal usada por selects
 export async function fetchRolesMinimal() {
   return prisma.role.findMany({ select: { id: true, name: true } })
 }
-

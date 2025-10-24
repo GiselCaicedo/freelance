@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express'
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 import { parseServicePayload } from '../../admin/controllers/serviceController.js'
 import { updateService } from '../../admin/services/serviceService.js'
 

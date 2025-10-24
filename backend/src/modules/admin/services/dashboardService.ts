@@ -1,4 +1,4 @@
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 const PAID_KEYWORDS = ['paid', 'pagado', 'aprob', 'complet', 'success', 'cobrad']
 const pendiente_KEYWORDS = ['pend', 'proces', 'waiting', 'hold', 'due', 'unpaid', 'por cobrar']
@@ -183,7 +183,9 @@ export async function fetchUpcomingInvoiceExpirations(
     orderBy: { expiry: 'asc' },
   })
 
-  const pendienteInvoices = invoices.filter((invoice) => isPendingStatus(invoice.status_pay))
+  const pendienteInvoices = invoices.filter((invoice) =>
+    isPendingStatus((invoice as { status_pay?: string | null }).status_pay),
+  )
 
   return pendienteInvoices.map((invoice) => {
     const expiryDate = invoice.expiry ?? null
