@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 export type InvoiceStatus = 'paid' | 'pending' | 'overdue' | 'cancelled'
 
@@ -250,7 +250,7 @@ const mapInvoiceRecord = (invoice: any): InvoiceRecord => {
     url: invoice.url ?? null,
     createdAt: toIso(invoice.created),
     updatedAt: toIso(invoice.updated),
-    details: details.map((detail, index) => mapInvoiceDetail(detail, index)),
+    details: details.map((detail: any, index: number) => mapInvoiceDetail(detail, index)),
     attachments: mapAttachments(invoice),
   }
 }

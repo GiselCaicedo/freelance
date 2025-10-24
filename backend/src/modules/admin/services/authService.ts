@@ -30,13 +30,20 @@ export const loginUser = async (identifier: string, password: string) => {
 
   if (!user) throw new Error('Usuario no encontrado');
 
+  if (!user.pass) {
+    throw new Error('El usuario no tiene una contraseña configurada');
+  }
+
   const valid = await bcrypt.compare(password, user.pass);
   if (!valid) throw new Error('Contraseña incorrecta');
 
-  const permissions = user.role?.role_permission.map((rp) => rp.permission.name) ?? [];
+  const permissions =
+    user.role?.role_permission
+      .map((rp) => rp.permission?.name)
+      .filter((name): name is string => typeof name === 'string') ?? [];
 
   const roleCategory =
-    (user.role?.panel as 'ADMIN' | 'CLIENT' ) ??
+    (user.role?.panel as 'ADMIN' | 'CLIENT' | null) ??
     inferCategoryFromPermissions(permissions);
 
 

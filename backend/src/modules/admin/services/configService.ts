@@ -1,7 +1,10 @@
-import type { Prisma } from '@prisma/client'
-import { prisma } from '../../../config/db.ts'
+import type { Prisma, RoleCategory } from '@prisma/client'
 import bcrypt from 'bcrypt'
+import { prisma } from '../../../config/db.js'
 import { normalizeRoleCategory, safeNormalizeRoleCategory } from '../../shared/services/panel.utils.js'
+
+const toPrismaPanel = (category: string): RoleCategory =>
+  category.toLowerCase() === 'admin' ? 'ADMIN' : 'CLIENT'
 
 const sanitizeStringArray = (value: unknown): string[] => {
   if (!Array.isArray(value)) return []
@@ -68,7 +71,7 @@ export async function fetchRoles() {
       description: true,
       status: true,
       updated: true,
-      role_category: true,
+      panel: true,
     },
     orderBy: { name: "asc" },
   });
@@ -79,7 +82,7 @@ export async function fetchRoles() {
       description: role.description,
       status: role.status,
       updated: role.updated,
-      role_category: safeNormalizeRoleCategory(role.role_category),
+      role_category: safeNormalizeRoleCategory(role.panel),
     }
   })
 }
@@ -112,6 +115,7 @@ export async function fetchPermissionsGrouped() {
   for (const r of rows) {
     const key = r.section ?? 'General'
     if (!grouped[key]) grouped[key] = []
+    if (typeof r.name !== 'string') continue
     grouped[key].push({ id: r.id, name: r.name })
   }
   return grouped
@@ -127,7 +131,7 @@ export async function fetchRoleByIdSvc(id: string) {
       description: true,
       status: true,
       updated: true,
-      role_category: true,
+      panel: true,
     },
   })
 
@@ -139,7 +143,7 @@ export async function fetchRoleByIdSvc(id: string) {
     description: role.description,
     status: role.status,
     updated: role.updated,
-    role_category: safeNormalizeRoleCategory(role.role_category),
+    role_category: safeNormalizeRoleCategory(role.panel),
   }
 }
 
@@ -150,7 +154,10 @@ export async function createRoleSvc(data: {
   role_category?: string | null // "client" o "admin"
 }) {
   return prisma.$transaction(async (tx) => {
-    const category = normalizeRoleCategory(data.role_category)
+    const normalized = data.role_category
+      ? normalizeRoleCategory(data.role_category)
+      : 'client'
+    const category = toPrismaPanel(normalized)
 
     const role = await tx.role.create({
       data: {
@@ -158,12 +165,15 @@ export async function createRoleSvc(data: {
         description: data.description ?? null,
         status: typeof data.status === 'boolean' ? data.status : true,
         updated: new Date(),
-        role_category: category,
+        panel: category,
       },
-      select: { id: true, name: true, description: true, status: true, updated: true, role_category: true },
+      select: { id: true, name: true, description: true, status: true, updated: true, panel: true },
     })
 
-    return role
+    return {
+      ...role,
+      role_category: safeNormalizeRoleCategory(role.panel),
+    }
   })
 }
 
@@ -174,23 +184,27 @@ export async function updateRoleSvc(
   payload: { name?: string; description?: string | null; status?: boolean; role_category?: string | null },
 ) {
   return prisma.$transaction(async (tx) => {
-    const data: Prisma.RoleUpdateInput = { updated: new Date() }
+    const data: Prisma.roleUpdateInput = { updated: new Date() }
 
     if (typeof payload.name !== 'undefined') data.name = payload.name
     if (typeof payload.description !== 'undefined') data.description = payload.description
     if (typeof payload.status !== 'undefined') data.status = payload.status
 
     if (typeof payload.role_category !== 'undefined') {
-      data.role_category = normalizeRoleCategory(payload.role_category)
+      const normalized = normalizeRoleCategory(payload.role_category)
+      data.panel = toPrismaPanel(normalized)
     }
 
     const updated = await tx.role.update({
       where: { id },
       data,
-      select: { id: true, name: true, description: true, status: true, updated: true, role_category: true },
+      select: { id: true, name: true, description: true, status: true, updated: true, panel: true },
     })
 
-    return updated
+    return {
+      ...updated,
+      role_category: safeNormalizeRoleCategory(updated.panel),
+    }
   })
 }
 

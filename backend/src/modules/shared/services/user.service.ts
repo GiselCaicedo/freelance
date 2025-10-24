@@ -1,9 +1,9 @@
 import bcrypt from 'bcrypt'
 import type { Prisma } from '@prisma/client'
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 export async function fetchUsers(empresaId?: string) {
-  const where: Prisma.UserWhereInput = {}
+  const where: Prisma.userWhereInput = {}
 
   if (empresaId) {
     where.client_id = empresaId

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { prisma } from '../../../config/db.ts'
+import { prisma } from '../../../config/db.js'
 
 export type ClientStatus = 'active' | 'inactive' | 'onboarding'
 export type ClientType = 'natural' | 'juridica'
@@ -125,8 +125,8 @@ const mapClientRecord = (
   const now = new Date()
 
   const details = detailEntries
-    .filter((detail) => Boolean(detail.c_parameter_id))
-    .map((detail) => ({
+    .filter((detail: any) => Boolean(detail.c_parameter_id))
+    .map((detail: any) => ({
       parameterId: detail.c_parameter_id!,
       parameterName:
         parameterNames.get(detail.c_parameter_id!) ??
@@ -134,9 +134,9 @@ const mapClientRecord = (
       value: detail.value ?? '',
     }))
 
-  const services = serviceEntries.map((service) => mapClientServiceEntry(service, client.id))
+  const services = serviceEntries.map((service: any) => mapClientServiceEntry(service, client.id))
 
-  const quotes = quoteEntries.map((quote) => ({
+  const quotes = quoteEntries.map((quote: any) => ({
     id: quote.id,
     reference: normalizeText(quote.description, quote.id),
     issuedAt: toIso(quote.created),
@@ -144,7 +144,7 @@ const mapClientRecord = (
     status: quote.status === true ? 'aprobada' : quote.status === false ? 'rechazada' : 'pendiente',
   }))
 
-  const payments = paymentEntries.map((payment) => ({
+  const payments = paymentEntries.map((payment: any) => ({
     id: payment.id,
     reference: normalizeText(payment.code, payment.id),
     paidAt: toIso(payment.updated ?? payment.created),
@@ -152,7 +152,7 @@ const mapClientRecord = (
     method: normalizeText(payment.method, 'desconocido'),
   }))
 
-  const invoices = invoiceEntries.map((invoice) => ({
+  const invoices = invoiceEntries.map((invoice: any) => ({
     id: invoice.id,
     number: normalizeText(invoice.description, invoice.id),
     issuedAt: toIso(invoice.created),
@@ -166,7 +166,7 @@ const mapClientRecord = (
           : 'pendiente',
   }))
 
-  const reminders = invoiceEntries.map((invoice) => {
+  const reminders = invoiceEntries.map((invoice: any) => {
     const dueAt = invoice.expiry ?? invoice.updated ?? invoice.created ?? null
     const dueIso = dueAt ? dueAt.toISOString() : null
     let status: 'pendiente' | 'enviado' | 'confirmado' = 'pendiente'
